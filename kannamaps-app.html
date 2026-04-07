@@ -884,4 +884,13 @@ function selectDoctor(id) {
 }
 function selectSlot(el) {
   document.querySelectorAll('.slot:not(.unavailable)').forEach(s => s.classList.remove('selected'));
-  el.classList.ad
+  el.classList.add('selected');
+}
+function selectPay(id) {
+  document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('selected'));
+  document.getElementById(id).classList.add('selected');
+}
+</script>
+</div>
+</body>
+</html>
