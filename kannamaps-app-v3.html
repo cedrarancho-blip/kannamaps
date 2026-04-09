@@ -949,21 +949,50 @@ async function doLogout() {
 // ===================== PROFILE =====================
 async function loadProfile() {
   if (!currentUser) return;
-  const { data } = await sb.from('pacientes').select('*').eq('id', currentUser.id).single();
-  currentProfile = data;
-  if (data) {
-    el('home-nome').textContent = 'Olá, ' + (data.nome ? data.nome.split(' ')[0] : '') + ' 👋';
-    el('perfil-av').textContent = data.nome ? data.nome.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '?';
-    el('perfil-nome').textContent = data.nome || '';
-    el('perfil-email').textContent = currentUser.email;
-    el('perfil-nome-input').value = data.nome || '';
-    el('perfil-cpf').value = data.cpf || '';
-    el('perfil-nasc').value = data.nascimento || '';
-    el('perfil-tel').value = data.telefone || '';
-    el('perfil-cep').value = data.cep || '';
-    if (data.anvisa_protocolo) { const inp = document.getElementById('anvisa-protocolo'); if(inp) inp.value = data.anvisa_protocolo; }
-    updateCompletude(data);
+
+  // Try to get profile from DB
+  const { data, error } = await sb.from('pacientes').select('*').eq('id', currentUser.id).single();
+
+  // If no profile exists yet, create one
+  if (!data || error) {
+    await sb.from('pacientes').upsert({
+      id: currentUser.id,
+      email: currentUser.email,
+      nome: currentUser.user_metadata?.nome || '',
+      cpf: currentUser.user_metadata?.cpf || '',
+      nascimento: currentUser.user_metadata?.nascimento || '',
+      telefone: currentUser.user_metadata?.telefone || ''
+    });
+    // Reload
+    const { data: data2 } = await sb.from('pacientes').select('*').eq('id', currentUser.id).single();
+    currentProfile = data2;
+  } else {
+    currentProfile = data;
   }
+
+  const p = currentProfile;
+  if (!p) return;
+
+  // Home screen
+  const firstName = p.nome ? p.nome.split(' ')[0] : (currentUser.email ? currentUser.email.split('@')[0] : 'você');
+  el('home-nome').textContent = 'Olá, ' + firstName + ' 👋';
+
+  // Perfil screen
+  const initials = p.nome ? p.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase() : (currentUser.email ? currentUser.email[0].toUpperCase() : '?');
+  el('perfil-av').textContent = initials;
+  el('perfil-nome').textContent = p.nome || currentUser.email;
+  el('perfil-email').textContent = currentUser.email;
+  el('perfil-nome-input').value = p.nome || '';
+  el('perfil-cpf').value = p.cpf || '';
+  el('perfil-nasc').value = p.nascimento || '';
+  el('perfil-tel').value = p.telefone || '';
+  el('perfil-cep').value = p.cep || '';
+
+  // ANVISA protocolo
+  const anvInp = document.getElementById('anvisa-protocolo');
+  if (anvInp && p.anvisa_protocolo) anvInp.value = p.anvisa_protocolo;
+
+  updateCompletude(p);
   await loadDocs();
 }
 
@@ -979,22 +1008,30 @@ function updateCompletude(p) {
 
 async function salvarPerfil() {
   if (!currentUser) return;
+  const nome = v('perfil-nome-input');
   const data = {
-    nome: v('perfil-nome-input'),
+    nome,
     nascimento: v('perfil-nasc'),
     telefone: v('perfil-tel'),
     cep: v('perfil-cep')
   };
+  if (!nome) return showAlert('perfil-alert', 'Digite seu nome completo.', 'err');
   showLoading('Salvando...');
-  const { error } = await sb.from('pacientes').update(data).eq('id', currentUser.id);
+  const { error } = await sb.from('pacientes').upsert({
+    id: currentUser.id,
+    email: currentUser.email,
+    ...data
+  });
   hideLoading();
-  if (error) return showAlert('perfil-alert', 'Erro ao salvar. Tente novamente.', 'err');
-  currentProfile = {...currentProfile, ...data};
-  el('perfil-nome').textContent = data.nome;
-  el('home-nome').textContent = 'Olá, ' + data.nome.split(' ')[0] + ' 👋';
-  el('perfil-av').textContent = data.nome.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  if (error) return showAlert('perfil-alert', 'Erro ao salvar: ' + error.message, 'err');
+  currentProfile = {...(currentProfile||{}), ...data};
+  const firstName = nome.split(' ')[0];
+  const initials = nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  el('perfil-nome').textContent = nome;
+  el('perfil-av').textContent = initials;
+  el('home-nome').textContent = 'Olá, ' + firstName + ' 👋';
   updateCompletude(currentProfile);
-  showAlert('perfil-alert', 'Perfil atualizado com sucesso!', 'ok');
+  showAlert('perfil-alert', '✓ Perfil salvo com sucesso!', 'ok');
 }
 
 // ===================== SINTOMAS =====================
