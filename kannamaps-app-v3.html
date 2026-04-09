@@ -209,7 +209,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div class="steps-dots"><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div></div>
     <div id="cad-alert"></div>
     <div class="ig"><label class="il">Nome completo</label><input class="input" id="cad-nome" type="text" placeholder="Seu nome completo"></div>
-    <div class="ig"><label class="il">CPF</label><input class="input" id="cad-cpf" type="text" placeholder="000.000.000-00" maxlength="14" oninput="fmtCPF(this)"></div>
+    <div class="ig"><label class="il">CPF</label><input class="input" id="cad-cpf" type="text" placeholder="000.000.000-00" maxlength="14" oninput="fmtCPF(this)" inputmode="numeric"></div>
     <div class="ig"><label class="il">Data de nascimento</label><input class="input" id="cad-nasc" type="date"></div>
     <div class="ig"><label class="il">Celular</label><input class="input" id="cad-tel" type="tel" placeholder="(00) 00000-0000" maxlength="15" oninput="fmtTel(this)"></div>
     <div class="ig"><label class="il">E-mail</label><input class="input" id="cad-email" type="email" placeholder="seu@email.com"></div>
@@ -479,7 +479,16 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       <div style="flex:1;"><div style="font-size:13px;font-weight:500;">Comprovante de resid&ecirc;ncia</div><div style="font-size:11px;color:var(--muted);" id="doc-comp-status">Pendente</div></div>
       <span class="badge ba" id="doc-comp-badge">Enviar</span>
     </div>
-    <button class="btn btn-green" style="margin-top:16px;">&#128249; Entrar na consulta</button>
+    <div id="video-container" style="margin-top:16px;">
+  <button class="btn btn-green" id="btn-entrar-consulta" onclick="entrarConsulta()">&#128249; Entrar na consulta</button>
+</div>
+<div id="daily-frame-wrap" style="display:none;margin-top:12px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);">
+  <div style="background:#1A1025;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:white;font-size:13px;font-weight:600;">&#128249; Consulta em andamento</span>
+    <button onclick="sairConsulta()" style="background:var(--red);color:white;border:none;border-radius:100px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600;">Encerrar</button>
+  </div>
+  <iframe id="daily-iframe" style="width:100%;height:480px;border:none;" allow="camera;microphone;fullscreen;display-capture"></iframe>
+</div>
   </div>
   <div class="bnav">
     <div class="bni" onclick="go('home')"><span class="bni-ic">&#127968;</span><span class="bni-lb">In&iacute;cio</span></div>
@@ -572,18 +581,118 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
   <div class="sbar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
   <div class="hdr">
     <div class="back" onclick="go('docs')">&#8592;</div>
-    <div class="hdr-title">Autoriza&ccedil;&atilde;o ANVISA</div>
+    <div class="hdr-title">Guia ANVISA</div>
     <div style="width:36px;"></div>
   </div>
   <div class="cnt">
-    <div class="alert alert-info">&#9888;&#65039; A autoriza&ccedil;&atilde;o ANVISA precisa ser solicitada por voc&ecirc; no portal Gov.br com sua receita m&eacute;dica em m&atilde;os. A Kannamaps te guia em cada passo.</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</div><div><div style="font-size:14px;font-weight:600;margin-bottom:3px;">Aguarde sua receita m&eacute;dica</div><div style="font-size:12px;color:var(--muted);">Ap&oacute;s consulta, a receita ficar&aacute; dispon&iacute;vel nos documentos.</div></div></div></div>
-      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--p-mid);color:var(--p);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</div><div><div style="font-size:14px;font-weight:600;margin-bottom:3px;">Acesse o portal Gov.br</div><div style="font-size:12px;color:var(--muted);">Entre com CPF e senha.</div></div></div></div>
-      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--p-mid);color:var(--p);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</div><div><div style="font-size:14px;font-weight:600;margin-bottom:3px;">Preencha o formul&aacute;rio GGMED</div><div style="font-size:12px;color:var(--muted);">Nosso guia explica campo por campo.</div></div></div></div>
-      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start;"><div style="width:26px;height:26px;border-radius:50%;background:var(--p-mid);color:var(--p);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">4</div><div><div style="font-size:14px;font-weight:600;margin-bottom:3px;">Envie o n&uacute;mero do protocolo</div><div style="font-size:12px;color:var(--muted);">A Kannamaps acompanha o status para voc&ecirc;.</div></div></div></div>
+    <div class="alert alert-info" style="margin-bottom:16px;">&#127963; Guia completo de solicita&ccedil;&atilde;o de importa&ccedil;&atilde;o excepcional de cannabis medicinal no Gov.br</div>
+
+    <div class="card" style="background:var(--p-pale);border-color:rgba(123,47,190,0.2);margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--p);margin-bottom:6px;">&#128279; Passo 1 &mdash; Acesse o link oficial</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Clique no bot&atilde;o abaixo para abrir o portal Gov.br no seu navegador:</div>
+      <a href="https://www.gov.br/pt-br/servicos/solicitar-autorizacao-para-importacao-excepcional-de-produtos-a-base-de-canabidiol" target="_blank" style="text-decoration:none;">
+        <button class="btn btn-primary" style="font-size:13px;">&#127760; Abrir portal Gov.br</button>
+      </a>
     </div>
-    <button class="btn btn-secondary" style="margin-top:16px;">&#128214; Ver guia completo</button>
+
+    <div class="slbl">Passo a passo completo</div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Solicita&ccedil;&atilde;o</div><div style="font-size:12px;color:var(--muted);">No portal, o CPF e n&uacute;mero de protocolo s&atilde;o inseridos automaticamente pelo sistema. Clique em <strong>Responder Formul&aacute;rio</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Dados do solicitante</div><div style="font-size:12px;color:var(--muted);">Preencha: nome completo, sexo, data de nascimento, estado, munic&iacute;pio e e-mail. Marque <strong>Sim</strong> em "Confirma os dados?" e clique em <strong>Prosseguir</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Tipo de solicita&ccedil;&atilde;o</div><div style="font-size:12px;color:var(--muted);">Selecione o tipo: <strong>Inicial</strong> (primeira vez), <strong>Renova&ccedil;&atilde;o</strong> ou <strong>Altera&ccedil;&atilde;o</strong>. Na primeira vez, sempre escolha <strong>Inicial</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Dados do solicitante &mdash; pr&oacute;prio paciente</div><div style="font-size:12px;color:var(--muted);">Marque a caixa <strong>"O Solicitante &eacute; o pr&oacute;prio Paciente"</strong>. Preencha nome completo (n&atilde;o pode ser menor de idade), sexo e data de nascimento.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">5</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Dados pessoais completos</div><div style="font-size:12px;color:var(--muted);">Preencha: endere&ccedil;o completo, estado, munic&iacute;pio (j&aacute; preenchido automaticamente), CEP, celular e e-mail. Clique em <strong>Prosseguir para Passo 2 de 3</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">6</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Dados do produto</div><div style="font-size:12px;color:var(--muted);">Preencha nome e CPF do paciente. Em <strong>Dados do Produto</strong>, clique na <strong>lupa</strong> para pesquisar o produto.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">7</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Pesquisar produto</div><div style="font-size:12px;color:var(--muted);">No campo Nome Comercial, digite o nome do produto prescrito. Clique em <strong>Filtrar</strong>. Clique no nome do produto encontrado.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">8</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Adicionar produto &agrave; tabela</div><div style="font-size:12px;color:var(--muted);">Com o produto selecionado e os campos preenchidos automaticamente, clique em <strong>Adicionar Dados na Tabela +</strong>. O produto aparecer&aacute; na lista abaixo.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">9</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Dados do prescritor (m&eacute;dico)</div><div style="font-size:12px;color:var(--muted);">Preencha os dados do m&eacute;dico que emitiu sua receita: nome completo, n&uacute;mero do CRM/CRO, especialidade, estado, munic&iacute;pio, telefone e e-mail.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">10</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Anexar receita m&eacute;dica</div><div style="font-size:12px;color:var(--muted);">Em <strong>Documentos Obrigat&oacute;rios</strong>, clique no &iacute;cone de upload ao lado de <strong>Receita M&eacute;dica</strong>. Selecione o arquivo PDF da sua receita. Clique em <strong>Importar</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--p);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">11</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Concordar com a declara&ccedil;&atilde;o</div><div style="font-size:12px;color:var(--muted);">Leia a declara&ccedil;&atilde;o informando que voc&ecirc; est&aacute; ciente das responsabilidades. Marque <strong>"Concordo com a Declara&ccedil;&atilde;o"</strong>. Clique em <strong>Prosseguir para Passo 3 de 3</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;background:var(--amber-pale);border-color:rgba(183,119,13,0.2);">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">12</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;color:var(--amber);">Enviar solicita&ccedil;&atilde;o &#9888;</div><div style="font-size:12px;color:var(--text);">Concordar com o Termo final. Clique em <strong>Enviar Solicita&ccedil;&atilde;o</strong>. Ap&oacute;s envio, aparecer&aacute; a mensagem <strong>"Dados enviados com sucesso!"</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:8px;background:var(--green-pale);border-color:rgba(26,127,90,0.2);">
+      <div style="display:flex;gap:10px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">&#10003;</div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;color:var(--green);">Resultado &mdash; Baixar autoriza&ccedil;&atilde;o</div><div style="font-size:12px;color:var(--text);">Ap&oacute;s aprova&ccedil;&atilde;o da ANVISA, volte ao portal, baixe o PDF da autoriza&ccedil;&atilde;o e clique em <strong>"Confirmar recebimento do certificado"</strong>.</div></div>
+      </div>
+    </div>
+
+    <div class="slbl">Envie o n&uacute;mero do protocolo aqui</div>
+    <div class="ig"><label class="il">N&uacute;mero do protocolo ANVISA</label><input class="input" id="anvisa-protocolo" placeholder="Ex: 25351.000000/2024-00"></div>
+    <button class="btn btn-primary" onclick="salvarProtocolo()">Salvar protocolo</button>
+    <div id="anvisa-alert" style="margin-top:10px;"></div>
+    <div style="height:20px;"></div>
   </div>
 </div>
 
@@ -852,6 +961,7 @@ async function loadProfile() {
     el('perfil-nasc').value = data.nascimento || '';
     el('perfil-tel').value = data.telefone || '';
     el('perfil-cep').value = data.cep || '';
+    if (data.anvisa_protocolo) { const inp = document.getElementById('anvisa-protocolo'); if(inp) inp.value = data.anvisa_protocolo; }
     updateCompletude(data);
   }
   await loadDocs();
@@ -1109,6 +1219,71 @@ function selPay(id) {
   document.querySelectorAll('.pay-opt').forEach(p => p.classList.remove('on'));
   const t = document.getElementById('pay-' + id);
   if (t) t.classList.add('on');
+}
+
+async function salvarProtocolo() {
+  const protocolo = document.getElementById('anvisa-protocolo')?.value?.trim();
+  if (!protocolo) return showAlert('anvisa-alert', 'Digite o número do protocolo.', 'err');
+  if (!currentUser) return;
+  await sb.from('pacientes').update({ anvisa_protocolo: protocolo }).eq('id', currentUser.id);
+  showAlert('anvisa-alert', '✓ Protocolo salvo! A Kannamaps acompanhará o status.', 'ok');
+}
+
+async function entrarConsulta() {
+  const btn = document.getElementById('btn-entrar-consulta');
+  if (btn) { btn.disabled = true; btn.textContent = 'Conectando...'; }
+
+  try {
+    // Create a Daily.co room via their REST API
+    const resp = await fetch('https://api.daily.co/v1/rooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getDailyKey()
+      },
+      body: JSON.stringify({
+        properties: {
+          exp: Math.floor(Date.now()/1000) + 3600, // 1 hora
+          enable_chat: true,
+          enable_screenshare: false,
+          max_participants: 2
+        }
+      })
+    });
+
+    if (resp.ok) {
+      const room = await resp.json();
+      document.getElementById('daily-frame-wrap').style.display = 'block';
+      document.getElementById('daily-iframe').src = room.url;
+      document.getElementById('video-container').style.display = 'none';
+    } else {
+      // Fallback: use a pre-created room
+      usarSalaFallback();
+    }
+  } catch(e) {
+    usarSalaFallback();
+  }
+}
+
+function usarSalaFallback() {
+  // Use Jitsi as fallback - free, no API key needed
+  const roomName = 'kannamaps-consulta-' + (currentUser ? currentUser.id.slice(0,8) : 'demo');
+  document.getElementById('daily-frame-wrap').style.display = 'block';
+  document.getElementById('daily-iframe').src = 'https://meet.jit.si/' + roomName + '#config.startWithAudioMuted=false&config.startWithVideoMuted=false&userInfo.displayName=' + encodeURIComponent((currentProfile?.nome || 'Paciente'));
+  document.getElementById('video-container').style.display = 'none';
+}
+
+function getDailyKey() {
+  // Daily.co free tier API key - to be configured
+  return '';
+}
+
+function sairConsulta() {
+  document.getElementById('daily-frame-wrap').style.display = 'none';
+  document.getElementById('video-container').style.display = 'block';
+  const btn = document.getElementById('btn-entrar-consulta');
+  if (btn) { btn.disabled = false; btn.textContent = '📹 Entrar na consulta'; }
+  document.getElementById('daily-iframe').src = '';
 }
 
 async function doRedefinirSenha() {
