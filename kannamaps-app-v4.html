@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kannamaps — Área do Paciente v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--p:#7B2FBE;--p2:#9B4FDE;--p-pale:#F3EEFB;--p-mid:#E8DCFB;--text:#1A1025;--muted:#6B5F82;--border:rgba(123,47,190,.13);--bg:#F9F7FD;--white:#FFF;--green:#1A7F5A;--green-pale:#EBF7F2;--red:#C0392B;--red-pale:#FDECEA;--amber:#B7770D;--amber-pale:#FEF6E4;--r:14px;--r-sm:10px;--font:'DM Sans',sans-serif;--font-d:'Syne',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text)}
+::-webkit-scrollbar{display:none}
+.phone{width:390px;min-height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.08);margin:40px auto;display:flex;flex-direction:column}
+@media(max-width:430px){body{background:var(--bg)}.phone{width:100vw;min-height:100dvh;border-radius:0;box-shadow:none;margin:0}}
+.screen{display:none;flex-direction:column;min-height:844px;background:var(--bg)}.screen.active{display:flex}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0;font-size:12px;font-weight:600;flex-shrink:0}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0}
+.back{width:36px;height:36px;border-radius:50%;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:all .15s}.back:active{transform:scale(.92)}
+.hdr-title{font-family:var(--font-d);font-size:15px;font-weight:700}
+.cnt{flex:1;padding:0 20px 100px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bnav{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 20px;flex-shrink:0;z-index:10}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;border-radius:12px;transition:all .15s}.bni.active .bni-ic,.bni.active .bni-lb{color:var(--p)}.bni.active .bni-lb{font-weight:600}
+.bni-ic{font-size:20px;color:var(--muted)}.bni-lb{font-size:10px;color:var(--muted)}
+.welcome{background:linear-gradient(160deg,#3D1470,#7B2FBE,#9B4FDE);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
+.welcome h1{font-family:var(--font-d);font-size:28px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:10px}
+.welcome p{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:44px;line-height:1.6;font-weight:300}
+.wbtns{display:flex;flex-direction:column;gap:10px;width:100%}
+.btn{padding:14px 20px;border-radius:100px;font-family:var(--font);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--p);color:#fff}.btn-primary:active{background:var(--p2)}
+.btn-white{background:#fff;color:var(--p)}.btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}.btn-secondary{background:var(--p-pale);color:var(--p)}
+.btn-green{background:var(--green);color:#fff}.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:8px 16px;font-size:13px;width:auto}.btn:disabled{opacity:.5;pointer-events:none}
+.ig{margin-bottom:14px}.il{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block}
+.input{width:100%;padding:13px 15px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:14px;color:var(--text);outline:none;transition:border-color .2s}.input:focus{border-color:var(--p)}.input::placeholder{color:#C4B8D8}
+.input-file{display:none}.file-btn{width:100%;padding:13px 15px;border-radius:var(--r-sm);border:1.5px dashed var(--border);background:var(--p-pale);font-family:var(--font);font-size:13px;color:var(--p);cursor:pointer;text-align:center;font-weight:500;transition:all .15s}.file-btn:hover{border-color:var(--p);background:var(--p-mid)}
+.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:12px;transition:all .15s}.card-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px}.bg{background:var(--green-pale);color:var(--green)}.ba{background:var(--amber-pale);color:var(--amber)}.br{background:var(--red-pale);color:var(--red)}.bp{background:var(--p-pale);color:var(--p)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{padding:8px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}.chip.on{background:var(--p);border-color:var(--p);color:#fff}
+.div{height:1px;background:var(--border);margin:14px 0}
+.slbl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:18px 0 8px}
+.hero-card{background:linear-gradient(135deg,#5A1F8E,#9B4FDE);border-radius:var(--r);padding:18px;margin-bottom:14px;cursor:pointer;transition:transform .15s}.hero-card:active{transform:scale(.98)}
+.av{border-radius:50%;background:var(--p-mid);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--p)}.av-lg{width:64px;height:64px;font-size:22px}.av-md{width:40px;height:40px;font-size:14px}
+.prog{height:6px;background:var(--p-mid);border-radius:100px;overflow:hidden;margin-top:8px}.prog-fill{height:100%;background:var(--p);border-radius:100px;transition:width .5s ease}
+.toggle{width:44px;height:24px;background:var(--p-mid);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}.toggle.on{background:var(--p)}.toggle::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}.toggle.on::after{transform:translateX(20px)}
+.doc-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--white);border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px;transition:all .15s}.doc-item:active{transform:scale(.98)}
+.doc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.alert{padding:12px 14px;border-radius:var(--r-sm);font-size:13px;margin-bottom:14px;line-height:1.5;animation:fadeIn .3s ease}
+.alert-err{background:var(--red-pale);color:var(--red);border:1px solid rgba(192,57,43,.2)}.alert-ok{background:var(--green-pale);color:var(--green);border:1px solid rgba(26,127,90,.2)}.alert-info{background:var(--p-pale);color:var(--p);border:1px solid rgba(123,47,190,.2)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.spinner{width:32px;height:32px;border:3px solid var(--p-mid);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.slot{padding:9px;border-radius:var(--r-sm);text-align:center;border:1.5px solid var(--border);background:var(--white);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}.slot.on{background:var(--p);border-color:var(--p);color:#fff}.slot.off{opacity:.35;pointer-events:none}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--white);border-radius:var(--r);border:2px solid var(--border);margin-bottom:10px;cursor:pointer;transition:all .15s}.pay-opt.on{border-color:var(--p);background:var(--p-pale)}
+.success-wrap{text-align:center;padding:50px 20px}.success-icon{font-size:64px;margin-bottom:16px;animation:pop .4s ease}
+.steps-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}.sdot{width:8px;height:8px;border-radius:50%;background:var(--p-mid)}.sdot.on{background:var(--p);width:24px;border-radius:4px}.sdot.done{background:var(--p);opacity:.4}
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}.check-row:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}.check-box.on{background:var(--p);border-color:var(--p)}.check-box.on::after{content:"✓";color:#fff;font-size:11px;font-weight:700}
+.check-label{font-size:12px;color:var(--text);line-height:1.55;cursor:pointer}.check-label span{color:var(--p);text-decoration:underline;cursor:pointer}
+.modal-overlay{position:fixed;inset:0;background:rgba(13,10,20,.75);z-index:1000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}.modal-overlay.hidden{display:none}
+.modal-box{background:var(--white);border-radius:22px 22px 0 0;width:100%;max-width:430px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}.modal-hdr-title{font-family:var(--font-d);font-size:16px;font-weight:700}.modal-hdr-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.modal-body{flex:1;overflow-y:auto;padding:16px 20px}.modal-footer{padding:14px 20px 28px;border-top:1px solid var(--border);flex-shrink:0;background:var(--white)}
+.terms-section{margin-bottom:18px}.terms-h{font-size:13px;font-weight:700;margin-bottom:6px}.terms-p{font-size:11.5px;color:var(--muted);line-height:1.7}.terms-p strong{color:var(--text);font-weight:600}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--red);position:absolute;top:0;right:0}
+.cart-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.notif-item{padding:14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}.notif-item:active{background:var(--p-pale)}.notif-item.unread{background:var(--p-pale);border-left:3px solid var(--p)}
+.qty-ctrl{display:flex;align-items:center;gap:8px}.qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--p)}.qty-btn:active{background:var(--p-pale)}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<!-- ===== WELCOME ===== -->
+<div class="screen active" id="s-welcome">
+<div class="welcome">
+<img src="data:image/png;base64,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" alt="Kannamaps" style="height:44px;margin-bottom:32px;">
+<h1>Sua saúde,<br>no lugar certo.</h1>
+<p>Marketplace seguro para cannabis medicinal.<br>Consulta, receita e entrega em um só lugar.</p>
+<div class="wbtns">
+<button class="btn btn-white" onclick="go('cadastro')">Criar minha conta</button>
+<button class="btn btn-ghost" onclick="go('login')">Já tenho conta</button>
+</div>
+</div>
+</div>
+
+<!-- ===== CADASTRO ===== -->
+<div class="screen" id="s-cadastro">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('welcome')">←</div><div class="hdr-title">Criar conta</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="steps-dots"><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div></div>
+<div id="cad-alert"></div>
+<div class="ig"><label class="il">Nome completo</label><input class="input" id="cad-nome" placeholder="Seu nome completo"></div>
+<div class="ig"><label class="il">CPF</label><input class="input" id="cad-cpf" placeholder="000.000.000-00" maxlength="14" oninput="fmtCPF(this)" inputmode="numeric"></div>
+<div class="ig"><label class="il">Data de nascimento</label><input class="input" id="cad-nasc" type="date"></div>
+<div class="ig"><label class="il">Celular</label><input class="input" id="cad-tel" type="tel" placeholder="(00) 00000-0000" maxlength="15" oninput="fmtTel(this)"></div>
+<div class="ig"><label class="il">E-mail</label><input class="input" id="cad-email" type="email" placeholder="seu@email.com"></div>
+<div class="ig"><label class="il">Senha</label><input class="input" id="cad-senha" type="password" placeholder="Mínimo 8 caracteres"></div>
+<div style="margin-bottom:14px">
+<div class="check-row"><div class="check-box" id="chk-termos" onclick="toggleCheck('chk-termos')"></div><div class="check-label">Li e aceito os <span onclick="abrirTermos()">Termos de Uso e Política de Privacidade</span> da Kannamaps. *</div></div>
+<div class="check-row"><div class="check-box" id="chk-maior" onclick="toggleCheck('chk-maior')"></div><div class="check-label">Declaro que sou maior de 18 anos e que as informações são verdadeiras. *</div></div>
+<div class="check-row"><div class="check-box" id="chk-regulatorio" onclick="toggleCheck('chk-regulatorio')"></div><div class="check-label">Estou ciente que cannabis medicinal é regulada pela ANVISA (RDC 660/2022) e requer receita. *</div></div>
+<div class="check-row"><div class="check-box" id="chk-marketing" onclick="toggleCheck('chk-marketing')"></div><div class="check-label">Aceito receber comunicações sobre meu tratamento. <span style="color:var(--muted);font-style:italic">(opcional)</span></div></div>
+</div>
+<button class="btn btn-primary" id="btn-cad" onclick="doCadastro()">Criar minha conta →</button>
+<p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">Já tem conta? <span style="color:var(--p);font-weight:600;cursor:pointer" onclick="go('login')">Entrar</span></p>
+</div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div class="screen" id="s-login">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('welcome')">←</div><div class="hdr-title">Entrar</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div style="margin-bottom:24px"><div style="font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:5px">Bem-vindo de volta</div><div style="font-size:13px;color:var(--muted)">Entre com seus dados de acesso</div></div>
+<div id="login-alert"></div>
+<div class="ig"><label class="il">E-mail</label><input class="input" id="login-email" type="email" placeholder="seu@email.com"></div>
+<div class="ig"><label class="il">Senha</label><input class="input" id="login-senha" type="password" placeholder="Sua senha"></div>
+<p style="text-align:right;font-size:12px;color:var(--p);font-weight:500;margin-bottom:20px;cursor:pointer" onclick="go('esqueci')">Esqueci minha senha</p>
+<button class="btn btn-primary" id="btn-login" onclick="doLogin()">Entrar</button>
+<div class="div"></div>
+<button class="btn btn-outline" onclick="go('cadastro')">Criar nova conta</button>
+</div>
+</div>
+
+<!-- ===== SINTOMAS ===== -->
+<div class="screen" id="s-sintomas">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('cadastro')">←</div><div class="hdr-title">Perfil de saúde</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="steps-dots"><div class="sdot done"></div><div class="sdot on"></div><div class="sdot"></div></div>
+<p style="font-size:13px;color:var(--muted);margin-bottom:18px">Essas informações ajudam o médico a preparar sua consulta.</p>
+<div class="slbl">Para qual condição você busca tratamento?</div>
+<div class="chips" id="chips-sintomas">
+<div class="chip" onclick="this.classList.toggle('on')">Ansiedade</div>
+<div class="chip" onclick="this.classList.toggle('on')">Insônia</div>
+<div class="chip" onclick="this.classList.toggle('on')">Dor crônica</div>
+<div class="chip" onclick="this.classList.toggle('on')">Epilepsia</div>
+<div class="chip" onclick="this.classList.toggle('on')">Depressão</div>
+<div class="chip" onclick="this.classList.toggle('on')">TDAH</div>
+<div class="chip" onclick="this.classList.toggle('on')">Fibromialgia</div>
+<div class="chip" onclick="this.classList.toggle('on')">Autismo</div>
+<div class="chip" onclick="this.classList.toggle('on')">Parkinson</div>
+<div class="chip" onclick="this.classList.toggle('on')">Enxaqueca</div>
+<div class="chip" onclick="this.classList.toggle('on')">Outra</div>
+</div>
+<div class="slbl" style="margin-top:16px">Já usou CBD antes?</div>
+<div class="chips"><div class="chip" onclick="excl(this,'cbd')">Sim, regularmente</div><div class="chip" onclick="excl(this,'cbd')">Sim, experimentei</div><div class="chip" onclick="excl(this,'cbd')">Nunca usei</div></div>
+<div class="slbl" style="margin-top:16px">Já tem receita médica?</div>
+<div class="chips"><div class="chip" onclick="excl(this,'receita')">Sim, tenho receita</div><div class="chip" onclick="excl(this,'receita')">Não tenho ainda</div></div>
+<button class="btn btn-primary" style="margin-top:20px" onclick="salvarSintomas()">Continuar →</button>
+</div>
+</div>
+
+<!-- ===== AGENDAR ===== -->
+<div class="screen" id="s-agendar">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('sintomas')">←</div><div class="hdr-title">Agendar consulta</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="steps-dots"><div class="sdot done"></div><div class="sdot done"></div><div class="sdot on"></div></div>
+<div class="slbl">Escolha o médico</div>
+<div class="card" id="dr-ds" onclick="selDoc('ds')" style="cursor:pointer;border-width:2px"><div style="display:flex;gap:12px;align-items:center"><div class="av av-md">DS</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Dra. Daniela Souza</div><div style="font-size:12px;color:var(--muted)">Neurologista · CRM 45.231-SP</div></div><span class="badge bg">★ 4.9</span></div></div>
+<div class="card" id="dr-rm" onclick="selDoc('rm')" style="cursor:pointer;border-width:2px"><div style="display:flex;gap:12px;align-items:center"><div class="av av-md">RM</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Dr. Rafael Mendes</div><div style="font-size:12px;color:var(--muted)">Clínico Geral · CRM 38.910-RJ</div></div><span class="badge bg">★ 4.8</span></div></div>
+<div class="slbl">Escolha o dia</div>
+<div class="chips"><div class="chip" onclick="excl(this,'dia')">Hoje</div><div class="chip on" onclick="excl(this,'dia')">Amanhã</div><div class="chip" onclick="excl(this,'dia')">Sex 18/04</div><div class="chip" onclick="excl(this,'dia')">Sáb 19/04</div></div>
+<div class="slbl">Horário</div>
+<div class="slots"><div class="slot off">08:00</div><div class="slot off">09:00</div><div class="slot" onclick="selSlot(this)">10:00</div><div class="slot on" onclick="selSlot(this)">11:00</div><div class="slot" onclick="selSlot(this)">14:00</div><div class="slot" onclick="selSlot(this)">15:00</div><div class="slot" onclick="selSlot(this)">16:00</div><div class="slot off">17:00</div><div class="slot" onclick="selSlot(this)">18:00</div></div>
+<button class="btn btn-primary" style="margin-top:16px" onclick="go('pagamento')">Ir para pagamento →</button>
+</div>
+</div>
+
+<!-- ===== PAGAMENTO ===== -->
+<div class="screen" id="s-pagamento">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('agendar')">←</div><div class="hdr-title">Pagamento</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="card" style="background:var(--p-pale);border-color:rgba(123,47,190,.2);margin-bottom:18px"><div style="font-size:12px;color:var(--muted);margin-bottom:3px">Consulta online · Amanhã 11:00</div><div style="font-size:13px;font-weight:500">Dra. Daniela Souza · Neurologista</div><div class="div"></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--muted)">Consulta médica</span><span style="font-size:20px;font-weight:700;color:var(--p)">R$ 89,00</span></div></div>
+<div class="slbl">Forma de pagamento</div>
+<div class="pay-opt on" id="pay-pix" onclick="selPay('pix')"><span style="font-size:22px">⚡</span><div style="flex:1"><div style="font-size:14px;font-weight:600">PIX</div><div style="font-size:11px;color:var(--muted)">Aprovação imediata</div></div><span class="badge bg">Recomendado</span></div>
+<div class="pay-opt" id="pay-card" onclick="selPay('card')"><span style="font-size:22px">💳</span><div style="flex:1"><div style="font-size:14px;font-weight:600">Cartão de crédito</div><div style="font-size:11px;color:var(--muted)">Até 3x sem juros</div></div></div>
+<button class="btn btn-primary" style="margin-top:16px" onclick="salvarConsulta()">Pagar R$ 89,00 →</button>
+<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">🔒 Pagamento seguro</p>
+</div>
+</div>
+
+<!-- ===== CONFIRMAÇÃO ===== -->
+<div class="screen" id="s-confirmacao">
+<div class="cnt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1">
+<div class="success-wrap"><div class="success-icon">✅</div><div style="font-family:var(--font-d);font-size:24px;font-weight:800;margin-bottom:8px">Consulta agendada!</div><div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:32px">Dra. Daniela Souza<br>Amanhã às 11:00 · Online<br><br>Você receberá o link por e-mail e WhatsApp.</div><button class="btn btn-primary" style="margin-bottom:10px" onclick="go('home')">Ir para meu painel</button><button class="btn btn-secondary" onclick="go('consulta')">Ver detalhes da consulta</button></div>
+</div>
+</div>
+
+<!-- ===== HOME/DASHBOARD ===== -->
+<div class="screen" id="s-home">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr">
+<img src="data:image/png;base64,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" alt="Kannamaps" style="height:28px">
+<div style="display:flex;gap:10px;align-items:center">
+<div style="position:relative;cursor:pointer" onclick="go('carrinho')"><span style="font-size:22px">🛒</span><div class="cart-badge" id="cart-count" style="display:none">0</div></div>
+<div style="position:relative;cursor:pointer" onclick="go('notif')"><span style="font-size:22px">🔔</span><div class="notif-dot" id="notif-dot" style="display:none"></div></div>
+</div>
+</div>
+<div class="cnt">
+<div style="margin-bottom:18px"><div style="font-size:13px;color:var(--muted)">Bom dia,</div><div style="font-family:var(--font-d);font-size:22px;font-weight:700" id="home-nome">Olá!</div></div>
+<div id="home-consulta-card"><div class="hero-card" onclick="go('consulta')"><div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px">PRÓXIMA CONSULTA</div><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:2px">Dra. Daniela Souza</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:12px">Amanhã · 11:00 · Online</div><span style="background:rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600">Ver detalhes →</span></div></div>
+<div class="slbl">Minha jornada</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
+<div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('docs')"><div style="font-size:26px;margin-bottom:6px">📁</div><div style="font-size:13px;font-weight:600">Documentos</div><div style="font-size:11px;color:var(--amber);margin-top:2px" id="home-docs-status">2 pendentes</div></div>
+<div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('marketplace')"><div style="font-size:26px;margin-bottom:6px">🛒</div><div style="font-size:13px;font-weight:600">Marketplace</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Ver produtos</div></div>
+<div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('anvisa')"><div style="font-size:26px;margin-bottom:6px">🏛</div><div style="font-size:13px;font-weight:600">ANVISA</div><div style="font-size:11px;color:var(--amber);margin-top:2px">Guia passo a passo</div></div>
+<div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('perfil')"><div style="font-size:26px;margin-bottom:6px">👤</div><div style="font-size:13px;font-weight:600">Meu perfil</div><div style="font-size:11px;color:var(--muted);margin-top:2px" id="home-perfil-status">Completar</div></div>
+</div>
+<div class="slbl">Progresso da jornada</div>
+<div class="card" id="jornada-card">
+<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:17px">✅</span><div style="flex:1;font-size:13px;font-weight:500">Conta criada</div><span class="badge bg">Feito</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="go('agendar')" id="jornada-consulta"><span style="font-size:17px">⏰</span><div style="flex:1;font-size:13px;font-weight:500">Consulta agendada</div><span class="badge ba" id="jornada-consulta-badge">Pendente</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="go('docs')"><span style="font-size:17px" id="jornada-docs-icon">⏰</span><div style="flex:1;font-size:13px;font-weight:500">Enviar documentos</div><span class="badge ba" id="jornada-docs-badge">Pendente</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)"><span style="font-size:17px">🔒</span><div style="flex:1;font-size:13px;font-weight:500">Receita médica</div><span class="badge bp">Após consulta</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer" onclick="go('anvisa')"><span style="font-size:17px">🔒</span><div style="flex:1;font-size:13px;font-weight:500">Autorização ANVISA</div><span class="badge bp">Em breve</span></div>
+</div>
+</div>
+<div class="bnav">
+<div class="bni active" id="bni-home" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni" id="bni-marketplace" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" id="bni-docs" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div>
+<div class="bni" id="bni-perfil" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
+
+<!-- ===== NOTIFICAÇÕES ===== -->
+<div class="screen" id="s-notif">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Notificações</div><div style="width:36px"></div></div>
+<div class="cnt"><div id="notif-list"><div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Carregando notificações...</div></div></div>
+</div>
+
+<!-- ===== MARKETPLACE ===== -->
+<div class="screen" id="s-marketplace">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Marketplace</div><div style="position:relative;cursor:pointer" onclick="go('carrinho')"><span style="font-size:20px">🛒</span><div class="cart-badge" id="cart-count2" style="display:none">0</div></div></div>
+<div class="cnt">
+<input class="input" id="search-prod" placeholder="🔍 Buscar produtos..." style="margin-bottom:14px" oninput="filterProducts()">
+<div class="chips" style="margin-bottom:14px" id="cat-chips">
+<div class="chip on" onclick="filterCat(this,'all')">Todos</div>
+<div class="chip" onclick="filterCat(this,'CBD')">CBD</div>
+<div class="chip" onclick="filterCat(this,'THC:CBD')">THC:CBD</div>
+<div class="chip" onclick="filterCat(this,'CBN')">CBN</div>
+<div class="chip" onclick="filterCat(this,'CBG')">CBG</div>
+</div>
+<div id="products-list"><div style="text-align:center;padding:40px"><div class="spinner" style="margin:0 auto 12px"></div><div style="font-size:13px;color:var(--muted)">Carregando produtos...</div></div></div>
+</div>
+<div class="bnav">
+<div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni active" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div>
+<div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
+
+<!-- ===== CARRINHO ===== -->
+<div class="screen" id="s-carrinho">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('marketplace')">←</div><div class="hdr-title">Meu carrinho</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="cart-items"></div>
+<div id="cart-empty" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">🛒</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Carrinho vazio</div><div style="font-size:13px;margin-bottom:20px">Explore nosso marketplace e adicione produtos.</div><button class="btn btn-primary" onclick="go('marketplace')">Ver produtos</button></div>
+<div id="cart-summary" style="display:none">
+<div class="div"></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--muted)">Subtotal</span><span style="font-size:14px;font-weight:600" id="cart-subtotal">R$ 0</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:14px"><span style="font-size:13px;color:var(--muted)">Frete</span><span style="font-size:14px;font-weight:600;color:var(--green)">Grátis</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:18px"><span style="font-size:16px;font-weight:700">Total</span><span style="font-size:20px;font-weight:700;color:var(--p)" id="cart-total">R$ 0</span></div>
+<button class="btn btn-primary" onclick="finalizarPedido()">Finalizar pedido →</button>
+<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">🔒 Requer receita médica e autorização ANVISA</p>
+</div>
+</div>
+</div>
+
+<!-- ===== CONSULTA ===== -->
+<div class="screen" id="s-consulta">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Minha consulta</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="card" style="text-align:center;padding:22px"><div class="av av-lg" style="margin:0 auto 12px">DS</div><div style="font-size:16px;font-weight:600;margin-bottom:3px">Dra. Daniela Souza</div><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Neurologista · CRM 45.231-SP</div><span class="badge ba">⏱ Amanhã 11:00</span></div>
+<div class="card"><div class="card-title">📋 Resumo enviado ao médico</div><div id="consulta-resumo" style="font-size:13px;color:var(--muted);line-height:1.7">Carregando...</div></div>
+<div class="slbl">Documentos necessários</div>
+<div class="doc-item" onclick="go('docs')"><div class="doc-icon" style="background:var(--amber-pale)">🪪</div><div style="flex:1"><div style="font-size:13px;font-weight:500">RG / CNH</div><div style="font-size:11px;color:var(--muted)" id="doc-rg-status">Pendente</div></div><span class="badge ba" id="doc-rg-badge">Enviar</span></div>
+<div class="doc-item" onclick="go('docs')"><div class="doc-icon" style="background:var(--amber-pale)">🏠</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Comprovante de residência</div><div style="font-size:11px;color:var(--muted)" id="doc-comp-status">Pendente</div></div><span class="badge ba" id="doc-comp-badge">Enviar</span></div>
+<div id="video-container" style="margin-top:16px"><button class="btn btn-green" id="btn-entrar-consulta" onclick="entrarConsulta()">📹 Entrar na consulta</button></div>
+<div id="daily-frame-wrap" style="display:none;margin-top:12px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)"><div style="background:#1A1025;padding:8px 14px;display:flex;justify-content:space-between;align-items:center"><span style="color:#fff;font-size:13px;font-weight:600">📹 Consulta em andamento</span><button onclick="sairConsulta()" style="background:var(--red);color:#fff;border:none;border-radius:100px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600">Encerrar</button></div><iframe id="daily-iframe" style="width:100%;height:480px;border:none" allow="camera;microphone;fullscreen;display-capture"></iframe></div>
+</div>
+<div class="bnav"><div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div><div class="bni" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div><div class="bni" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div><div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div></div>
+</div>
+
+<!-- ===== DOCUMENTOS ===== -->
+<div class="screen" id="s-docs">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Meus documentos</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="docs-alert"></div>
+<div class="slbl">Documentos pessoais</div>
+<div class="doc-item" id="doc-rg-item"><div class="doc-icon" style="background:var(--amber-pale)" id="doc-rg-icon">🪪</div><div style="flex:1"><div style="font-size:13px;font-weight:500">RG ou CNH</div><div style="font-size:11px;color:var(--muted)" id="doc-rg-info">Obrigatório · Pendente</div></div><div><input type="file" id="file-rg" class="input-file" accept="image/*,.pdf" onchange="uploadDoc('rg',this)"><button class="btn-sm" id="btn-rg" onclick="document.getElementById('file-rg').click()" style="background:var(--amber-pale);color:var(--amber);border:none;font-size:12px;padding:6px 12px;border-radius:100px;font-weight:600;cursor:pointer">Enviar</button></div></div>
+<div class="doc-item" id="doc-comp-item"><div class="doc-icon" style="background:var(--amber-pale)" id="doc-comp-icon">🏠</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Comprovante de residência</div><div style="font-size:11px;color:var(--muted)" id="doc-comp-info">Obrigatório · Pendente</div></div><div><input type="file" id="file-comp" class="input-file" accept="image/*,.pdf" onchange="uploadDoc('comprovante',this)"><button class="btn-sm" id="btn-comp" onclick="document.getElementById('file-comp').click()" style="background:var(--amber-pale);color:var(--amber);border:none;font-size:12px;padding:6px 12px;border-radius:100px;font-weight:600;cursor:pointer">Enviar</button></div></div>
+<div class="slbl">Documentos médicos</div>
+<div class="doc-item"><div class="doc-icon" style="background:var(--p-pale)">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Receita médica</div><div style="font-size:11px;color:var(--muted)">Gerada após consulta</div></div><span class="badge bp">Aguardando</span></div>
+<div class="doc-item" onclick="go('anvisa')" style="cursor:pointer"><div class="doc-icon" style="background:var(--p-pale)">🏛</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Autorização ANVISA</div><div style="font-size:11px;color:var(--muted)">Guia passo a passo</div></div><span class="badge bp">Ver guia →</span></div>
+<div class="slbl">Adicionar documento</div>
+<div><input type="file" id="file-outro" class="input-file" accept="image/*,.pdf" onchange="uploadDoc('outro',this)"><div class="file-btn" onclick="document.getElementById('file-outro').click()">📄 Fazer upload de documento</div></div>
+</div>
+<div class="bnav"><div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div><div class="bni" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div><div class="bni active" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div><div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div></div>
+</div>
+
+<!-- ===== ANVISA ===== -->
+<div class="screen" id="s-anvisa">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('docs')">←</div><div class="hdr-title">Guia ANVISA</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div class="alert alert-info" style="margin-bottom:16px">🏛 Guia completo de solicitação de importação excepcional no Gov.br</div>
+<div class="card" style="background:var(--p-pale);border-color:rgba(123,47,190,.2);margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:var(--p);margin-bottom:6px">🔗 Passo 1 — Acesse o link oficial</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px">Clique para abrir o portal Gov.br:</div><a href="https://www.gov.br/pt-br/servicos/solicitar-autorizacao-para-importacao-excepcional-de-produtos-a-base-de-canabidiol" target="_blank" style="text-decoration:none"><button class="btn btn-primary" style="font-size:13px">🌐 Abrir portal Gov.br</button></a></div>
+<div class="slbl">Passos 2-12</div>
+<div id="anvisa-steps"></div>
+<div class="slbl">Envie o número do protocolo</div>
+<div class="ig"><label class="il">Número do protocolo ANVISA</label><input class="input" id="anvisa-protocolo" placeholder="Ex: 25351.000000/2024-00"></div>
+<button class="btn btn-primary" onclick="salvarProtocolo()">Salvar protocolo</button>
+<div id="anvisa-alert" style="margin-top:10px"></div>
+</div>
+</div>
+
+<!-- ===== PERFIL ===== -->
+<div class="screen" id="s-perfil">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Meu perfil</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div style="text-align:center;padding:18px 0 22px"><div class="av av-lg" style="margin:0 auto 12px" id="perfil-av">?</div><div style="font-family:var(--font-d);font-size:18px;font-weight:700" id="perfil-nome">Carregando...</div><div style="font-size:13px;color:var(--muted);margin-top:4px" id="perfil-email"></div><div style="margin-top:8px"><span class="badge ba" id="perfil-completude">Perfil incompleto</span></div><div class="prog"><div class="prog-fill" id="perfil-prog" style="width:20%"></div></div></div>
+<div id="perfil-alert"></div>
+<div class="ig"><label class="il">Nome completo</label><input class="input" id="perfil-nome-input" placeholder="Seu nome completo"></div>
+<div class="ig"><label class="il">CPF</label><input class="input" id="perfil-cpf" readonly style="opacity:.6"></div>
+<div class="ig"><label class="il">Data de nascimento</label><input class="input" id="perfil-nasc" type="date"></div>
+<div class="ig"><label class="il">Celular</label><input class="input" id="perfil-tel" placeholder="(00) 00000-0000" oninput="fmtTel(this)"></div>
+<div class="ig"><label class="il">CEP</label><input class="input" id="perfil-cep" placeholder="00000-000" maxlength="9" oninput="fmtCEP(this)"></div>
+<div class="slbl">Notificações</div>
+<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:14px;font-weight:500">WhatsApp</div><div style="font-size:11px;color:var(--muted)">Lembretes de consulta</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:500">E-mail</div><div style="font-size:11px;color:var(--muted)">Atualizações de pedidos</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div></div>
+<button class="btn btn-primary" style="margin-bottom:10px" onclick="salvarPerfil()">Salvar alterações</button>
+<button class="btn btn-outline" style="color:var(--red);border-color:rgba(192,57,43,.2)" onclick="doLogout()">Sair da conta</button>
+</div>
+<div class="bnav"><div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div><div class="bni" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div><div class="bni" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div><div class="bni active" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div></div>
+</div>
+
+<!-- ===== ESQUECI SENHA ===== -->
+<div class="screen" id="s-esqueci">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('login')">←</div><div class="hdr-title">Recuperar senha</div><div style="width:36px"></div></div>
+<div class="cnt"><div style="margin-bottom:24px"><div style="font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:6px">Esqueceu sua senha?</div><div style="font-size:13px;color:var(--muted);line-height:1.6">Digite seu e-mail e enviaremos um link para criar uma nova senha.</div></div><div id="esqueci-alert"></div><div class="ig"><label class="il">E-mail cadastrado</label><input class="input" id="esqueci-email" type="email" placeholder="seu@email.com"></div><button class="btn btn-primary" id="btn-esqueci" onclick="doEsqueciSenha()">Enviar link de recuperação</button><button class="btn btn-outline" style="margin-top:10px" onclick="go('login')">Voltar para o login</button></div>
+</div>
+
+<div class="screen" id="s-senha-enviada">
+<div class="cnt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1"><div class="success-wrap"><div class="success-icon">📧</div><div style="font-family:var(--font-d);font-size:22px;font-weight:800;margin-bottom:8px">E-mail enviado!</div><div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:32px">Verifique sua caixa de entrada e clique no link.<br>Não encontrou? Verifique a pasta de spam.</div><button class="btn btn-primary" onclick="go('login')">Voltar para o login</button></div></div>
+</div>
+
+<div class="screen" id="s-redefinir-senha">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div style="width:36px"></div><div class="hdr-title">Nova senha</div><div style="width:36px"></div></div>
+<div class="cnt"><div style="margin-bottom:24px"><div style="font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:6px">Criar nova senha</div></div><div id="reset-alert"></div><div class="ig"><label class="il">Nova senha</label><input class="input" id="reset-senha" type="password" placeholder="Mínimo 8 caracteres"></div><div class="ig"><label class="il">Confirmar</label><input class="input" id="reset-confirma" type="password" placeholder="Repita a nova senha"></div><button class="btn btn-primary" id="btn-reset" onclick="doRedefinirSenha()">Salvar nova senha</button></div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(249,247,253,.95);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px"><div class="spinner"></div><div style="font-size:14px;color:var(--muted)" id="loading-msg">Carregando...</div></div>
+
+<!-- MODAL TERMOS (simplified for space) -->
+<div class="modal-overlay hidden" id="modal-termos"><div class="modal-box"><div class="modal-hdr"><div class="modal-hdr-title">📜 Termos de Uso e Privacidade</div><div class="modal-hdr-sub">Leia com atenção — Atualizado em abril/2026</div></div><div class="modal-body"><div class="terms-section"><div class="terms-h">1. Sobre a Kannamaps</div><div class="terms-p">A Kannamaps é uma plataforma digital que opera como marketplace entre pacientes, médicos e fornecedores de cannabis medicinal autorizados pela ANVISA.</div></div><div class="terms-section"><div class="terms-h">2. Elegibilidade</div><div class="terms-p">Usuário deve ter 18+ anos, residir no Brasil, e possuir ou buscar prescrição médica válida.</div></div><div class="terms-section"><div class="terms-h">3. LGPD</div><div class="terms-p">Dados sensíveis de saúde tratados conforme art. 11 da LGPD com consentimento expresso. Dados não serão vendidos a terceiros. DPO: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ee9e9c87988f8d878a8f8a8bae858f80808f838f9e9dc08d8183c08c9c">[email&#160;protected]</a></div></div><div class="terms-section"><div class="terms-h">4. Proibições</div><div class="terms-p">Proibido: uso sem receita, revenda, documentos falsos, fins recreativos. Descumprimento implica cancelamento e pode configurar ilícito penal (Lei 11.343/2006).</div></div><div style="padding:12px;background:var(--p-pale);border-radius:var(--r-sm);font-size:11px;color:var(--p)">🔒 Versão 1.0 — Abril 2026 · Foro: Comarca de São Paulo/SP</div></div><div class="modal-footer"><button class="btn btn-primary" onclick="fecharTermos()">Li e entendi os termos</button></div></div></div>
+
+</div><!-- /phone -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ===================== SUPABASE CONFIG =====================
+const SUPA_URL='https://dfxrdxfjqumajxikykay.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmeHJkeGZqcXVtYWp4aWt5a2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTgwMDgsImV4cCI6MjA5MTI3NDAwOH0.U1giCEnSkfjZeUWUigDMIpHm5wpvilSFJH4OljpJNT8';
+const{createClient}=supabase;
+const sb=createClient(SUPA_URL,SUPA_KEY);
+
+let currentUser=null,currentProfile=null,uploadedDocs={},allProducts=[],cart=[];
+
+// ===================== INIT =====================
+window.addEventListener('DOMContentLoaded',async()=>{
+  showLoading('Verificando sessão...');
+  renderAnvisaSteps();
+  const hash=window.location.hash;
+  if(hash&&hash.includes('type=recovery')){hideLoading();go('redefinir-senha');return}
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='PASSWORD_RECOVERY'){hideLoading();go('redefinir-senha');return}
+    if(event==='SIGNED_IN'&&session){currentUser=session.user;await loadProfile();const a=document.querySelector('.screen.active');if(a&&['s-welcome','s-login','s-cadastro'].includes(a.id))go('home')}
+  });
+  const{data:{session}}=await sb.auth.getSession();
+  hideLoading();
+  if(session){currentUser=session.user;await loadProfile();go('home')}else{go('welcome')}
+});
+
+// ===================== AUTH =====================
+function toggleCheck(id){const el=document.getElementById(id);if(el)el.classList.toggle('on')}
+function abrirTermos(){document.getElementById('modal-termos').classList.remove('hidden')}
+function fecharTermos(){document.getElementById('modal-termos').classList.add('hidden');const c=document.getElementById('chk-termos');if(c)c.classList.add('on')}
+
+async function doCadastro(){
+  const nome=v('cad-nome'),cpf=v('cad-cpf'),nasc=v('cad-nasc'),tel=v('cad-tel'),email=v('cad-email'),senha=v('cad-senha');
+  if(!document.getElementById('chk-termos')?.classList.contains('on'))return showAlert('cad-alert','Aceite os Termos de Uso.','err');
+  if(!document.getElementById('chk-maior')?.classList.contains('on'))return showAlert('cad-alert','Confirme que tem 18+ anos.','err');
+  if(!document.getElementById('chk-regulatorio')?.classList.contains('on'))return showAlert('cad-alert','Confirme as exigências regulatórias.','err');
+  if(!nome||!email||!senha)return showAlert('cad-alert','Preencha todos os campos obrigatórios.','err');
+  if(senha.length<8)return showAlert('cad-alert','Senha: mínimo 8 caracteres.','err');
+  setBtn('btn-cad',true,'Criando conta...');
+  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,cpf,nascimento:nasc,telefone:tel}}});
+  setBtn('btn-cad',false,'Criar minha conta →');
+  if(error)return showAlert('cad-alert',error.message,'err');
+  currentUser=data.user;
+  await sb.from('pacientes').upsert({id:currentUser.id,nome,cpf,nascimento:nasc||null,telefone:tel,email,criado_em:new Date().toISOString(),aceite_termos:true,aceite_termos_data:new Date().toISOString(),aceite_marketing:document.getElementById('chk-marketing')?.classList.contains('on')||false});
+  go('sintomas');
+}
+
+async function doLogin(){
+  const email=v('login-email'),senha=v('login-senha');
+  if(!email||!senha)return showAlert('login-alert','Preencha e-mail e senha.','err');
+  setBtn('btn-login',true,'Entrando...');
+  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  setBtn('btn-login',false,'Entrar');
+  if(error)return showAlert('login-alert','E-mail ou senha incorretos.','err');
+  currentUser=data.user;await loadProfile();go('home');
+}
+
+async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;uploadedDocs={};cart=[];go('welcome')}
+
+async function doEsqueciSenha(){
+  const email=v('esqueci-email');if(!email)return showAlert('esqueci-alert','Digite seu e-mail.','err');
+  setBtn('btn-esqueci',true,'Enviando...');
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href.split('?')[0].split('#')[0]});
+  setBtn('btn-esqueci',false,'Enviar link de recuperação');
+  if(error)return showAlert('esqueci-alert','Erro: '+error.message,'err');
+  go('senha-enviada');
+}
+
+async function doRedefinirSenha(){
+  const s=v('reset-senha'),c=v('reset-confirma');
+  if(!s||!c)return showAlert('reset-alert','Preencha os dois campos.','err');
+  if(s.length<8)return showAlert('reset-alert','Mínimo 8 caracteres.','err');
+  if(s!==c)return showAlert('reset-alert','As senhas não coincidem.','err');
+  setBtn('btn-reset',true,'Salvando...');
+  const{error}=await sb.auth.updateUser({password:s});
+  setBtn('btn-reset',false,'Salvar nova senha');
+  if(error)return showAlert('reset-alert','Erro: '+error.message,'err');
+  showAlert('reset-alert','✓ Senha alterada!','ok');
+  setTimeout(()=>{go('home')},1500);
+}
+
+// ===================== PROFILE =====================
+async function loadProfile(){
+  if(!currentUser)return;
+  let{data}=await sb.from('pacientes').select('*').eq('id',currentUser.id).single();
+  if(!data){await sb.from('pacientes').upsert({id:currentUser.id,email:currentUser.email,nome:currentUser.user_metadata?.nome||'',cpf:currentUser.user_metadata?.cpf||'',nascimento:currentUser.user_metadata?.nascimento||null,telefone:currentUser.user_metadata?.telefone||''});({data}=await sb.from('pacientes').select('*').eq('id',currentUser.id).single())}
+  currentProfile=data;if(!data)return;
+  const fn=data.nome?data.nome.split(' ')[0]:(currentUser.email?currentUser.email.split('@')[0]:'você');
+  el('home-nome').textContent='Olá, '+fn+' 👋';
+  const ini=data.nome?data.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
+  el('perfil-av').textContent=ini;el('perfil-nome').textContent=data.nome||currentUser.email;el('perfil-email').textContent=currentUser.email;
+  el('perfil-nome-input').value=data.nome||'';el('perfil-cpf').value=data.cpf||'';el('perfil-nasc').value=data.nascimento||'';el('perfil-tel').value=data.telefone||'';el('perfil-cep').value=data.cep||'';
+  if(data.anvisa_protocolo)el('anvisa-protocolo').value=data.anvisa_protocolo;
+  updateCompletude(data);await loadDocs();await loadNotifications();
+}
+
+function updateCompletude(p){
+  const f=['nome','cpf','nascimento','telefone','cep'],c=f.filter(x=>p&&p[x]).length,pct=Math.round(c/f.length*100);
+  el('perfil-prog').style.width=pct+'%';el('perfil-completude').textContent=pct+'% completo';el('perfil-completude').className='badge '+(pct===100?'bg':'ba');el('home-perfil-status').textContent=pct===100?'Completo ✓':pct+'%';
+}
+
+async function salvarPerfil(){
+  if(!currentUser)return;const nome=v('perfil-nome-input');
+  if(!nome)return showAlert('perfil-alert','Digite seu nome.','err');
+  showLoading('Salvando...');
+  const d={nome,nascimento:v('perfil-nasc')||null,telefone:v('perfil-tel'),cep:v('perfil-cep')};
+  const{error}=await sb.from('pacientes').update(d).eq('id',currentUser.id);
+  hideLoading();if(error)return showAlert('perfil-alert','Erro: '+error.message,'err');
+  currentProfile={...currentProfile,...d};
+  el('perfil-nome').textContent=nome;el('perfil-av').textContent=nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  el('home-nome').textContent='Olá, '+nome.split(' ')[0]+' 👋';updateCompletude(currentProfile);showAlert('perfil-alert','✓ Perfil salvo!','ok');
+}
+
+// ===================== SINTOMAS & CONSULTA =====================
+async function salvarSintomas(){
+  if(!currentUser)return go('agendar');
+  const chips=document.querySelectorAll('#chips-sintomas .chip.on');
+  const sintomas=Array.from(chips).map(c=>c.textContent).join(', ');
+  const cbd=document.querySelector('[onclick*="cbd"].on'),rec=document.querySelector('[onclick*="receita"].on');
+  await sb.from('pacientes').update({sintomas,uso_cbd:cbd?.textContent||null,tem_receita:rec?.textContent||null}).eq('id',currentUser.id);
+  if(currentProfile)currentProfile.sintomas=sintomas;
+  go('agendar');
+}
+
+async function salvarConsulta(){
+  if(!currentUser)return go('confirmacao');
+  showLoading('Processando pagamento...');await new Promise(r=>setTimeout(r,1500));
+  await sb.from('consultas').insert({paciente_id:currentUser.id,medico:'Dra. Daniela Souza',especialidade:'Neurologista',data_consulta:new Date(Date.now()+86400000).toISOString(),horario:'11:00',status:'confirmada',valor:89.00});
+  hideLoading();el('jornada-consulta-badge').textContent='Feito';el('jornada-consulta-badge').className='badge bg';go('confirmacao');
+}
+
+function loadConsultaResumo(){if(!currentProfile)return;el('consulta-resumo').innerHTML='<strong>Condições:</strong> '+(currentProfile.sintomas||'Não informado')+'<br><strong>CBD anterior:</strong> '+(currentProfile.uso_cbd||'Não informado')+'<br><strong>Tem receita:</strong> '+(currentProfile.tem_receita||'Não informado')}
+
+// ===================== DOCUMENTOS =====================
+async function loadDocs(){
+  if(!currentUser)return;const{data}=await sb.from('documentos').select('*').eq('paciente_id',currentUser.id);
+  if(!data)return;uploadedDocs={};data.forEach(d=>{uploadedDocs[d.tipo]=d});
+  updateDocUI('rg');updateDocUI('comprovante');updateJornadaDocs();
+}
+function updateDocUI(tipo){
+  const doc=uploadedDocs[tipo],p=tipo==='rg'?'doc-rg':'doc-comp',btn=tipo==='rg'?'btn-rg':'btn-comp';
+  if(doc){el(p+'-icon').textContent='✅';el(p+'-icon').style.background='var(--green-pale)';el(p+'-info').textContent='Enviado · '+new Date(doc.enviado_em).toLocaleDateString('pt-BR');
+  if(el(btn)){el(btn).textContent='Atualizar';el(btn).style.background='var(--green-pale)';el(btn).style.color='var(--green)'}
+  if(el(p+'-status')){el(p+'-status').textContent='Enviado ✓'}if(el(p+'-badge')){el(p+'-badge').textContent='✓';el(p+'-badge').className='badge bg'}}
+}
+function updateJornadaDocs(){
+  const r=!!uploadedDocs['rg'],c=!!uploadedDocs['comprovante'],n=(r?0:1)+(c?0:1);
+  el('home-docs-status').textContent=n===0?'Completo ✓':n+' pendente'+(n>1?'s':'');el('home-docs-status').style.color=n===0?'var(--green)':'var(--amber)';
+  if(n===0){el('jornada-docs-icon').textContent='✅';el('jornada-docs-badge').textContent='Feito';el('jornada-docs-badge').className='badge bg'}
+}
+async function uploadDoc(tipo,input){
+  if(!input.files||!input.files[0])return;if(!currentUser)return showAlert('docs-alert','Faça login primeiro.','err');
+  const file=input.files[0];if(file.size>10*1024*1024)return showAlert('docs-alert','Máximo 10MB.','err');
+  showLoading('Enviando '+file.name+'...');
+  const ext=file.name.split('.').pop(),path=currentUser.id+'/'+tipo+'_'+Date.now()+'.'+ext;
+  const{error:se}=await sb.storage.from('documentos').upload(path,file,{upsert:true});
+  if(se){hideLoading();return showAlert('docs-alert','Erro: '+se.message,'err')}
+  const{data:{publicUrl}}=sb.storage.from('documentos').getPublicUrl(path);
+  const{error:de}=await sb.from('documentos').upsert({paciente_id:currentUser.id,tipo,nome_arquivo:file.name,url:publicUrl,path,enviado_em:new Date().toISOString(),status:'pendente_revisao'},{onConflict:'paciente_id,tipo'});
+  hideLoading();if(de)return showAlert('docs-alert','Erro: '+de.message,'err');
+  uploadedDocs[tipo]={tipo,nome_arquivo:file.name,url:publicUrl,enviado_em:new Date().toISOString()};
+  updateDocUI(tipo);updateJornadaDocs();showAlert('docs-alert','✓ '+file.name+' enviado!','ok');input.value='';
+}
+
+// ===================== NOTIFICATIONS =====================
+async function loadNotifications(){
+  if(!currentUser)return;
+  const{data}=await sb.from('notificacoes').select('*').eq('paciente_id',currentUser.id).order('criado_em',{ascending:false}).limit(20);
+  const list=el('notif-list');if(!data||data.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">🔔</div><div style="font-size:13px">Nenhuma notificação ainda</div></div>';el('notif-dot').style.display='none';return}
+  const unread=data.filter(n=>!n.lida).length;el('notif-dot').style.display=unread>0?'block':'none';
+  list.innerHTML=data.map(n=>'<div class="notif-item'+(n.lida?'':' unread')+'" onclick="markNotifRead(\''+n.id+'\''+(n.link_tela?',\''+n.link_tela+'\'':'')+')"><div style="font-size:13px;font-weight:'+(n.lida?'400':'600')+'">'+n.titulo+'</div>'+(n.mensagem?'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+n.mensagem+'</div>':'')+'<div style="font-size:11px;color:var(--muted);margin-top:4px">'+timeAgo(n.criado_em)+'</div></div>').join('');
+}
+async function markNotifRead(id,link){
+  await sb.from('notificacoes').update({lida:true}).eq('id',id);
+  await loadNotifications();if(link)go(link);
+}
+function timeAgo(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return'agora';if(s<3600)return Math.floor(s/60)+'min atrás';if(s<86400)return Math.floor(s/3600)+'h atrás';return Math.floor(s/86400)+'d atrás'}
+
+// ===================== MARKETPLACE =====================
+let currentCat='all';
+async function loadProducts(){
+  const{data}=await sb.from('produtos').select('*').eq('ativo',true).order('destaque',{ascending:false});
+  allProducts=data||[];renderProducts(allProducts);
+}
+function filterProducts(){const q=v('search-prod').toLowerCase();renderProducts(allProducts.filter(p=>(currentCat==='all'||p.categoria===currentCat)&&(p.nome.toLowerCase().includes(q)||p.descricao?.toLowerCase().includes(q)||p.fornecedor?.toLowerCase().includes(q))))}
+function filterCat(el,cat){document.querySelectorAll('#cat-chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');currentCat=cat;filterProducts()}
+function renderProducts(prods){
+  const c=document.getElementById('products-list');
+  if(!prods.length){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum produto encontrado</div>';return}
+  c.innerHTML=prods.map(p=>{
+    const inCart=cart.find(i=>i.id===p.id);
+    return '<div class="card" style="cursor:pointer;margin-bottom:10px'+(p.requer_anvisa&&!currentProfile?.anvisa_protocolo?';opacity:.7':'')+'">'
+    +'<div style="display:flex;gap:12px"><div style="width:60px;height:60px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">'+p.imagem_emoji+'</div>'
+    +'<div style="flex:1"><div style="font-size:14px;font-weight:600">'+p.nome+'</div>'
+    +'<div style="font-size:12px;color:var(--muted)">'+p.fornecedor+' · '+p.volume+'</div>'
+    +'<div style="margin:4px 0"><span class="badge bg">★ '+p.rating+'</span>'+(p.destaque?' <span class="badge bp">Destaque</span>':'')+(p.requer_anvisa?' <span class="badge ba">🔒 ANVISA</span>':'')+'</div>'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+    +(p.preco_anterior?'<span style="font-size:12px;color:var(--muted);text-decoration:line-through">R$ '+p.preco_anterior.toFixed(2)+'</span>':'')
+    +'<span style="font-size:16px;font-weight:700;color:var(--p)">R$ '+p.preco.toFixed(2)+'</span></div>'
+    +'<button class="btn-sm" onclick="event.stopPropagation();addToCart(\''+p.id+'\')" style="margin-top:6px;background:'+(inCart?'var(--green-pale)':'var(--p)')+';color:'+(inCart?'var(--green)':'#fff')+';border:none;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer">'+(inCart?'✓ No carrinho':'+ Adicionar')+'</button>'
+    +'</div></div></div>'
+  }).join('');
+}
+function addToCart(id){
+  const p=allProducts.find(x=>x.id===id);if(!p)return;
+  const existing=cart.find(i=>i.id===id);
+  if(existing){existing.qty++}else{cart.push({...p,qty:1})}
+  updateCartBadge();renderProducts(currentCat==='all'?allProducts:allProducts.filter(x=>x.categoria===currentCat));
+}
+function removeFromCart(id){cart=cart.filter(i=>i.id!==id);renderCart();updateCartBadge()}
+function changeQty(id,delta){const i=cart.find(x=>x.id===id);if(!i)return;i.qty+=delta;if(i.qty<1)return removeFromCart(id);renderCart()}
+function updateCartBadge(){
+  const n=cart.reduce((s,i)=>s+i.qty,0);
+  ['cart-count','cart-count2'].forEach(id=>{const b=el(id);if(b){b.style.display=n>0?'flex':'none';b.textContent=n}});
+}
+function renderCart(){
+  const items=el('cart-items'),empty=el('cart-empty'),summary=el('cart-summary');
+  if(!cart.length){items.innerHTML='';empty.style.display='block';summary.style.display='none';return}
+  empty.style.display='none';summary.style.display='block';
+  const sub=cart.reduce((s,i)=>s+i.preco*i.qty,0);
+  el('cart-subtotal').textContent='R$ '+sub.toFixed(2);el('cart-total').textContent='R$ '+sub.toFixed(2);
+  items.innerHTML=cart.map(i=>'<div class="card" style="margin-bottom:8px"><div style="display:flex;gap:12px;align-items:center">'
+  +'<div style="width:44px;height:44px;background:var(--p-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">'+i.imagem_emoji+'</div>'
+  +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+i.nome+'</div><div style="font-size:12px;color:var(--muted)">R$ '+i.preco.toFixed(2)+'</div></div>'
+  +'<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty(\''+i.id+'\',-1)">−</button><span style="font-size:14px;font-weight:600;min-width:20px;text-align:center">'+i.qty+'</span><button class="qty-btn" onclick="changeQty(\''+i.id+'\',1)">+</button></div>'
+  +'<button onclick="removeFromCart(\''+i.id+'\')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--red)">✕</button>'
+  +'</div></div>').join('');
+}
+async function finalizarPedido(){
+  if(!currentUser)return showAlert('cart-alert','Faça login primeiro.','err');
+  if(!cart.length)return;
+  showLoading('Processando pedido...');
+  const sub=cart.reduce((s,i)=>s+i.preco*i.qty,0);
+  const{data:pedido,error}=await sb.from('pedidos').insert({paciente_id:currentUser.id,status:'confirmado',subtotal:sub,total:sub,pagamento_metodo:'pix'}).select().single();
+  if(error){hideLoading();return alert('Erro ao criar pedido: '+error.message)}
+  for(const i of cart){await sb.from('pedido_itens').insert({pedido_id:pedido.id,produto_id:i.id,nome_produto:i.nome,quantidade:i.qty,preco_unitario:i.preco,subtotal:i.preco*i.qty})}
+  await sb.from('notificacoes').insert({paciente_id:currentUser.id,titulo:'Pedido confirmado! 📦',mensagem:'Seu pedido #'+pedido.id.slice(0,8)+' no valor de R$ '+sub.toFixed(2)+' foi confirmado.',tipo:'pedido',link_tela:'home'});
+  cart=[];updateCartBadge();hideLoading();
+  el('cart-items').innerHTML='<div class="success-wrap"><div class="success-icon">📦</div><div style="font-family:var(--font-d);font-size:20px;font-weight:800;margin-bottom:8px">Pedido realizado!</div><div style="font-size:13px;color:var(--muted);margin-bottom:20px">Pedido #'+pedido.id.slice(0,8)+'<br>Você receberá atualizações por e-mail.</div><button class="btn btn-primary" onclick="go(\'home\')">Voltar ao início</button></div>';
+  el('cart-empty').style.display='none';el('cart-summary').style.display='none';
+}
+
+// ===================== ANVISA STEPS =====================
+function renderAnvisaSteps(){
+  const steps=[
+    ['Dados do solicitante','Preencha nome, sexo, data de nascimento, estado e e-mail. Marque "Confirma os dados?" e clique Prosseguir.'],
+    ['Tipo de solicitação','Selecione: Inicial (primeira vez), Renovação ou Alteração.'],
+    ['Paciente = Solicitante','Marque "O Solicitante é o próprio Paciente" e preencha seus dados.'],
+    ['Endereço completo','Preencha endereço, CEP, celular e e-mail. Clique Prosseguir.'],
+    ['Dados do produto','Clique na lupa para pesquisar o produto prescrito pelo nome comercial.'],
+    ['Adicionar produto','Com o produto selecionado, clique em "Adicionar Dados na Tabela +".'],
+    ['Dados do médico','Preencha nome, CRM, especialidade, estado e contato do médico prescritor.'],
+    ['Anexar receita','Em Documentos Obrigatórios, faça upload do PDF da receita médica.'],
+    ['Concordar e enviar','Marque "Concordo com a Declaração" e clique "Enviar Solicitação".'],
+    ['Baixar autorização','Após aprovação, volte ao portal e baixe o PDF da autorização.']
+  ];
+  const c=el('anvisa-steps');if(!c)return;
+  c.innerHTML=steps.map((s,i)=>'<div class="card" style="margin-bottom:8px'+(i===steps.length-1?';background:var(--green-pale);border-color:rgba(26,127,90,.2)':'')+'"><div style="display:flex;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:'+(i===steps.length-1?'var(--green)':'var(--p)')+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+(i===steps.length-1?'✓':(i+2))+'</div><div><div style="font-size:13px;font-weight:600;margin-bottom:3px">'+s[0]+'</div><div style="font-size:12px;color:var(--muted)">'+s[1]+'</div></div></div></div>').join('');
+}
+
+async function salvarProtocolo(){
+  const p=v('anvisa-protocolo');if(!p)return showAlert('anvisa-alert','Digite o protocolo.','err');
+  if(!currentUser)return;await sb.from('pacientes').update({anvisa_protocolo:p}).eq('id',currentUser.id);
+  if(currentProfile)currentProfile.anvisa_protocolo=p;showAlert('anvisa-alert','✓ Protocolo salvo!','ok');
+}
+
+// ===================== VIDEO CONSULTA =====================
+function entrarConsulta(){
+  const room='kannamaps-consulta-'+(currentUser?currentUser.id.slice(0,8):'demo');
+  el('daily-frame-wrap').style.display='block';el('daily-iframe').src='https://meet.jit.si/'+room+'#config.startWithAudioMuted=false&config.startWithVideoMuted=false&userInfo.displayName='+encodeURIComponent(currentProfile?.nome||'Paciente');
+  el('video-container').style.display='none';
+}
+function sairConsulta(){el('daily-frame-wrap').style.display='none';el('video-container').style.display='block';el('daily-iframe').src=''}
+
+// ===================== NAVIGATION =====================
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const t=document.getElementById('s-'+id);if(t)t.classList.add('active');
+  ['home','marketplace','docs','perfil'].forEach(n=>{const b=el('bni-'+n);if(b)b.classList.toggle('active',n===id)});
+  if(id==='perfil'&&currentUser)loadProfile();
+  if(id==='consulta')loadConsultaResumo();
+  if(id==='docs'&&currentUser)loadDocs();
+  if(id==='marketplace')loadProducts();
+  if(id==='carrinho')renderCart();
+  if(id==='notif')loadNotifications();
+  window.scrollTo(0,0);try{t.scrollTop=0}catch(e){}
+}
+
+// ===================== UTILS =====================
+function v(id){return document.getElementById(id)?.value?.trim()||''}
+function el(id){return document.getElementById(id)}
+function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
+function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
+function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex'}
+function hideLoading(){const l=el('loading');if(l)l.style.display='none'}
+function excl(e,group){document.querySelectorAll('[onclick*="\''+group+'\'"]').forEach(c=>c.classList.remove('on'));e.classList.add('on')}
+function selDoc(id){['dr-ds','dr-rm'].forEach(d=>{const c=document.getElementById(d);if(c){c.style.borderColor='var(--border)';c.style.background='var(--white)'}});const t=document.getElementById('dr-'+id);if(t){t.style.borderColor='var(--p)';t.style.background='var(--p-pale)'}}
+function selSlot(e){document.querySelectorAll('.slot:not(.off)').forEach(s=>s.classList.remove('on'));e.classList.add('on')}
+function selPay(id){document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('on'));const t=document.getElementById('pay-'+id);if(t)t.classList.add('on')}
+function fmtCPF(e){let v=e.value.replace(/\D/g,'');v=v.replace(/(\d{3})(\d)/,'$1.$2');v=v.replace(/(\d{3})(\d)/,'$1.$2');v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');e.value=v}
+function fmtTel(e){l
