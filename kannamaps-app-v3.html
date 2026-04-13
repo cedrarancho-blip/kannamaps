@@ -166,6 +166,28 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 /* LOGO SVG */
 .logo-p{display:inline-block;}
 .logo-w{display:inline-block;filter:brightness(0) invert(1);}
+
+/* MODAL TERMOS */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,10,20,0.75);z-index:1000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:var(--white);border-radius:22px 22px 0 0;width:100%;max-width:430px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-hdr-title{font-family:var(--font-d);font-size:16px;font-weight:700;}
+.modal-hdr-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.modal-body{flex:1;overflow-y:auto;padding:16px 20px;}
+.modal-footer{padding:14px 20px 28px;border-top:1px solid var(--border);flex-shrink:0;background:var(--white);}
+.terms-section{margin-bottom:18px;}
+.terms-h{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.terms-p{font-size:11.5px;color:var(--muted);line-height:1.7;}
+.terms-p strong{color:var(--text);font-weight:600;}
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.check-row:last-child{border-bottom:none;}
+.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all 0.15s;}
+.check-box.on{background:var(--p);border-color:var(--p);}
+.check-box.on::after{content:"✓";color:white;font-size:11px;font-weight:700;}
+.check-label{font-size:12px;color:var(--text);line-height:1.55;cursor:pointer;}
+.check-label span{color:var(--p);text-decoration:underline;cursor:pointer;}
+
 </style>
 </head>
 <body>
@@ -214,7 +236,25 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div class="ig"><label class="il">Celular</label><input class="input" id="cad-tel" type="tel" placeholder="(00) 00000-0000" maxlength="15" oninput="fmtTel(this)"></div>
     <div class="ig"><label class="il">E-mail</label><input class="input" id="cad-email" type="email" placeholder="seu@email.com"></div>
     <div class="ig"><label class="il">Senha</label><input class="input" id="cad-senha" type="password" placeholder="M&iacute;nimo 8 caracteres"></div>
-    <button class="btn btn-primary" id="btn-cad" onclick="doCadastro()">Continuar &rarr;</button>
+    <div style="margin-bottom:14px;">
+      <div class="check-row">
+        <div class="check-box" id="chk-termos" onclick="toggleCheck('chk-termos')"></div>
+        <div class="check-label">Li e aceito os <span onclick="abrirTermos()">Termos de Uso e Pol&iacute;tica de Privacidade</span> da Kannamaps, incluindo o tratamento de dados de sa&uacute;de conforme a LGPD. *</div>
+      </div>
+      <div class="check-row">
+        <div class="check-box" id="chk-maior" onclick="toggleCheck('chk-maior')"></div>
+        <div class="check-label">Declaro que sou maior de 18 anos e que as informa&ccedil;&otilde;es fornecidas s&atilde;o verdadeiras e aut&ecirc;nticas. *</div>
+      </div>
+      <div class="check-row">
+        <div class="check-box" id="chk-regulatorio" onclick="toggleCheck('chk-regulatorio')"></div>
+        <div class="check-label">Estou ciente de que o uso de cannabis medicinal no Brasil &eacute; regulado pela ANVISA (RDC 660/2022) e que preciso de prescri&ccedil;&atilde;o m&eacute;dica v&aacute;lida para adquirir produtos. *</div>
+      </div>
+      <div class="check-row">
+        <div class="check-box" id="chk-marketing" onclick="toggleCheck('chk-marketing')"></div>
+        <div class="check-label">Aceito receber comunica&ccedil;&otilde;es por e-mail e WhatsApp sobre minha jornada de tratamento, novidades e promo&ccedil;&otilde;es da Kannamaps. <span style="color:var(--muted);font-style:italic;">(opcional)</span></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-cad" onclick="doCadastro()">Criar minha conta &rarr;</button>
     <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;">J&aacute; tem conta? <span style="color:var(--p);font-weight:600;cursor:pointer;" onclick="go('login')">Entrar</span></p>
   </div>
 </div>
@@ -846,6 +886,97 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
   </div>
 </div>
 
+
+<!-- ===== MODAL: TERMOS DE USO ===== -->
+<div class="modal-overlay hidden" id="modal-termos">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-size:14px;">&#128220;</div>
+        <div>
+          <div class="modal-hdr-title">Termos de Uso e Privacidade</div>
+          <div class="modal-hdr-sub">Leia com aten&ccedil;&atilde;o antes de prosseguir &mdash; Atualizado em abril/2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body" id="termos-body">
+
+      <div class="terms-section">
+        <div class="terms-h">1. Sobre a Kannamaps</div>
+        <div class="terms-p">A <strong>Kannamaps Tecnologia Ltda.</strong> (CNPJ em processo de abertura) &eacute; uma plataforma digital que opera como <strong>marketplace de interm&eacute;dio</strong> entre pacientes, m&eacute;dicos e fornecedores de produtos derivados de cannabis medicinal, devidamente autorizados pela ANVISA. A Kannamaps n&atilde;o &eacute; uma farmácia, n&atilde;o &eacute; uma cl&iacute;nica e n&atilde;o fornece diretamente nenhum produto ou servi&ccedil;o m&eacute;dico.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">2. Elegibilidade</div>
+        <div class="terms-p">Para utilizar a plataforma, o usu&aacute;rio deve: <strong>(a)</strong> ter 18 anos ou mais; <strong>(b)</strong> ser residente no Brasil; <strong>(c)</strong> possuir ou estar em processo de obten&ccedil;&atilde;o de prescri&ccedil;&atilde;o m&eacute;dica v&aacute;lida para cannabis medicinal emitida por profissional habilitado; <strong>(d)</strong> fornecer informa&ccedil;&otilde;es verdadeiras e atualizadas no cadastro.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">3. Natureza Regulat&oacute;ria e Responsabilidades</div>
+        <div class="terms-p">O uso de produtos derivados de cannabis medicinal no Brasil &eacute; regulado pela <strong>RDC 660/2022</strong> e <strong>RDC 327/2019</strong> da ANVISA. O usu&aacute;rio &eacute; integralmente respons&aacute;vel por: <strong>(a)</strong> obter e manter autoriza&ccedil;&atilde;o v&aacute;lida da ANVISA para importa&ccedil;&atilde;o quando aplic&aacute;vel; <strong>(b)</strong> seguir rigorosamente a prescri&ccedil;&atilde;o m&eacute;dica; <strong>(c)</strong> n&atilde;o transferir, compartilhar, vender ou ceder a terceiros qualquer produto adquirido pela plataforma; <strong>(d)</strong> comunicar imediatamente &agrave; Kannamaps qualquer efeito adverso ou irregularidade verificada.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">4. Coleta e Uso de Dados Pessoais (LGPD &mdash; Lei 13.709/2018)</div>
+        <div class="terms-p">A Kannamaps coleta e trata os seguintes dados com base nas hip&oacute;teses legais da LGPD:<br><br>
+        <strong>Dados cadastrais:</strong> nome, CPF, data de nascimento, e-mail, telefone, endere&ccedil;o e CEP &mdash; para identifica&ccedil;&atilde;o, autentica&ccedil;&atilde;o e cumprimento de obriga&ccedil;&otilde;es regulat&oacute;rias (art. 7&ordm;, II e III).<br><br>
+        <strong>Dados de sa&uacute;de:</strong> condi&ccedil;&otilde;es m&eacute;dicas informadas, sintomas, historico de uso de CBD, receitas e laudos enviados &mdash; tratados como <strong>dados sens&iacute;veis</strong> conforme art. 11 da LGPD, com consentimento expresso do titular para finalidades m&eacute;dicas e regulat&oacute;rias.<br><br>
+        <strong>Documentos:</strong> RG, CNH, comprovante de resid&ecirc;ncia, receitas m&eacute;dicas e autoriza&ccedil;&otilde;es ANVISA &mdash; armazenados de forma segura com criptografia em repouso.<br><br>
+        <strong>Dados de uso:</strong> logs de acesso, intera&ccedil;&otilde;es com a plataforma e prefer&ecirc;ncias &mdash; para melhoria do servi&ccedil;o e seguran&ccedil;a da conta.<br><br>
+        Os dados n&atilde;o ser&atilde;o vendidos a terceiros. Poder&atilde;o ser compartilhados com: m&eacute;dicos parceiros (com consentimento), fornecedores (apenas dados necess&aacute;rios &agrave; entrega), processadores de pagamento e &oacute;rg&atilde;os reguladores quando exigido por lei.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">5. Direito de Imagem e Conteúdo</div>
+        <div class="terms-p">O usu&aacute;rio declara que: <strong>(a)</strong> todos os documentos, fotos e arquivos enviados s&atilde;o aut&ecirc;nticos e de sua propriedade ou possui autoriza&ccedil;&atilde;o para us&aacute;-los; <strong>(b)</strong> autoriza a Kannamaps a armazenar, processar e transmitir esses arquivos exclusivamente para as finalidades da plataforma; <strong>(c)</strong> n&atilde;o autoriza o uso de sua imagem para fins publicit&aacute;rios sem consentimento expresso adicional; <strong>(d)</strong> fotos e documentos ser&atilde;o exclu&iacute;dos mediante solicita&ccedil;&atilde;o do titular (direito &agrave; exclus&atilde;o &mdash; art. 18, VI da LGPD).</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">6. Videoconsulta e Dados M&eacute;dicos</div>
+        <div class="terms-p">As videoconsultas realizadas pela plataforma: <strong>(a)</strong> s&atilde;o conduzidas por m&eacute;dicos independentes registrados no CRM, n&atilde;o sendo a Kannamaps respons&aacute;vel pela conduta m&eacute;dica; <strong>(b)</strong> n&atilde;o s&atilde;o gravadas pela Kannamaps sem consentimento pr&eacute;vio; <strong>(c)</strong> geram prontu&aacute;rio virtual de responsabilidade do m&eacute;dico prescritor; <strong>(d)</strong> a prescri&ccedil;&atilde;o emitida &eacute; de uso pessoal e intransfer&iacute;vel.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">7. Proibições e Uso Indevido</div>
+        <div class="terms-p">&Eacute; <strong>estritamente proibido</strong>: <strong>(a)</strong> usar a plataforma para adquirir produtos sem prescri&ccedil;&atilde;o m&eacute;dica v&aacute;lida; <strong>(b)</strong> revender, compartilhar ou transferir produtos a terceiros; <strong>(c)</strong> fornecer documentos falsos, adulterados ou de terceiros; <strong>(d)</strong> usar a plataforma para fins recreativos ou n&atilde;o m&eacute;dicos; <strong>(e)</strong> tentar burlar os controles regulat&oacute;rios da ANVISA. O descumprimento implica em cancelamento imediato da conta e pode configurar il&iacute;cito penal, especialmente sob a Lei 11.343/2006 (Lei de Drogas) e o C&oacute;digo Penal Brasileiro.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">8. Isen&ccedil;&atilde;o de Responsabilidade</div>
+        <div class="terms-p">A Kannamaps atua como plataforma de conex&atilde;o e <strong>n&atilde;o se responsabiliza</strong> por: <strong>(a)</strong> efeitos adversos ou resultados cl&iacute;nicos do uso dos produtos; <strong>(b)</strong> atrasos ou problemas na entrega de produtos por fornecedores; <strong>(c)</strong> nega&ccedil;&atilde;o de autoriza&ccedil;&atilde;o pela ANVISA; <strong>(d)</strong> indisponibilidade de m&eacute;dicos ou fornecedores parceiros; <strong>(e)</strong> imprecis&atilde;o em informa&ccedil;&otilde;es fornecidas por terceiros na plataforma.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">9. Seguran&ccedil;a da Conta</div>
+        <div class="terms-p">O usu&aacute;rio &eacute; respons&aacute;vel pela guarda de suas credenciais de acesso. A Kannamaps utiliza <strong>Supabase Auth</strong> com criptografia bcrypt para senhas e TLS 1.3 para transmiss&atilde;o de dados. Recomenda-se o uso de senha forte e &uacute;nica. Em caso de suspeita de acesso n&atilde;o autorizado, o usu&aacute;rio deve alterar a senha imediatamente e comunicar a Kannamaps.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">10. Direitos do Titular (LGPD)</div>
+        <div class="terms-p">O titular dos dados tem direito a: <strong>(a)</strong> confirma&ccedil;&atilde;o e acesso aos dados tratados; <strong>(b)</strong> corre&ccedil;&atilde;o de dados incompletos, inexatos ou desatualizados; <strong>(c)</strong> anonimiza&ccedil;&atilde;o ou exclus&atilde;o de dados desnecess&aacute;rios; <strong>(d)</strong> portabilidade dos dados; <strong>(e)</strong> revoga&ccedil;&atilde;o do consentimento a qualquer tempo; <strong>(f)</strong> oposi&ccedil;&atilde;o ao tratamento. Solicita&ccedil;&otilde;es devem ser enviadas para <strong>privacidade@kannamaps.com.br</strong> com resposta em at&eacute; 15 dias &uacute;teis.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">11. Altera&ccedil;&otilde;es nos Termos</div>
+        <div class="terms-p">A Kannamaps reserva-se o direito de atualizar estes termos. Altera&ccedil;&otilde;es substanciais ser&atilde;o notificadas com <strong>30 dias de anteced&ecirc;ncia</strong> via e-mail e notifica&ccedil;&atilde;o no app. A continua&ccedil;&atilde;o do uso ap&oacute;s a data de vig&ecirc;ncia implica em aceita&ccedil;&atilde;o dos novos termos.</div>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-h">12. Foro e Lei Aplic&aacute;vel</div>
+        <div class="terms-p">Estes termos s&atilde;o regidos pela legisla&ccedil;&atilde;o brasileira. Fica eleito o foro da <strong>Comarca de S&atilde;o Paulo &mdash; SP</strong> para dirimir quaisquer controv&eacute;rsias, com ren&uacute;ncia expressa a qualquer outro, por mais privilegiado que seja.</div>
+      </div>
+
+      <div style="padding:12px;background:var(--p-pale);border-radius:var(--r-sm);font-size:11px;color:var(--p);line-height:1.6;">
+        &#128274; <strong>Vers&atilde;o:</strong> 1.0 &mdash; Abril 2026 &middot; <strong>DPO:</strong> privacidade@kannamaps.com.br &middot; Este documento tem car&aacute;ter legal e vinculante.
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="fecharTermos()">Li e entendi os termos</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /phone -->
 
 <script>
@@ -901,9 +1032,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ===================== AUTH =====================
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('on');
+}
+
+function abrirTermos() {
+  document.getElementById('modal-termos').classList.remove('hidden');
+  document.getElementById('termos-body').scrollTop = 0;
+}
+
+function fecharTermos() {
+  document.getElementById('modal-termos').classList.add('hidden');
+  // Auto-check the terms checkbox after reading
+  const chk = document.getElementById('chk-termos');
+  if (chk) chk.classList.add('on');
+}
+
 async function doCadastro() {
   const nome = v('cad-nome'), cpf = v('cad-cpf'), nasc = v('cad-nasc');
   const tel = v('cad-tel'), email = v('cad-email'), senha = v('cad-senha');
+  // Validate required checkboxes
+  const chkTermos = document.getElementById('chk-termos')?.classList.contains('on');
+  const chkMaior = document.getElementById('chk-maior')?.classList.contains('on');
+  const chkReg = document.getElementById('chk-regulatorio')?.classList.contains('on');
+  if (!chkTermos) return showAlert('cad-alert','Você precisa aceitar os Termos de Uso para continuar.','err');
+  if (!chkMaior) return showAlert('cad-alert','Confirme que você tem 18 anos ou mais.','err');
+  if (!chkReg) return showAlert('cad-alert','Confirme que está ciente das exigências regulatórias.','err');
   if (!nome||!email||!senha) return showAlert('cad-alert','Preencha todos os campos obrigatórios.','err');
   if (senha.length < 8) return showAlert('cad-alert','A senha precisa ter no mínimo 8 caracteres.','err');
 
@@ -918,9 +1073,12 @@ async function doCadastro() {
   currentUser = data.user;
 
   // Create profile in DB
+  const aceitouMarketing = document.getElementById('chk-marketing')?.classList.contains('on');
   await sb.from('pacientes').upsert({
     id: currentUser.id, nome, cpf, nascimento: nasc,
-    telefone: tel, email, criado_em: new Date().toISOString()
+    telefone: tel, email, criado_em: new Date().toISOString(),
+    aceite_termos: true, aceite_termos_data: new Date().toISOString(),
+    aceite_marketing: (document.getElementById('chk-marketing')?.classList.contains('on') || false)
   });
 
   go('sintomas');
