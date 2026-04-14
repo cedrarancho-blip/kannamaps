@@ -91,7 +91,7 @@ select.input{-webkit-appearance:none;appearance:none}
 <div id="cad-alert"></div>
 <div class="ig"><label class="il">Razão social</label><input class="input" id="cad-razao" placeholder="Nome da empresa Ltda."></div>
 <div class="ig"><label class="il">Nome fantasia</label><input class="input" id="cad-fantasia" placeholder="Nome comercial"></div>
-<div class="ig"><label class="il">CNPJ</label><input class="input" id="cad-cnpj" placeholder="00.000.000/0000-00" maxlength="18"></div>
+<div class="ig"><label class="il">CNPJ</label><input class="input" id="cad-cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="fmtCNPJ(this)" inputmode="numeric"></div>
 <div class="ig"><label class="il">Responsável</label><input class="input" id="cad-resp" placeholder="Nome do responsável"></div>
 <div class="ig"><label class="il">E-mail</label><input class="input" id="cad-email" type="email" placeholder="contato@empresa.com"></div>
 <div class="ig"><label class="il">Senha</label><input class="input" id="cad-senha" type="password" placeholder="Mínimo 8 caracteres"></div>
@@ -247,14 +247,18 @@ async function doLogin(){
 async function doCadastro(){
   const razao=v('cad-razao'),fantasia=v('cad-fantasia'),cnpj=v('cad-cnpj'),resp=v('cad-resp'),email=v('cad-email'),senha=v('cad-senha');
   if(!razao||!cnpj||!email||!senha)return showAlert('cad-alert','Preencha todos os campos.','err');
+  if(cnpj.replace(/\D/g,'').length!==14)return showAlert('cad-alert','CNPJ deve ter 14 dígitos.','err');
   if(senha.length<8)return showAlert('cad-alert','Senha: mínimo 8 caracteres.','err');
   setBtn('btn-cad',true,'Criando...');
-  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{razao_social:razao,nome_fantasia:fantasia}}});
-  setBtn('btn-cad',false,'Cadastrar →');
-  if(error)return showAlert('cad-alert',error.message,'err');
-  currentUser=data.user;
-  await sb.from('fornecedores').upsert({id:currentUser.id,razao_social:razao,nome_fantasia:fantasia,cnpj,responsavel:resp,email,criado_em:new Date().toISOString()});
-  await loadProfile();go('home');
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{razao_social:razao,nome_fantasia:fantasia}}});
+    if(error){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert',error.message,'err')}
+    if(!data.user){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert','Verifique seu e-mail para confirmar o cadastro.','info')}
+    currentUser=data.user;
+    const{error:dbErr}=await sb.from('fornecedores').upsert({id:currentUser.id,razao_social:razao,nome_fantasia:fantasia,cnpj,responsavel:resp,email,criado_em:new Date().toISOString()});
+    if(dbErr){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert','Erro ao salvar: '+dbErr.message,'err')}
+    await loadProfile();go('home');
+  }catch(e){setBtn('btn-cad',false,'Cadastrar →');showAlert('cad-alert','Erro de conexão: '+e.message,'err')}
 }
 async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;go('welcome')}
 
@@ -360,6 +364,7 @@ function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div 
 function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
 function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';clearTimeout(window._loadTimer);window._loadTimer=setTimeout(hideLoading,8000)}
 function hideLoading(){clearTimeout(window._loadTimer);const l=el('loading');if(l)l.style.display='none'}
+function fmtCNPJ(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{2})(\d)/,'$1.$2');v=v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');v=v.replace(/\.(\d{3})(\d)/,'.$1/$2');v=v.replace(/(\d{4})(\d)/,'$1-$2');e.value=v}
 </script>
 </body>
 </html>
