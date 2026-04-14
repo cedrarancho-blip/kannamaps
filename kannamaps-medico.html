@@ -292,12 +292,15 @@ async function doCadastro(){
   if(!nome||!crm||!email||!senha)return showAlert('cad-alert','Preencha todos os campos.','err');
   if(senha.length<8)return showAlert('cad-alert','Senha: mínimo 8 caracteres.','err');
   setBtn('btn-cad',true,'Criando...');
-  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,crm,especialidade:esp}}});
-  setBtn('btn-cad',false,'Criar conta →');
-  if(error)return showAlert('cad-alert',error.message,'err');
-  currentUser=data.user;
-  await sb.from('medicos').upsert({id:currentUser.id,nome,crm,estado_crm:estado.toUpperCase(),especialidade:esp,email,criado_em:new Date().toISOString()});
-  await loadProfile();go('home');
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,crm,especialidade:esp}}});
+    if(error){setBtn('btn-cad',false,'Criar conta →');return showAlert('cad-alert',error.message,'err')}
+    if(!data.user){setBtn('btn-cad',false,'Criar conta →');return showAlert('cad-alert','Verifique seu e-mail para confirmar o cadastro.','info')}
+    currentUser=data.user;
+    const{error:dbErr}=await sb.from('medicos').upsert({id:currentUser.id,nome,crm,estado_crm:estado.toUpperCase(),especialidade:esp,email,criado_em:new Date().toISOString()});
+    if(dbErr){setBtn('btn-cad',false,'Criar conta →');return showAlert('cad-alert','Erro ao salvar: '+dbErr.message,'err')}
+    await loadProfile();go('home');
+  }catch(e){setBtn('btn-cad',false,'Criar conta →');showAlert('cad-alert','Erro de conexão: '+e.message,'err')}
 }
 async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;go('welcome')}
 
