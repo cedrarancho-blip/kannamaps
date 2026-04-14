@@ -311,8 +311,8 @@ async function salvarPerfil(){
   if(!currentUser)return;
   const d={nome:v('perfil-nome-input'),especialidade:v('perfil-esp'),telefone:v('perfil-tel'),bio:v('perfil-bio'),valor_consulta:parseFloat(v('perfil-valor'))||89};
   showLoading('Salvando...');
-  await sb.from('medicos').update(d).eq('id',currentUser.id);
-  hideLoading();currentProfile={...currentProfile,...d};
+  try{await sb.from('medicos').update(d).eq('id',currentUser.id);
+  hideLoading();}catch(e){hideLoading();showAlert('perfil-alert','Erro de conexão.','err');return}currentProfile={...currentProfile,...d};
   el('perfil-nome').textContent=d.nome;el('home-nome').textContent=d.nome.split(' ').slice(0,2).join(' ')+' 🩺';
   showAlert('perfil-alert','✓ Perfil salvo!','ok');
 }
@@ -443,8 +443,8 @@ function v(id){return document.getElementById(id)?.value?.trim()||''}
 function el(id){return document.getElementById(id)}
 function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
 function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
-function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex'}
-function hideLoading(){const l=el('loading');if(l)l.style.display='none'}
+function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';clearTimeout(window._loadTimer);window._loadTimer=setTimeout(hideLoading,8000)}
+function hideLoading(){clearTimeout(window._loadTimer);const l=el('loading');if(l)l.style.display='none'}
 </script>
 </body>
 </html>
