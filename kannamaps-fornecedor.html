@@ -261,7 +261,7 @@ async function loadProfile(){
 async function salvarPerfil(){
   if(!currentUser)return;
   const d={razao_social:v('perfil-razao'),nome_fantasia:v('perfil-fantasia'),responsavel:v('perfil-resp'),telefone:v('perfil-tel'),cidade:v('perfil-cidade'),estado:v('perfil-estado'),alvara_anvisa:v('perfil-alvara')};
-  showLoading('Salvando...');await sb.from('fornecedores').update(d).eq('id',currentUser.id);hideLoading();
+  showLoading('Salvando...');try{await sb.from('fornecedores').update(d).eq('id',currentUser.id);hideLoading();}catch(e){hideLoading();showAlert('perfil-alert','Erro de conexão.','err');return}
   currentProfile={...currentProfile,...d};el('perfil-nome').textContent=d.nome_fantasia||d.razao_social;el('home-nome').textContent=(d.nome_fantasia||d.razao_social)+' 📦';
   showAlert('perfil-alert','✓ Perfil salvo!','ok');
 }
@@ -294,7 +294,8 @@ async function salvarProduto(){
   if(!currentUser)return;
   const d={fornecedor_id:currentUser.id,fornecedor:currentProfile?.nome_fantasia||currentProfile?.razao_social||'',nome:v('np-nome'),descricao:v('np-desc'),categoria:v('np-cat'),preco:parseFloat(v('np-preco'))||0,estoque:parseInt(v('np-estoque'))||0,volume:v('np-vol'),concentracao:v('np-conc'),imagem_emoji:v('np-emoji')||'🌿',requer_anvisa:document.getElementById('np-anvisa')?.checked||false,ativo:true};
   if(!d.nome||!d.preco)return showAlert('np-alert','Preencha nome e preço.','err');
-  showLoading('Cadastrando...');const{error}=await sb.from('produtos').insert(d);hideLoading();
+  showLoading('Cadastrando...');try{const{error}=await sb.from('produtos').insert(d);hideLoading();
+  if(error)return showAlert('np-alert','Erro: '+error.message,'err');}catch(e){hideLoading();showAlert('np-alert','Erro de conexão.','err');return}
   if(error)return showAlert('np-alert','Erro: '+error.message,'err');
   showAlert('np-alert','✓ Produto cadastrado!','ok');
   setTimeout(()=>go('produtos'),1500);
@@ -335,8 +336,8 @@ function v(id){return document.getElementById(id)?.value?.trim()||''}
 function el(id){return document.getElementById(id)}
 function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
 function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
-function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex'}
-function hideLoading(){const l=el('loading');if(l)l.style.display='none'}
+function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';clearTimeout(window._loadTimer);window._loadTimer=setTimeout(hideLoading,8000)}
+function hideLoading(){clearTimeout(window._loadTimer);const l=el('loading');if(l)l.style.display='none'}
 </script>
 </body>
 </html>
