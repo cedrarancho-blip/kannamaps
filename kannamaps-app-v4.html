@@ -336,7 +336,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 <div style="text-align:center;padding:18px 0 22px"><div class="av av-lg" style="margin:0 auto 12px" id="perfil-av">?</div><div style="font-family:var(--font-d);font-size:18px;font-weight:700" id="perfil-nome">Carregando...</div><div style="font-size:13px;color:var(--muted);margin-top:4px" id="perfil-email"></div><div style="margin-top:8px"><span class="badge ba" id="perfil-completude">Perfil incompleto</span></div><div class="prog"><div class="prog-fill" id="perfil-prog" style="width:20%"></div></div></div>
 <div id="perfil-alert"></div>
 <div class="ig"><label class="il">Nome completo</label><input class="input" id="perfil-nome-input" placeholder="Seu nome completo"></div>
-<div class="ig"><label class="il">CPF</label><input class="input" id="perfil-cpf" readonly style="opacity:.6"></div>
+<div class="ig"><label class="il">CPF</label><input class="input" id="perfil-cpf" placeholder="000.000.000-00" maxlength="14" oninput="fmtCPF(this)" inputmode="numeric"></div>
 <div class="ig"><label class="il">Data de nascimento</label><input class="input" id="perfil-nasc" type="date"></div>
 <div class="ig"><label class="il">Celular</label><input class="input" id="perfil-tel" placeholder="(00) 00000-0000" oninput="fmtTel(this)"></div>
 <div class="ig"><label class="il">CEP</label><input class="input" id="perfil-cep" placeholder="00000-000" maxlength="9" oninput="fmtCEP(this)"></div>
@@ -369,11 +369,11 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 <div id="loading" style="display:none;position:fixed;inset:0;background:rgba(249,247,253,.95);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px"><div class="spinner"></div><div style="font-size:14px;color:var(--muted)" id="loading-msg">Carregando...</div></div>
 
 <!-- MODAL TERMOS (simplified for space) -->
-<div class="modal-overlay hidden" id="modal-termos"><div class="modal-box"><div class="modal-hdr"><div class="modal-hdr-title">📜 Termos de Uso e Privacidade</div><div class="modal-hdr-sub">Leia com atenção — Atualizado em abril/2026</div></div><div class="modal-body"><div class="terms-section"><div class="terms-h">1. Sobre a Kannamaps</div><div class="terms-p">A Kannamaps é uma plataforma digital que opera como marketplace entre pacientes, médicos e fornecedores de cannabis medicinal autorizados pela ANVISA.</div></div><div class="terms-section"><div class="terms-h">2. Elegibilidade</div><div class="terms-p">Usuário deve ter 18+ anos, residir no Brasil, e possuir ou buscar prescrição médica válida.</div></div><div class="terms-section"><div class="terms-h">3. LGPD</div><div class="terms-p">Dados sensíveis de saúde tratados conforme art. 11 da LGPD com consentimento expresso. Dados não serão vendidos a terceiros. DPO: privacidade@kannamaps.com.br</div></div><div class="terms-section"><div class="terms-h">4. Proibições</div><div class="terms-p">Proibido: uso sem receita, revenda, documentos falsos, fins recreativos. Descumprimento implica cancelamento e pode configurar ilícito penal (Lei 11.343/2006).</div></div><div style="padding:12px;background:var(--p-pale);border-radius:var(--r-sm);font-size:11px;color:var(--p)">🔒 Versão 1.0 — Abril 2026 · Foro: Comarca de São Paulo/SP</div></div><div class="modal-footer"><button class="btn btn-primary" onclick="fecharTermos()">Li e entendi os termos</button></div></div></div>
+<div class="modal-overlay hidden" id="modal-termos"><div class="modal-box"><div class="modal-hdr"><div class="modal-hdr-title">📜 Termos de Uso e Privacidade</div><div class="modal-hdr-sub">Leia com atenção — Atualizado em abril/2026</div></div><div class="modal-body"><div class="terms-section"><div class="terms-h">1. Sobre a Kannamaps</div><div class="terms-p">A Kannamaps é uma plataforma digital que opera como marketplace entre pacientes, médicos e fornecedores de cannabis medicinal autorizados pela ANVISA.</div></div><div class="terms-section"><div class="terms-h">2. Elegibilidade</div><div class="terms-p">Usuário deve ter 18+ anos, residir no Brasil, e possuir ou buscar prescrição médica válida.</div></div><div class="terms-section"><div class="terms-h">3. LGPD</div><div class="terms-p">Dados sensíveis de saúde tratados conforme art. 11 da LGPD com consentimento expresso. Dados não serão vendidos a terceiros. DPO: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4f3f3d26392e2c262b2e2b2a0f242e21212e222e3f3c612c2022612d3d">[email&#160;protected]</a></div></div><div class="terms-section"><div class="terms-h">4. Proibições</div><div class="terms-p">Proibido: uso sem receita, revenda, documentos falsos, fins recreativos. Descumprimento implica cancelamento e pode configurar ilícito penal (Lei 11.343/2006).</div></div><div style="padding:12px;background:var(--p-pale);border-radius:var(--r-sm);font-size:11px;color:var(--p)">🔒 Versão 1.0 — Abril 2026 · Foro: Comarca de São Paulo/SP</div></div><div class="modal-footer"><button class="btn btn-primary" onclick="fecharTermos()">Li e entendi os termos</button></div></div></div>
 
 </div><!-- /phone -->
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===================== SUPABASE CONFIG =====================
 const SUPA_URL='https://dfxrdxfjqumajxikykay.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmeHJkeGZqcXVtYWp4aWt5a2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTgwMDgsImV4cCI6MjA5MTI3NDAwOH0.U1giCEnSkfjZeUWUigDMIpHm5wpvilSFJH4OljpJNT8';
@@ -476,12 +476,13 @@ async function salvarPerfil(){
   if(!currentUser)return;const nome=v('perfil-nome-input');
   if(!nome)return showAlert('perfil-alert','Digite seu nome.','err');
   showLoading('Salvando...');
-  const d={nome,nascimento:v('perfil-nasc')||null,telefone:v('perfil-tel'),cep:v('perfil-cep')};
-  const{error}=await sb.from('pacientes').update(d).eq('id',currentUser.id);
+  const d={nome,cpf:v('perfil-cpf')||null,nascimento:v('perfil-nasc')||null,telefone:v('perfil-tel'),cep:v('perfil-cep')};
+  try{const{error}=await sb.from('pacientes').update(d).eq('id',currentUser.id);
   hideLoading();if(error)return showAlert('perfil-alert','Erro: '+error.message,'err');
   currentProfile={...currentProfile,...d};
   el('perfil-nome').textContent=nome;el('perfil-av').textContent=nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
   el('home-nome').textContent='Olá, '+nome.split(' ')[0]+' 👋';updateCompletude(currentProfile);showAlert('perfil-alert','✓ Perfil salvo!','ok');
+  }catch(e){hideLoading();showAlert('perfil-alert','Erro de conexão. Tente novamente.','err')}
 }
 
 // ===================== SINTOMAS & CONSULTA =====================
@@ -664,15 +665,11 @@ function v(id){return document.getElementById(id)?.value?.trim()||''}
 function el(id){return document.getElementById(id)}
 function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
 function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
-function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex'}
-function hideLoading(){const l=el('loading');if(l)l.style.display='none'}
+function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';clearTimeout(window._loadTimer);window._loadTimer=setTimeout(hideLoading,8000)}
+function hideLoading(){clearTimeout(window._loadTimer);const l=el('loading');if(l)l.style.display='none'}
 function excl(e,group){document.querySelectorAll('[onclick*="\''+group+'\'"]').forEach(c=>c.classList.remove('on'));e.classList.add('on')}
 function selDoc(id){['dr-ds','dr-rm'].forEach(d=>{const c=document.getElementById(d);if(c){c.style.borderColor='var(--border)';c.style.background='var(--white)'}});const t=document.getElementById('dr-'+id);if(t){t.style.borderColor='var(--p)';t.style.background='var(--p-pale)'}}
 function selSlot(e){document.querySelectorAll('.slot:not(.off)').forEach(s=>s.classList.remove('on'));e.classList.add('on')}
 function selPay(id){document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('on'));const t=document.getElementById('pay-'+id);if(t)t.classList.add('on')}
 function fmtCPF(e){let v=e.value.replace(/\D/g,'');v=v.replace(/(\d{3})(\d)/,'$1.$2');v=v.replace(/(\d{3})(\d)/,'$1.$2');v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');e.value=v}
-function fmtTel(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{2})(\d)/,'($1) $2');v=v.replace(/(\d{5})(\d)/,'$1-$2');e.value=v}
-function fmtCEP(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{5})(\d)/,'$1-$2');e.value=v}
-</script>
-</body>
-</html>
+function fmtTel(e){
