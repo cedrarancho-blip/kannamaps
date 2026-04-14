@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Kannamaps — Selecione seu perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{--font:'DM Sans',sans-serif;--font-d:'Syne',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100vh;font-family:var(--font);background:linear-gradient(160deg,#3D1470,#7B2FBE,#9B4FDE);color:#fff}
+.wrap{max-width:800px;margin:0 auto;padding:60px 24px;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:40px}
+.logo svg{height:40px}
+h1{font-family:var(--font-d);font-size:clamp(28px,5vw,42px);font-weight:800;line-height:1.15;margin-bottom:12px}
+.sub{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:40px;line-height:1.6;max-width:480px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:700px;margin-bottom:32px}
+.card{background:rgba(255,255,255,.12);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:32px 20px;cursor:pointer;transition:all .2s;text-decoration:none;color:#fff;display:block}
+.card:hover{background:rgba(255,255,255,.2);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.2)}
+.card-icon{font-size:40px;margin-bottom:14px;display:block}
+.card-title{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:6px}
+.card-desc{font-size:13px;color:rgba(255,255,255,.7);line-height:1.5}
+.back{font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s}.back:hover{color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="logo">
+<svg height="40" viewBox="0 0 280 76" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="38" r="36" fill="white"/><text x="38" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="#7B2FBE">km</text><path d="M22 50 Q38 62 54 50" stroke="#7B2FBE" stroke-width="3" fill="none" stroke-linecap="round"/><text x="88" y="48" font-family="Arial,sans-serif" font-weight="700" font-size="36" fill="white">kannamaps</text></svg>
+</div>
+<h1>Acesse a plataforma Kannamaps</h1>
+<p class="sub">O marketplace fácil e seguro para cannabis medicinal.<br>Selecione o seu perfil para continuar.</p>
+<div class="cards">
+<a class="card" href="kannamaps-paciente.html">
+<span class="card-icon">🧑‍⚕️</span>
+<div class="card-title">Sou paciente</div>
+<div class="card-desc">Consulta, receita e marketplace em um só lugar</div>
+</a>
+<a class="card" href="kannamaps-medico.html">
+<span class="card-icon">👨‍⚕️</span>
+<div class="card-title">Sou médico</div>
+<div class="card-desc">Prescreva, acompanhe pacientes e gerencie sua agenda</div>
+</a>
+<a class="card" href="kannamaps-fornecedor.html">
+<span class="card-icon">📦</span>
+<div class="card-title">Sou fornecedor</div>
+<div class="card-desc">Gerencie produtos, pedidos e financeiro</div>
+</a>
+</div>
+<a class="back" href="index.html">← Voltar para o site</a>
+</div>
+</body>
+</html>
