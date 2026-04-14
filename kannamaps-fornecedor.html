@@ -2,653 +2,341 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Kannamaps — Painel do Fornecedor</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Kannamaps — Portal do Fornecedor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --p:#7B2FBE;--p2:#9B4FDE;--p-pale:#F3EEFB;--p-mid:#E8DCFB;
-  --text:#1A1025;--muted:#6B5F82;--border:rgba(123,47,190,0.13);
-  --bg:#F9F7FD;--white:#FFFFFF;
-  --green:#1A7F5A;--green-pale:#EBF7F2;
-  --red:#C0392B;--red-pale:#FDECEA;
-  --amber:#B7770D;--amber-pale:#FEF6E4;
-  --blue:#1A5FA8;--blue-pale:#EBF2FB;
-  --r:14px;--r-sm:10px;
-  --font:"DM Sans",sans-serif;--font-d:"Syne",sans-serif;
-  --sidebar:220px;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);}
-
-/* LOGIN */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;background:var(--bg);}
-.login-box{width:100%;max-width:420px;}
-.login-logo{text-align:center;margin-bottom:28px;}
-.login-title{font-family:var(--font-d);font-size:22px;font-weight:700;margin:14px 0 5px;}
-.login-sub{font-size:13px;color:var(--muted);}
-.login-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:24px;margin-bottom:12px;}
-.login-info{padding:10px 14px;border-radius:var(--r-sm);text-align:center;font-size:12px;margin-bottom:10px;}
-
-/* APP LAYOUT */
-.app{display:none;height:100vh;flex-direction:column;}
-.app.active{display:flex;}
-
-/* TOPNAV */
-.topnav{background:var(--white);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
-.topnav-right{display:flex;align-items:center;gap:12px;}
-.user-chip{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:100px;cursor:pointer;transition:background 0.15s;}
-.user-chip:hover{background:var(--p-pale);}
-.av{border-radius:50%;background:var(--p-mid);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--p);flex-shrink:0;}
-.av-sm{width:28px;height:28px;font-size:10px;}
-.av-md{width:36px;height:36px;font-size:13px;}
-.av-lg{width:52px;height:52px;font-size:17px;}
-.user-name{font-size:13px;font-weight:500;}
-.user-role{font-size:11px;color:var(--muted);}
-.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;position:relative;}
-.ndot{width:7px;height:7px;border-radius:50%;background:#E74C3C;position:absolute;top:0;right:0;}
-
-/* BODY */
-.app-body{display:flex;flex:1;overflow:hidden;}
-
-/* SIDEBAR */
-.sidebar{width:var(--sidebar);background:var(--white);border-right:1px solid var(--border);padding:12px 0;overflow-y:auto;flex-shrink:0;}
-.nav-section{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;padding:12px 18px 4px;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:13px;color:var(--muted);border-left:3px solid transparent;transition:all 0.15s;}
-.nav-item:hover{background:var(--p-pale);color:var(--text);}
-.nav-item.active{background:var(--p-pale);color:var(--p);font-weight:600;border-left-color:var(--p);}
-.nav-item .ni{font-size:15px;width:18px;text-align:center;}
-.nbadge{margin-left:auto;background:var(--p);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:100px;}
-
-/* MAIN */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
-.page-hdr{background:var(--white);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.page-title{font-family:var(--font-d);font-size:18px;font-weight:700;}
-.page-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-.page-body{padding:20px 24px;flex:1;}
-
-/* SCREENS */
-.screen{display:none;}
-.screen.active{display:block;}
-
-/* CARDS */
-.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:18px;}
-.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.card-title{font-size:14px;font-weight:600;}
-.card-action{font-size:12px;color:var(--p);cursor:pointer;font-weight:500;}
-
-/* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
-.metric{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:15px 16px;}
-.metric-label{font-size:12px;color:var(--muted);margin-bottom:5px;}
-.metric-val{font-size:22px;font-weight:700;font-family:var(--font-d);line-height:1;}
-.metric-delta{font-size:11px;margin-top:4px;}
-.up{color:var(--green);}
-.dn{color:var(--red);}
-
-/* BADGE */
-.badge{padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
-.bg{background:var(--green-pale);color:var(--green);}
-.ba{background:var(--amber-pale);color:var(--amber);}
-.br{background:var(--red-pale);color:var(--red);}
-.bp{background:var(--p-pale);color:var(--p);}
-.bb{background:var(--blue-pale);color:var(--blue);}
-
-/* BUTTONS */
-.btn{padding:9px 18px;border-radius:100px;font-family:var(--font);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;}
-.btn-primary{background:var(--p);color:white;}
-.btn-primary:hover{background:var(--p2);}
-.btn-secondary{background:var(--p-pale);color:var(--p);}
-.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);}
-.btn-green{background:var(--green);color:white;}
-.btn-red{background:var(--red);color:white;}
-.btn-sm{padding:5px 12px;font-size:12px;}
-.btn-full{width:100%;justify-content:center;}
-
-/* INPUTS */
-.input{width:100%;padding:9px 12px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color 0.2s;}
-.input:focus{border-color:var(--p);}
-.input::placeholder{color:#C4B8D8;}
-.ig{margin-bottom:12px;}
-.il{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:4px;display:block;}
-
-/* TABLE */
-.tw{overflow-x:auto;}
-.table{width:100%;border-collapse:collapse;font-size:13px;min-width:500px;}
-.table th{text-align:left;font-size:11px;font-weight:600;color:var(--muted);padding:0 8px 8px 0;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.05em;}
-.table td{padding:10px 8px 10px 0;border-bottom:1px solid var(--border);vertical-align:middle;}
-.table tr:last-child td{border-bottom:none;}
-
-/* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-
-/* DIVIDER */
-.divider{height:1px;background:var(--border);margin:12px 0;}
-
-/* CHART BARS */
-.chart-bars{display:flex;align-items:flex-end;gap:5px;height:80px;margin-top:6px;}
-.bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.bar{width:100%;border-radius:3px 3px 0 0;background:var(--p-mid);}
-.bar.hl{background:var(--p);}
-.bar-l{font-size:10px;color:var(--muted);}
-
-/* PRODUCT ROW */
-.prod-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:8px;}
-.prod-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--p-pale);}
-
-/* TOGGLE */
-.toggle{width:42px;height:22px;background:var(--p-mid);border-radius:11px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
-.toggle.on{background:var(--p);}
-.toggle::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform 0.2s;}
-.toggle.on::after{transform:translateX(20px);}
-
-/* PROG */
-.prog{height:5px;background:var(--p-mid);border-radius:100px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--p);border-radius:100px;}
-
-/* MOBILE */
-.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);padding:6px 0 18px;z-index:100;}
-.bnav-inner{display:flex;justify-content:space-around;}
-.bni{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 14px;cursor:pointer;border-radius:10px;}
-.bni.active .bni-icon,.bni.active .bni-label{color:var(--p);}
-.bni.active .bni-label{font-weight:600;}
-.bni-icon{font-size:19px;color:var(--muted);}
-.bni-label{font-size:10px;color:var(--muted);}
-
-@media(max-width:768px){
-  .sidebar{display:none;}
-  .bnav{display:block;}
-  .page-body{padding:14px;padding-bottom:90px;}
-  .page-hdr{padding:12px 16px;}
-  .g2,.g3{grid-template-columns:1fr;}
-  .metrics{grid-template-columns:1fr 1fr;}
-  .topnav{padding:0 14px;}
-  .user-name,.user-role{display:none;}
-}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--p-mid);border-radius:2px;}
+:root{--p:#B7770D;--p2:#D4930F;--p-pale:#FEF6E4;--p-mid:#FCECC5;--text:#1F1507;--muted:#6B5A3A;--border:rgba(183,119,13,.13);--bg:#FDFAF3;--white:#FFF;--green:#1A7F5A;--green-pale:#EBF7F2;--red:#C0392B;--red-pale:#FDECEA;--amber:#B7770D;--amber-pale:#FEF6E4;--purple:#7B2FBE;--purple-pale:#F3EEFB;--r:14px;--r-sm:10px;--font:'DM Sans',sans-serif;--font-d:'Syne',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text)}
+::-webkit-scrollbar{display:none}
+.phone{width:390px;min-height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.08);margin:40px auto;display:flex;flex-direction:column}
+@media(max-width:430px){body{background:var(--bg)}.phone{width:100vw;min-height:100dvh;border-radius:0;box-shadow:none;margin:0}}
+.screen{display:none;flex-direction:column;min-height:844px;background:var(--bg)}.screen.active{display:flex}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0;font-size:12px;font-weight:600;flex-shrink:0}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;flex-shrink:0}
+.back{width:36px;height:36px;border-radius:50%;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:all .15s}.back:active{transform:scale(.92)}
+.hdr-title{font-family:var(--font-d);font-size:15px;font-weight:700}
+.cnt{flex:1;padding:0 20px 100px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bnav{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 20px;flex-shrink:0;z-index:10}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;border-radius:12px;transition:all .15s}.bni.active .bni-ic,.bni.active .bni-lb{color:var(--p)}.bni.active .bni-lb{font-weight:600}
+.bni-ic{font-size:20px;color:var(--muted)}.bni-lb{font-size:10px;color:var(--muted)}
+.btn{padding:14px 20px;border-radius:100px;font-family:var(--font);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--p);color:#fff}.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary{background:var(--p-pale);color:var(--p)}.btn-sm{padding:8px 16px;font-size:13px;width:auto}.btn:disabled{opacity:.5;pointer-events:none}
+.ig{margin-bottom:14px}.il{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block}
+.input{width:100%;padding:13px 15px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:14px;color:var(--text);outline:none;transition:border-color .2s}.input:focus{border-color:var(--p)}.input::placeholder{color:#C4B08A}
+textarea.input{resize:vertical;min-height:80px}
+select.input{-webkit-appearance:none;appearance:none}
+.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:12px;transition:all .15s}
+.card-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.bg{background:var(--green-pale);color:var(--green)}.ba{background:var(--amber-pale);color:var(--amber)}.br{background:var(--red-pale);color:var(--red)}.bp{background:var(--purple-pale);color:var(--purple)}
+.slbl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:18px 0 8px}
+.div{height:1px;background:var(--border);margin:14px 0}
+.av{border-radius:50%;background:var(--p-mid);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--p)}.av-lg{width:64px;height:64px;font-size:22px}.av-md{width:40px;height:40px;font-size:14px}
+.alert{padding:12px 14px;border-radius:var(--r-sm);font-size:13px;margin-bottom:14px;line-height:1.5;animation:fadeIn .3s ease}
+.alert-err{background:var(--red-pale);color:var(--red)}.alert-ok{background:var(--green-pale);color:var(--green)}.alert-info{background:var(--p-pale);color:var(--p)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:32px;height:32px;border:3px solid var(--p-mid);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
+.stat-num{font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--p)}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.welcome-sup{background:linear-gradient(160deg,#6B4A08,#B7770D,#D4930F);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
+.welcome-sup h1{font-family:var(--font-d);font-size:26px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:10px}
+.welcome-sup p{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:44px;line-height:1.6}
+.prod-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--white);border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .15s}.prod-item:active{background:var(--p-pale)}
+.order-item{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:10px}
 </style>
 </head>
 <body>
+<div class="phone" id="phone">
 
-<!-- LOGIN -->
-<div class="login-wrap" id="login-wrap">
-  <div class="login-box">
-    <div class="login-logo"><svg height="30" viewBox="0 0 250 65" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="30" fill="#7B2FBE"/><text x="32" y="28" text-anchor="middle" font-family="Arial" font-weight="800" font-size="15" fill="white">km</text><path d="M19 42 Q32 51 45 42" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="74" y="43" font-family="Arial" font-weight="700" font-size="32" fill="#7B2FBE">kannamaps</text></svg></div>
-    <div style="text-align:center;margin-bottom:24px;">
-      <div class="login-title">Acesso do Fornecedor</div>
-      <div class="login-sub">Farm&aacute;cias e importadoras autorizadas</div>
-    </div>
-    <div class="login-card">
-      <div class="ig"><label class="il">E-mail da empresa</label><input class="input" type="email" placeholder="contato@empresa.com.br" id="login-email"></div>
-      <div class="ig" style="margin-bottom:6px;"><label class="il">Senha</label><input class="input" type="password" placeholder="Sua senha" id="login-senha"></div>
-      <p style="text-align:right;font-size:12px;color:var(--p);cursor:pointer;margin-bottom:16px;font-weight:500;">Esqueci minha senha</p>
-      <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar no painel</button>
-      <div style="text-align:center;font-size:12px;color:var(--muted);margin:12px 0;">Ainda n&atilde;o &eacute; parceiro?</div>
-      <button class="btn btn-secondary btn-full">Solicitar cadastro de fornecedor</button>
-    </div>
-    <div class="login-info" style="background:var(--green-pale);color:var(--green);">&#x2705; Exige autoriza&ccedil;&atilde;o ANVISA e CNPJ ativo</div>
-    <p style="text-align:center;font-size:12px;color:var(--muted);">&#8592; <a href="index.html" style="color:var(--p);text-decoration:none;font-weight:500;">Voltar para o site</a></p>
-  </div>
+<!-- WELCOME -->
+<div class="screen active" id="s-welcome">
+<div class="welcome-sup">
+<svg height="44" viewBox="0 0 280 76" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:32px"><circle cx="38" cy="38" r="36" fill="white"/><text x="38" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="#B7770D">km</text><path d="M22 50 Q38 62 54 50" stroke="#B7770D" stroke-width="3" fill="none" stroke-linecap="round"/><text x="88" y="48" font-family="Arial,sans-serif" font-weight="700" font-size="36" fill="white">kannamaps</text></svg>
+<div style="background:rgba(255,255,255,.15);padding:4px 14px;border-radius:100px;font-size:12px;color:rgba(255,255,255,.9);margin-bottom:20px;font-weight:600">Portal do Fornecedor</div>
+<h1>Venda seus produtos no maior marketplace.</h1>
+<p>Gerencie catálogo, pedidos e financeiro em uma plataforma integrada.</p>
+<div style="display:flex;flex-direction:column;gap:10px;width:100%">
+<button class="btn" style="background:#fff;color:var(--p)" onclick="go('cadastro')">Cadastrar empresa</button>
+<button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="go('login')">Já tenho conta</button>
+</div>
+</div>
 </div>
 
-<!-- APP -->
-<div class="app" id="app">
+<!-- LOGIN -->
+<div class="screen" id="s-login">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('welcome')">←</div><div class="hdr-title">Entrar</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div style="margin-bottom:24px"><div style="font-family:var(--font-d);font-size:22px;font-weight:700">Portal Fornecedor</div><div style="font-size:13px;color:var(--muted)">Acesse sua conta empresarial</div></div>
+<div id="login-alert"></div>
+<div class="ig"><label class="il">E-mail</label><input class="input" id="login-email" type="email" placeholder="contato@empresa.com"></div>
+<div class="ig"><label class="il">Senha</label><input class="input" id="login-senha" type="password" placeholder="Sua senha"></div>
+<button class="btn btn-primary" id="btn-login" onclick="doLogin()">Entrar</button>
+<div class="div"></div>
+<button class="btn btn-outline" onclick="go('cadastro')">Cadastrar empresa</button>
+</div>
+</div>
 
-  <!-- TOPNAV -->
-  <nav class="topnav">
-    <svg height="30" viewBox="0 0 250 65" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="30" fill="#7B2FBE"/><text x="32" y="28" text-anchor="middle" font-family="Arial" font-weight="800" font-size="15" fill="white">km</text><path d="M19 42 Q32 51 45 42" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="74" y="43" font-family="Arial" font-weight="700" font-size="32" fill="#7B2FBE">kannamaps</text></svg>
-    <div class="topnav-right">
-      <div class="icon-btn" onclick="go('notificacoes')">&#x1F514;<div class="ndot"></div></div>
-      <div class="user-chip" onclick="go('perfil')">
-        <div class="av av-md" id="nav-av">FV</div>
-        <div><div class="user-name">Farm&aacute;cia Verde Vida</div><div class="user-role">Fornecedor Verificado</div></div>
-      </div>
-    </div>
-  </nav>
+<!-- CADASTRO -->
+<div class="screen" id="s-cadastro">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('welcome')">←</div><div class="hdr-title">Cadastro empresa</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="cad-alert"></div>
+<div class="ig"><label class="il">Razão social</label><input class="input" id="cad-razao" placeholder="Nome da empresa Ltda."></div>
+<div class="ig"><label class="il">Nome fantasia</label><input class="input" id="cad-fantasia" placeholder="Nome comercial"></div>
+<div class="ig"><label class="il">CNPJ</label><input class="input" id="cad-cnpj" placeholder="00.000.000/0000-00" maxlength="18"></div>
+<div class="ig"><label class="il">Responsável</label><input class="input" id="cad-resp" placeholder="Nome do responsável"></div>
+<div class="ig"><label class="il">E-mail</label><input class="input" id="cad-email" type="email" placeholder="contato@empresa.com"></div>
+<div class="ig"><label class="il">Senha</label><input class="input" id="cad-senha" type="password" placeholder="Mínimo 8 caracteres"></div>
+<button class="btn btn-primary" id="btn-cad" onclick="doCadastro()">Cadastrar →</button>
+</div>
+</div>
 
-  <div class="app-body">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="nav-section">Principal</div>
-      <div class="nav-item active" onclick="go('home')"><span class="ni">&#127968;</span>Vis&atilde;o geral</div>
-      <div class="nav-item" onclick="go('pedidos')"><span class="ni">&#128230;</span>Pedidos<span class="nbadge">4</span></div>
-      <div class="nav-section">Cat&aacute;logo</div>
-      <div class="nav-item" onclick="go('produtos')"><span class="ni">&#127807;</span>Produtos</div>
-      <div class="nav-item" onclick="go('cadastrar-produto')"><span class="ni">&#43;</span>Novo produto</div>
-      <div class="nav-section">Neg&oacute;cios</div>
-      <div class="nav-item" onclick="go('financeiro')"><span class="ni">&#128176;</span>Financeiro</div>
-      <div class="nav-item" onclick="go('avaliacoes')"><span class="ni">&#11088;</span>Avalia&ccedil;&otilde;es</div>
-      <div class="nav-item" onclick="go('analytics')"><span class="ni">&#128200;</span>Analytics</div>
-      <div class="nav-section">Conta</div>
-      <div class="nav-item" onclick="go('perfil')"><span class="ni">&#127866;</span>Meu perfil</div>
-      <div class="nav-item" onclick="go('documentos')"><span class="ni">&#128196;</span>Documentos</div>
-      <div class="nav-item" onclick="go('config')"><span class="ni">&#9881;</span>Configura&ccedil;&otilde;es</div>
-      <div class="nav-section">Sess&atilde;o</div>
-      <div class="nav-item" onclick="doLogout()" style="color:var(--red);"><span class="ni">&#128682;</span>Sair</div>
-    </div>
+<!-- DASHBOARD -->
+<div class="screen" id="s-home">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr">
+<svg height="28" viewBox="0 0 280 76" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="38" r="36" fill="#B7770D"/><text x="38" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="white">km</text><path d="M22 50 Q38 62 54 50" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/><text x="88" y="48" font-family="Arial,sans-serif" font-weight="700" font-size="36" fill="#B7770D">kannamaps</text></svg>
+<span class="badge ba" style="font-size:10px">Fornecedor</span>
+</div>
+<div class="cnt">
+<div style="margin-bottom:18px"><div style="font-size:13px;color:var(--muted)">Painel</div><div style="font-family:var(--font-d);font-size:22px;font-weight:700" id="home-nome">Empresa</div></div>
+<div class="stat-grid">
+<div class="stat"><div class="stat-num" id="stat-prods">0</div><div class="stat-lbl">Produtos ativos</div></div>
+<div class="stat"><div class="stat-num" id="stat-pedidos">0</div><div class="stat-lbl">Pedidos</div></div>
+<div class="stat"><div class="stat-num" id="stat-receita">R$ 0</div><div class="stat-lbl">Receita total</div></div>
+<div class="stat"><div class="stat-num" id="stat-pend">0</div><div class="stat-lbl">Pendentes</div></div>
+</div>
+<div class="slbl">Pedidos recentes</div>
+<div id="home-pedidos"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhum pedido ainda</div></div>
+</div>
+<div class="bnav">
+<div class="bni active" id="bni-home" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni" id="bni-produtos" onclick="go('produtos')"><span class="bni-ic">📦</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" id="bni-pedidos" onclick="go('pedidos')"><span class="bni-ic">📋</span><span class="bni-lb">Pedidos</span></div>
+<div class="bni" id="bni-perfil" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
 
-    <!-- MAIN -->
-    <div class="main">
-      <div class="page-hdr">
-        <div>
-          <div class="page-title" id="page-title">Vis&atilde;o geral</div>
-          <div class="page-sub" id="page-sub">Segunda-feira, 07 de Abril de 2025</div>
-        </div>
-        <div id="page-actions">
-          <button class="btn btn-primary btn-sm" onclick="go('cadastrar-produto')">+ Novo produto</button>
-        </div>
-      </div>
-      <div class="page-body">
+<!-- PRODUTOS -->
+<div class="screen" id="s-produtos">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Meus produtos</div><button class="btn-sm" style="background:var(--p);color:#fff;border:none;border-radius:100px;font-weight:600;cursor:pointer" onclick="go('novo-produto')">+ Novo</button></div>
+<div class="cnt">
+<div id="prod-list"><div style="text-align:center;padding:40px;color:var(--muted);font-size:13px"><div class="spinner" style="margin:0 auto 12px"></div>Carregando...</div></div>
+</div>
+<div class="bnav">
+<div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni active" onclick="go('produtos')"><span class="bni-ic">📦</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" onclick="go('pedidos')"><span class="bni-ic">📋</span><span class="bni-lb">Pedidos</span></div>
+<div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
 
-        <!-- HOME -->
-        <div class="screen active" id="s-home">
-          <div class="metrics">
-            <div class="metric"><div class="metric-label">Receita do m&ecirc;s</div><div class="metric-val">R$38.420</div><div class="metric-delta up">&#8593; 18% vs mar&ccedil;o</div></div>
-            <div class="metric"><div class="metric-label">Pedidos</div><div class="metric-val">142</div><div class="metric-delta up">+24 hoje</div></div>
-            <div class="metric"><div class="metric-label">Ticket m&eacute;dio</div><div class="metric-val">R$271</div><div class="metric-delta up">&#8593; R$12</div></div>
-            <div class="metric"><div class="metric-label">Avalia&ccedil;&atilde;o</div><div class="metric-val">4.8 &#11088;</div><div class="metric-delta" style="color:var(--muted);">87 avalia&ccedil;&otilde;es</div></div>
-          </div>
-          <div class="g2" style="margin-bottom:14px;">
-            <div class="card">
-              <div class="card-hdr"><div class="card-title">Vendas &mdash; 7 dias</div></div>
-              <div class="chart-bars">
-                <div class="bar-w"><div class="bar" style="height:40px"></div><div class="bar-l">Seg</div></div>
-                <div class="bar-w"><div class="bar" style="height:58px"></div><div class="bar-l">Ter</div></div>
-                <div class="bar-w"><div class="bar" style="height:35px"></div><div class="bar-l">Qua</div></div>
-                <div class="bar-w"><div class="bar" style="height:70px"></div><div class="bar-l">Qui</div></div>
-                <div class="bar-w"><div class="bar" style="height:50px"></div><div class="bar-l">Sex</div></div>
-                <div class="bar-w"><div class="bar" style="height:28px"></div><div class="bar-l">S&aacute;b</div></div>
-                <div class="bar-w"><div class="bar hl" style="height:78px"></div><div class="bar-l">Hoj</div></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-hdr"><div class="card-title">Alertas de estoque</div><div class="card-action" onclick="go('produtos')">Ver todos &#8594;</div></div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--amber-pale);border-radius:var(--r-sm);">
-                  <span style="font-size:18px;">&#128138;</span>
-                  <div style="flex:1;"><div style="font-size:13px;font-weight:500;">CBD Isolado 500mg</div><div style="font-size:11px;color:var(--muted);">7 unidades restantes</div></div>
-                  <span class="badge ba">Baixo</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--red-pale);border-radius:var(--r-sm);">
-                  <span style="font-size:18px;">&#127769;</span>
-                  <div style="flex:1;"><div style="font-size:13px;font-weight:500;">CBN Sono 750mg</div><div style="font-size:11px;color:var(--muted);">4 unidades restantes</div></div>
-                  <span class="badge br">Cr&iacute;tico</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-hdr"><div class="card-title">Pedidos recentes</div><div class="card-action" onclick="go('pedidos')">Ver todos &#8594;</div></div>
-            <div class="tw"><table class="table">
-              <thead><tr><th>Pedido</th><th>Paciente</th><th>Produto</th><th>Valor</th><th>Data</th><th>Status</th><th>A&ccedil;&atilde;o</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:600;">#KM-4821</td><td>M. Fonseca</td><td>CBD 1500mg</td><td>R$320</td><td style="color:var(--muted);">06/04</td><td><span class="badge ba">Em tr&acirc;nsito</span></td><td><button class="btn btn-outline btn-sm">Ver</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4820</td><td>R. Castro</td><td>CBN Sono</td><td>R$210</td><td style="color:var(--muted);">05/04</td><td><span class="badge bg">Entregue</span></td><td><button class="btn btn-outline btn-sm">Ver</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4819</td><td>A. Lima</td><td>THC:CBD 1:1</td><td>R$485</td><td style="color:var(--muted);">05/04</td><td><span class="badge bg">Entregue</span></td><td><button class="btn btn-outline btn-sm">Ver</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4818</td><td>P. Santos</td><td>CBD Isolado</td><td>R$158</td><td style="color:var(--muted);">06/04</td><td><span class="badge bb">Novo</span></td><td><button class="btn btn-green btn-sm">Processar</button></td></tr>
-              </tbody>
-            </table></div>
-          </div>
-        </div>
+<!-- NOVO PRODUTO -->
+<div class="screen" id="s-novo-produto">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('produtos')">←</div><div class="hdr-title">Novo produto</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="np-alert"></div>
+<div class="ig"><label class="il">Nome do produto</label><input class="input" id="np-nome" placeholder="Ex: CBD Full Spectrum 1500mg"></div>
+<div class="ig"><label class="il">Descrição</label><textarea class="input" id="np-desc" placeholder="Descrição detalhada do produto..."></textarea></div>
+<div class="ig"><label class="il">Categoria</label><select class="input" id="np-cat"><option value="CBD">CBD</option><option value="THC:CBD">THC:CBD</option><option value="CBN">CBN</option><option value="CBG">CBG</option></select></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="ig"><label class="il">Preço (R$)</label><input class="input" id="np-preco" type="number" placeholder="0.00" step="0.01"></div>
+<div class="ig"><label class="il">Estoque</label><input class="input" id="np-estoque" type="number" placeholder="0"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="ig"><label class="il">Volume</label><input class="input" id="np-vol" placeholder="Ex: 30ml"></div>
+<div class="ig"><label class="il">Concentração</label><input class="input" id="np-conc" placeholder="Ex: 1500mg CBD"></div>
+</div>
+<div class="ig"><label class="il">Emoji do produto</label><input class="input" id="np-emoji" placeholder="🌿" maxlength="4" style="font-size:24px;text-align:center;width:60px"></div>
+<div class="ig" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="np-anvisa"><label for="np-anvisa" style="font-size:13px;color:var(--muted)">Requer autorização ANVISA</label></div>
+<button class="btn btn-primary" onclick="salvarProduto()">Cadastrar produto →</button>
+</div>
+</div>
 
-        <!-- PEDIDOS -->
-        <div class="screen" id="s-pedidos">
-          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-            <input class="input" placeholder="&#128269; Buscar pedido ou paciente..." style="max-width:280px;">
-            <select class="input" style="max-width:160px;"><option>Todos os status</option><option>Novos</option><option>Em tr&acirc;nsito</option><option>Entregues</option></select>
-          </div>
-          <div class="card">
-            <div class="tw"><table class="table">
-              <thead><tr><th>Pedido</th><th>Paciente</th><th>Produto</th><th>Qtd</th><th>Valor</th><th>Data</th><th>Status</th><th>A&ccedil;&atilde;o</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:600;">#KM-4821</td><td>M. Fonseca</td><td>CBD 1500mg 30ml</td><td>1</td><td>R$320</td><td style="color:var(--muted);">06/04</td><td><span class="badge ba">Em tr&acirc;nsito</span></td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4820</td><td>R. Castro</td><td>CBN Sono 750mg</td><td>1</td><td>R$210</td><td style="color:var(--muted);">05/04</td><td><span class="badge bg">Entregue</span></td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4819</td><td>A. Lima</td><td>THC:CBD 1:1 100mg</td><td>2</td><td>R$485</td><td style="color:var(--muted);">05/04</td><td><span class="badge bg">Entregue</span></td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4818</td><td>P. Santos</td><td>CBD Isolado 500mg</td><td>1</td><td>R$158</td><td style="color:var(--muted);">06/04</td><td><span class="badge bb">Novo</span></td><td><button class="btn btn-green btn-sm">Processar</button></td></tr>
-                <tr><td style="font-weight:600;">#KM-4817</td><td>C. Mendes</td><td>CBD 1500mg 30ml</td><td>1</td><td>R$320</td><td style="color:var(--muted);">04/04</td><td><span class="badge bg">Entregue</span></td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr>
-              </tbody>
-            </table></div>
-          </div>
-        </div>
+<!-- PEDIDOS -->
+<div class="screen" id="s-pedidos">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Pedidos</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="ped-list"><div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Carregando...</div></div>
+</div>
+<div class="bnav">
+<div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni" onclick="go('produtos')"><span class="bni-ic">📦</span><span class="bni-lb">Produtos</span></div>
+<div class="bni active" onclick="go('pedidos')"><span class="bni-ic">📋</span><span class="bni-lb">Pedidos</span></div>
+<div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
 
-        <!-- PRODUTOS -->
-        <div class="screen" id="s-produtos">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <input class="input" placeholder="&#128269; Buscar produto..." style="max-width:280px;">
-            <button class="btn btn-primary btn-sm" onclick="go('cadastrar-produto')">+ Novo produto</button>
-          </div>
-          <div class="card">
-            <div class="prod-row">
-              <div class="prod-icon">&#127807;</div>
-              <div style="flex:1;">
-                <div style="font-size:14px;font-weight:600;">CBD Full Spectrum 1500mg</div>
-                <div style="font-size:12px;color:var(--muted);">SKU-0042 &middot; 30ml &middot; R$320,00</div>
-                <div style="margin-top:4px;"><span class="badge bg">48 un.</span> <span class="badge bp">Ativo</span></div>
-              </div>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-outline btn-sm">Editar</button>
-                <button class="btn btn-secondary btn-sm">Ver no marketplace</button>
-              </div>
-            </div>
-            <div class="prod-row">
-              <div class="prod-icon">&#128138;</div>
-              <div style="flex:1;">
-                <div style="font-size:14px;font-weight:600;">CBD Isolado 500mg</div>
-                <div style="font-size:12px;color:var(--muted);">SKU-0018 &middot; C&aacute;psulas 60un &middot; R$158,00</div>
-                <div style="margin-top:4px;"><span class="badge ba">7 un.</span> <span class="badge bp">Ativo</span></div>
-              </div>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-outline btn-sm">Editar</button>
-                <button class="btn btn-secondary btn-sm">Repor estoque</button>
-              </div>
-            </div>
-            <div class="prod-row">
-              <div class="prod-icon">&#127769;</div>
-              <div style="flex:1;">
-                <div style="font-size:14px;font-weight:600;">CBN Sono 750mg</div>
-                <div style="font-size:12px;color:var(--muted);">SKU-0055 &middot; 15ml &middot; R$290,00</div>
-                <div style="margin-top:4px;"><span class="badge br">4 un.</span> <span class="badge ba">Cr&iacute;tico</span></div>
-              </div>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-outline btn-sm">Editar</button>
-                <button class="btn btn-secondary btn-sm">Repor estoque</button>
-              </div>
-            </div>
-            <div class="prod-row" style="opacity:0.6;">
-              <div class="prod-icon">&#127807;</div>
-              <div style="flex:1;">
-                <div style="font-size:14px;font-weight:600;">THC:CBD 1:1 100mg</div>
-                <div style="font-size:12px;color:var(--muted);">SKU-0031 &middot; 10ml &middot; R$242,50</div>
-                <div style="margin-top:4px;"><span class="badge bg">23 un.</span> <span class="badge" style="background:#eee;color:var(--muted);">Inativo</span></div>
-              </div>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-outline btn-sm">Editar</button>
-                <button class="btn btn-green btn-sm">Ativar</button>
-              </div>
-            </div>
-          </div>
-        </div>
+<!-- PERFIL -->
+<div class="screen" id="s-perfil">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Perfil da empresa</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div style="text-align:center;padding:18px 0 22px"><div class="av av-lg" style="margin:0 auto 12px" id="perfil-av">?</div><div style="font-family:var(--font-d);font-size:18px;font-weight:700" id="perfil-nome">Carregando...</div><div style="font-size:13px;color:var(--muted);margin-top:4px" id="perfil-cnpj"></div></div>
+<div id="perfil-alert"></div>
+<div class="ig"><label class="il">Razão social</label><input class="input" id="perfil-razao"></div>
+<div class="ig"><label class="il">Nome fantasia</label><input class="input" id="perfil-fantasia"></div>
+<div class="ig"><label class="il">CNPJ</label><input class="input" id="perfil-cnpj-input" readonly style="opacity:.6"></div>
+<div class="ig"><label class="il">Responsável</label><input class="input" id="perfil-resp"></div>
+<div class="ig"><label class="il">Telefone</label><input class="input" id="perfil-tel" placeholder="(00) 00000-0000"></div>
+<div class="ig"><label class="il">Cidade</label><input class="input" id="perfil-cidade"></div>
+<div class="ig"><label class="il">Estado</label><input class="input" id="perfil-estado" maxlength="2" style="text-transform:uppercase"></div>
+<div class="ig"><label class="il">Alvará ANVISA</label><input class="input" id="perfil-alvara" placeholder="Número do alvará"></div>
+<button class="btn btn-primary" style="margin-bottom:10px" onclick="salvarPerfil()">Salvar alterações</button>
+<button class="btn btn-outline" style="color:var(--red);border-color:rgba(192,57,43,.2)" onclick="doLogout()">Sair da conta</button>
+</div>
+<div class="bnav">
+<div class="bni" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni" onclick="go('produtos')"><span class="bni-ic">📦</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" onclick="go('pedidos')"><span class="bni-ic">📋</span><span class="bni-lb">Pedidos</span></div>
+<div class="bni active" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
+</div>
 
-        <!-- CADASTRAR PRODUTO -->
-        <div class="screen" id="s-cadastrar-produto">
-          <div style="max-width:600px;">
-            <div class="card">
-              <div class="card-title" style="margin-bottom:16px;">Informa&ccedil;&otilde;es do produto</div>
-              <div class="ig"><label class="il">Nome do produto</label><input class="input" placeholder="Ex: CBD Full Spectrum 1500mg"></div>
-              <div class="ig"><label class="il">SKU / C&oacute;digo interno</label><input class="input" placeholder="Ex: SKU-0001"></div>
-              <div class="g2">
-                <div class="ig"><label class="il">Concentra&ccedil;&atilde;o</label><input class="input" placeholder="Ex: 1500mg/30ml"></div>
-                <div class="ig"><label class="il">Volume / Qtd</label><input class="input" placeholder="Ex: 30ml ou 60 c&aacute;psulas"></div>
-              </div>
-              <div class="g2">
-                <div class="ig"><label class="il">Pre&ccedil;o (R$)</label><input class="input" type="number" placeholder="0,00"></div>
-                <div class="ig"><label class="il">Estoque inicial</label><input class="input" type="number" placeholder="0"></div>
-              </div>
-              <div class="ig"><label class="il">Tipo de canabinóide</label>
-                <select class="input"><option>CBD Isolado</option><option>CBD Full Spectrum</option><option>CBD Broad Spectrum</option><option>THC:CBD</option><option>CBN</option><option>Outro</option></select>
-              </div>
-              <div class="ig"><label class="il">Descri&ccedil;&atilde;o (vis&iacute;vel no marketplace)</label><textarea class="input" rows="3" placeholder="Descreva o produto, indica&ccedil;&otilde;es e diferenciais..."></textarea></div>
-              <div class="divider"></div>
-              <div class="card-title" style="margin-bottom:12px;">Documentos do produto</div>
-              <div class="ig"><label class="il">Laudo COA (Certificado de An&aacute;lise)</label><input class="input" type="file" accept=".pdf"></div>
-              <div class="ig"><label class="il">Registro ANVISA / Autoriza&ccedil;&atilde;o de importa&ccedil;&atilde;o</label><input class="input" type="file" accept=".pdf"></div>
-              <div style="display:flex;gap:10px;margin-top:8px;">
-                <button class="btn btn-primary" onclick="go('produtos')">&#10003; Cadastrar produto</button>
-                <button class="btn btn-outline" onclick="go('produtos')">Cancelar</button>
-              </div>
-            </div>
-          </div>
-        </div>
+<!-- LOADING -->
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(253,250,243,.95);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px"><div class="spinner"></div><div style="font-size:14px;color:var(--muted)" id="loading-msg">Carregando...</div></div>
 
-        <!-- FINANCEIRO -->
-        <div class="screen" id="s-financeiro">
-          <div class="metrics" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
-            <div class="metric"><div class="metric-label">Receita abril</div><div class="metric-val">R$38.420</div><div class="metric-delta up">&#8593; 18%</div></div>
-            <div class="metric"><div class="metric-label">A receber</div><div class="metric-val">R$8.240</div><div class="metric-delta" style="color:var(--muted);">Pr&oacute;x. repasse</div></div>
-            <div class="metric"><div class="metric-label">Comiss&atilde;o Kannamaps (10%)</div><div class="metric-val">R$3.842</div><div class="metric-delta" style="color:var(--muted);">Este m&ecirc;s</div></div>
-          </div>
-          <div class="card" style="margin-bottom:14px;">
-            <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--green-pale);border-radius:var(--r-sm);">
-              <span style="font-size:24px;">&#128176;</span>
-              <div style="flex:1;"><div style="font-size:14px;font-weight:600;color:var(--green);">Pr&oacute;ximo repasse: R$8.240,00</div><div style="font-size:12px;color:var(--green);">Previsto para 15/04/2025</div></div>
-              <button class="btn btn-outline btn-sm">Ver detalhes</button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-hdr"><div class="card-title">Extrato de vendas &mdash; Abril 2025</div><button class="btn btn-outline btn-sm">&#128229; Exportar</button></div>
-            <div class="tw"><table class="table">
-              <thead><tr><th>Data</th><th>Pedido</th><th>Produto</th><th>Valor bruto</th><th>Comiss&atilde;o (10%)</th><th>L&iacute;quido</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td style="color:var(--muted);">06/04</td><td>#KM-4821</td><td>CBD 1500mg</td><td>R$320</td><td>R$32</td><td style="color:var(--green);font-weight:600;">R$288</td><td><span class="badge ba">Aguardando</span></td></tr>
-                <tr><td style="color:var(--muted);">05/04</td><td>#KM-4820</td><td>CBN Sono</td><td>R$210</td><td>R$21</td><td style="color:var(--green);font-weight:600;">R$189</td><td><span class="badge bg">Pago</span></td></tr>
-                <tr><td style="color:var(--muted);">05/04</td><td>#KM-4819</td><td>THC:CBD 1:1</td><td>R$485</td><td>R$48,50</td><td style="color:var(--green);font-weight:600;">R$436,50</td><td><span class="badge bg">Pago</span></td></tr>
-                <tr><td style="color:var(--muted);">04/04</td><td>#KM-4817</td><td>CBD 1500mg</td><td>R$320</td><td>R$32</td><td style="color:var(--green);font-weight:600;">R$288</td><td><span class="badge bg">Pago</span></td></tr>
-              </tbody>
-            </table></div>
-          </div>
-        </div>
-
-        <!-- AVALIAÇÕES -->
-        <div class="screen" id="s-avaliacoes">
-          <div class="g2" style="align-items:start;">
-            <div class="card" style="text-align:center;padding:24px;">
-              <div style="font-family:var(--font-d);font-size:52px;font-weight:800;color:var(--p);">4.8</div>
-              <div style="font-size:20px;color:#F5A623;">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
-              <div style="font-size:13px;color:var(--muted);margin-top:4px;">87 avalia&ccedil;&otilde;es</div>
-              <div class="divider"></div>
-              <div style="display:flex;flex-direction:column;gap:6px;text-align:left;">
-                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span>5&#11088;</span><div class="prog" style="flex:1;"><div class="prog-fill" style="width:72%;"></div></div><span style="color:var(--muted);">72%</span></div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span>4&#11088;</span><div class="prog" style="flex:1;"><div class="prog-fill" style="width:20%;background:var(--p-mid);"></div></div><span style="color:var(--muted);">20%</span></div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span>3&#11088;</span><div class="prog" style="flex:1;"><div class="prog-fill" style="width:8%;background:var(--p-mid);"></div></div><span style="color:var(--muted);">8%</span></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title" style="margin-bottom:14px;">Avalia&ccedil;&otilde;es recentes</div>
-              <div style="padding:10px 0;border-bottom:1px solid var(--border);">
-                <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:13px;font-weight:500;">M. Fonseca</span><span style="color:#F5A623;">&#11088;&#11088;&#11088;&#11088;&#11088;</span></div>
-                <div style="font-size:12px;color:var(--muted);margin-bottom:2px;font-style:italic;">"Produto de &oacute;tima qualidade, entrega r&aacute;pida e bem embalado."</div>
-                <div style="font-size:11px;color:var(--muted);">CBD 1500mg &middot; 06/04/2025</div>
-              </div>
-              <div style="padding:10px 0;border-bottom:1px solid var(--border);">
-                <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:13px;font-weight:500;">R. Castro</span><span style="color:#F5A623;">&#11088;&#11088;&#11088;&#11088;&#11088;</span></div>
-                <div style="font-size:12px;color:var(--muted);margin-bottom:2px;font-style:italic;">"Melhor produto que usei. Sinto diferen&ccedil;a real no sono."</div>
-                <div style="font-size:11px;color:var(--muted);">CBN Sono &middot; 05/04/2025</div>
-              </div>
-              <div style="padding:10px 0;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:13px;font-weight:500;">A. Lima</span><span style="color:#F5A623;">&#11088;&#11088;&#11088;&#11088;&#9734;</span></div>
-                <div style="font-size:12px;color:var(--muted);margin-bottom:2px;font-style:italic;">"Bom produto, prazo de entrega um pouco longo."</div>
-                <div style="font-size:11px;color:var(--muted);">THC:CBD 1:1 &middot; 05/04/2025</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ANALYTICS -->
-        <div class="screen" id="s-analytics">
-          <div class="g3" style="margin-bottom:14px;">
-            <div class="metric"><div class="metric-label">Visualiza&ccedil;&otilde;es no marketplace</div><div class="metric-val">1.842</div><div class="metric-delta up">&#8593; 34% este m&ecirc;s</div></div>
-            <div class="metric"><div class="metric-label">Taxa de convers&atilde;o</div><div class="metric-val">7.7%</div><div class="metric-delta up">&#8593; 1.2%</div></div>
-            <div class="metric"><div class="metric-label">Produtos ativos</div><div class="metric-val">3</div><div class="metric-delta" style="color:var(--muted);">1 inativo</div></div>
-          </div>
-          <div class="g2">
-            <div class="card">
-              <div class="card-title" style="margin-bottom:10px;">Produtos mais vendidos</div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:16px;">&#127807;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">CBD 1500mg</div><div class="prog" style="margin-top:4px;"><div class="prog-fill" style="width:72%;"></div></div></div><span style="font-size:13px;font-weight:600;color:var(--p);">72%</span></div>
-                <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:16px;">&#127769;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">CBN Sono</div><div class="prog" style="margin-top:4px;"><div class="prog-fill" style="width:18%;background:var(--p-mid);"></div></div></div><span style="font-size:13px;font-weight:600;color:var(--p);">18%</span></div>
-                <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:16px;">&#128138;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">CBD Isolado</div><div class="prog" style="margin-top:4px;"><div class="prog-fill" style="width:10%;background:var(--p-mid);"></div></div></div><span style="font-size:13px;font-weight:600;color:var(--p);">10%</span></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title" style="margin-bottom:10px;">Estados com mais pedidos</div>
-              <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-                <div style="display:flex;justify-content:space-between;"><span>&#127463;&#127479; S&atilde;o Paulo</span><span class="badge bp">42%</span></div>
-                <div style="display:flex;justify-content:space-between;"><span>&#127463;&#127479; Rio de Janeiro</span><span class="badge bp">21%</span></div>
-                <div style="display:flex;justify-content:space-between;"><span>&#127463;&#127479; Minas Gerais</span><span class="badge bp">14%</span></div>
-                <div style="display:flex;justify-content:space-between;"><span>&#127463;&#127479; Rio Grande do Sul</span><span class="badge bp">9%</span></div>
-                <div style="display:flex;justify-content:space-between;"><span>&#127463;&#127479; Outros</span><span class="badge bp">14%</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PERFIL -->
-        <div class="screen" id="s-perfil">
-          <div class="g2" style="align-items:start;">
-            <div style="display:flex;flex-direction:column;gap:12px;">
-              <div class="card" style="text-align:center;padding:24px;">
-                <div style="font-size:40px;margin-bottom:10px;">&#127978;</div>
-                <div style="font-size:18px;font-weight:700;">Farm&aacute;cia Verde Vida</div>
-                <div style="font-size:13px;color:var(--muted);">CNPJ 12.345.678/0001-90</div>
-                <div style="margin-top:8px;display:flex;gap:6px;justify-content:center;">
-                  <span class="badge bg">Verificada ANVISA</span>
-                  <span class="badge bp">Premium</span>
-                </div>
-              </div>
-              <div class="card">
-                <div class="card-title" style="margin-bottom:12px;">Plano Premium</div>
-                <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Voc&ecirc; est&aacute; no plano Premium &mdash; R$299/m&ecirc;s</div>
-                <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--green);">
-                  <div>&#10003; Destaque no marketplace</div>
-                  <div>&#10003; Analytics avan&ccedil;ado</div>
-                  <div>&#10003; Produtos ilimitados</div>
-                  <div>&#10003; Suporte priorit&aacute;rio</div>
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title" style="margin-bottom:14px;">Dados da empresa</div>
-              <div class="ig"><label class="il">Nome fantasia</label><input class="input" value="Farm&aacute;cia Verde Vida"></div>
-              <div class="ig"><label class="il">CNPJ</label><input class="input" value="12.345.678/0001-90" readonly style="opacity:0.6;"></div>
-              <div class="ig"><label class="il">Respons&aacute;vel t&eacute;cnico (CRF)</label><input class="input" value="Dr. Paulo Mendes &mdash; CRF-SP 12.345"></div>
-              <div class="ig"><label class="il">E-mail</label><input class="input" value="contato@verdevida.com.br"></div>
-              <div class="ig"><label class="il">WhatsApp</label><input class="input" value="(11) 99999-0000"></div>
-              <div class="ig"><label class="il">Descri&ccedil;&atilde;o (vis&iacute;vel no marketplace)</label><textarea class="input" rows="3">Farm&aacute;cia especializada em cannabis medicinal com 8 anos de experi&ecirc;ncia. Todos os produtos com laudo COA.</textarea></div>
-              <button class="btn btn-primary btn-full">Salvar altera&ccedil;&otilde;es</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- DOCUMENTOS -->
-        <div class="screen" id="s-documentos">
-          <div style="max-width:600px;">
-            <div class="card" style="background:var(--green-pale);border-color:rgba(26,127,90,0.2);margin-bottom:16px;">
-              <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;">&#10003; Empresa verificada pela Kannamaps</div>
-              <div style="font-size:12px;color:var(--green);">Todos os documentos obrigat&oacute;rios foram aprovados.</div>
-            </div>
-            <div class="card">
-              <div class="card-title" style="margin-bottom:14px;">Documentos da empresa</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--green-pale);border-radius:var(--r-sm);"><span>&#128196;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">CNPJ ativo</div><div style="font-size:11px;color:var(--muted);">Validade: 31/12/2025</div></div><span class="badge bg">&#10003; Aprovado</span></div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--green-pale);border-radius:var(--r-sm);"><span>&#127963;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">Autoriza&ccedil;&atilde;o ANVISA</div><div style="font-size:11px;color:var(--muted);">RDC 660/2022 &mdash; Validade: 15/08/2025</div></div><span class="badge bg">&#10003; Aprovado</span></div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--green-pale);border-radius:var(--r-sm);"><span>&#128203;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">CRF &mdash; Respons&aacute;vel t&eacute;cnico</div><div style="font-size:11px;color:var(--muted);">Dr. Paulo Mendes &mdash; CRF-SP 12.345</div></div><span class="badge bg">&#10003; Aprovado</span></div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--amber-pale);border-radius:var(--r-sm);"><span>&#128196;</span><div style="flex:1;"><div style="font-size:13px;font-weight:500;">Alvar&aacute; de funcionamento</div><div style="font-size:11px;color:var(--amber);">Vence em 30 dias &mdash; 07/05/2025</div></div><span class="badge ba">Renovar</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CONFIG -->
-        <div class="screen" id="s-config">
-          <div style="max-width:520px;">
-            <div class="card" style="margin-bottom:12px;">
-              <div class="card-title" style="margin-bottom:14px;">Notifica&ccedil;&otilde;es</div>
-              <div style="display:flex;flex-direction:column;gap:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:500;">Novo pedido</div><div style="font-size:12px;color:var(--muted);">E-mail e WhatsApp</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:500;">Estoque baixo</div><div style="font-size:12px;color:var(--muted);">Alerta quando abaixo de 10 un.</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:500;">Repasse dispon&iacute;vel</div><div style="font-size:12px;color:var(--muted);">Quando valor for creditado</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:500;">Nova avalia&ccedil;&atilde;o</div><div style="font-size:12px;color:var(--muted);">Quando paciente avaliar produto</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title" style="margin-bottom:12px;">Conta</div>
-              <button class="btn btn-outline btn-full" style="margin-bottom:8px;">&#128273; Alterar senha</button>
-              <button class="btn btn-outline btn-full" style="color:var(--red);border-color:rgba(192,57,43,0.2);" onclick="doLogout()">Sair da conta</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- NOTIFICAÇÕES -->
-        <div class="screen" id="s-notificacoes">
-          <div style="max-width:520px;">
-            <div class="card" style="border-left:3px solid var(--p);margin-bottom:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:2px;">Novo pedido #KM-4818</div><div style="font-size:12px;color:var(--muted);">P. Santos &mdash; CBD Isolado 500mg &mdash; R$158</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">H&aacute; 5 minutos</div></div>
-            <div class="card" style="margin-bottom:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:2px;">Estoque cr&iacute;tico &mdash; CBN Sono 750mg</div><div style="font-size:12px;color:var(--muted);">Apenas 4 unidades restantes</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">H&aacute; 1 hora</div></div>
-            <div class="card" style="margin-bottom:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:2px;">Repasse creditado &mdash; R$977,50</div><div style="font-size:12px;color:var(--muted);">Referente aos pedidos de 01 a 05/04</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">H&aacute; 2 horas</div></div>
-          </div>
-        </div>
-
-      </div><!-- /page-body -->
-    </div><!-- /main -->
-  </div><!-- /app-body -->
-
-  <!-- BOTTOM NAV MOBILE -->
-  <div class="bnav">
-    <div class="bnav-inner">
-      <div class="bni active" id="bni-home" onclick="go('home')"><span class="bni-icon">&#127968;</span><span class="bni-label">In&iacute;cio</span></div>
-      <div class="bni" id="bni-pedidos" onclick="go('pedidos')"><span class="bni-icon">&#128230;</span><span class="bni-label">Pedidos</span></div>
-      <div class="bni" id="bni-produtos" onclick="go('produtos')"><span class="bni-icon">&#127807;</span><span class="bni-label">Produtos</span></div>
-      <div class="bni" id="bni-financeiro" onclick="go('financeiro')"><span class="bni-icon">&#128176;</span><span class="bni-label">Financeiro</span></div>
-      <div class="bni" id="bni-perfil" onclick="go('perfil')"><span class="bni-icon">&#127978;</span><span class="bni-label">Perfil</span></div>
-    </div>
-  </div>
-
-</div><!-- /app -->
+</div>
 
 <script>
-const TITLES = {
-  home:"Visão geral",pedidos:"Pedidos",produtos:"Produtos",
-  "cadastrar-produto":"Novo produto",financeiro:"Financeiro",
-  avaliacoes:"Avaliações",analytics:"Analytics",
-  perfil:"Meu perfil",documentos:"Documentos",
-  config:"Configurações",notificacoes:"Notificações"
-};
+const SUPA_URL='https://dfxrdxfjqumajxikykay.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmeHJkeGZqcXVtYWp4aWt5a2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTgwMDgsImV4cCI6MjA5MTI3NDAwOH0.U1giCEnSkfjZeUWUigDMIpHm5wpvilSFJH4OljpJNT8';
+const{createClient}=supabase;const sb=createClient(SUPA_URL,SUPA_KEY);
+let currentUser=null,currentProfile=null,myProducts=[],myOrders=[];
 
-function doLogin() {
-  document.getElementById("login-wrap").style.display = "none";
-  document.getElementById("app").classList.add("active");
-  go("home");
+window.addEventListener('DOMContentLoaded',async()=>{
+  showLoading('Verificando sessão...');
+  sb.auth.onAuthStateChange(async(ev,session)=>{if(ev==='SIGNED_IN'&&session){currentUser=session.user;await loadProfile();const a=document.querySelector('.screen.active');if(a&&['s-welcome','s-login','s-cadastro'].includes(a.id))go('home')}});
+  const{data:{session}}=await sb.auth.getSession();hideLoading();
+  if(session){currentUser=session.user;await loadProfile();go('home')}else{go('welcome')}
+});
+
+// AUTH
+async function doLogin(){
+  const email=v('login-email'),senha=v('login-senha');
+  if(!email||!senha)return showAlert('login-alert','Preencha os campos.','err');
+  setBtn('btn-login',true,'Entrando...');
+  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  setBtn('btn-login',false,'Entrar');
+  if(error)return showAlert('login-alert','Credenciais incorretas.','err');
+  currentUser=data.user;await loadProfile();go('home');
+}
+async function doCadastro(){
+  const razao=v('cad-razao'),fantasia=v('cad-fantasia'),cnpj=v('cad-cnpj'),resp=v('cad-resp'),email=v('cad-email'),senha=v('cad-senha');
+  if(!razao||!cnpj||!email||!senha)return showAlert('cad-alert','Preencha todos os campos.','err');
+  if(senha.length<8)return showAlert('cad-alert','Senha: mínimo 8 caracteres.','err');
+  setBtn('btn-cad',true,'Criando...');
+  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{razao_social:razao,nome_fantasia:fantasia}}});
+  setBtn('btn-cad',false,'Cadastrar →');
+  if(error)return showAlert('cad-alert',error.message,'err');
+  currentUser=data.user;
+  await sb.from('fornecedores').upsert({id:currentUser.id,razao_social:razao,nome_fantasia:fantasia,cnpj,responsavel:resp,email,criado_em:new Date().toISOString()});
+  await loadProfile();go('home');
+}
+async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;go('welcome')}
+
+// PROFILE
+async function loadProfile(){
+  if(!currentUser)return;
+  let{data}=await sb.from('fornecedores').select('*').eq('id',currentUser.id).single();
+  if(!data){await sb.from('fornecedores').upsert({id:currentUser.id,email:currentUser.email,razao_social:currentUser.user_metadata?.razao_social||'',nome_fantasia:currentUser.user_metadata?.nome_fantasia||''});({data}=await sb.from('fornecedores').select('*').eq('id',currentUser.id).single())}
+  currentProfile=data;if(!data)return;
+  el('home-nome').textContent=(data.nome_fantasia||data.razao_social||'Empresa')+' 📦';
+  const ini=(data.nome_fantasia||data.razao_social||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  el('perfil-av').textContent=ini;el('perfil-nome').textContent=data.nome_fantasia||data.razao_social||'';el('perfil-cnpj').textContent='CNPJ: '+(data.cnpj||'Não informado');
+  el('perfil-razao').value=data.razao_social||'';el('perfil-fantasia').value=data.nome_fantasia||'';el('perfil-cnpj-input').value=data.cnpj||'';el('perfil-resp').value=data.responsavel||'';el('perfil-tel').value=data.telefone||'';el('perfil-cidade').value=data.cidade||'';el('perfil-estado').value=data.estado||'';el('perfil-alvara').value=data.alvara_anvisa||'';
+  await loadDashboard();
+}
+async function salvarPerfil(){
+  if(!currentUser)return;
+  const d={razao_social:v('perfil-razao'),nome_fantasia:v('perfil-fantasia'),responsavel:v('perfil-resp'),telefone:v('perfil-tel'),cidade:v('perfil-cidade'),estado:v('perfil-estado'),alvara_anvisa:v('perfil-alvara')};
+  showLoading('Salvando...');await sb.from('fornecedores').update(d).eq('id',currentUser.id);hideLoading();
+  currentProfile={...currentProfile,...d};el('perfil-nome').textContent=d.nome_fantasia||d.razao_social;el('home-nome').textContent=(d.nome_fantasia||d.razao_social)+' 📦';
+  showAlert('perfil-alert','✓ Perfil salvo!','ok');
 }
 
-function doLogout() {
-  document.getElementById("app").classList.remove("active");
-  document.getElementById("login-wrap").style.display = "flex";
+// DASHBOARD
+async function loadDashboard(){
+  if(!currentUser)return;
+  const{data:prods}=await sb.from('produtos').select('*').eq('fornecedor_id',currentUser.id);
+  myProducts=prods||[];el('stat-prods').textContent=myProducts.filter(p=>p.ativo).length;
+  const{data:peds}=await sb.from('pedidos').select('*,pedido_itens(*)').eq('fornecedor_id',currentUser.id).order('criado_em',{ascending:false});
+  myOrders=peds||[];el('stat-pedidos').textContent=myOrders.length;
+  const total=myOrders.reduce((s,p)=>s+(p.total||0),0);el('stat-receita').textContent='R$ '+total.toFixed(0);
+  const pend=myOrders.filter(p=>p.status==='confirmado'||p.status==='pendente').length;el('stat-pend').textContent=pend;
+  renderHomeOrders();
+}
+function renderHomeOrders(){
+  const recent=myOrders.slice(0,5);
+  if(!recent.length){el('home-pedidos').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhum pedido ainda. Cadastre seus produtos!</div>';return}
+  el('home-pedidos').innerHTML=recent.map(o=>renderOrderCard(o)).join('');
 }
 
-function go(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  const t = document.getElementById("s-" + id);
-  if(t) t.classList.add("active");
-
-  document.getElementById("page-title").textContent = TITLES[id] || id;
-
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  document.querySelectorAll(".bni").forEach(n => n.classList.remove("active"));
-
-  const navMap = {
-    home:"home", pedidos:"pedidos", produtos:"produtos",
-    "cadastrar-produto":"produtos", financeiro:"financeiro",
-    avaliacoes:"avaliacoes", analytics:"analytics",
-    perfil:"perfil", documentos:"documentos", config:"config",
-    notificacoes:"notificacoes"
-  };
-
-  const navId = navMap[id] || id;
-  document.querySelectorAll(".nav-item").forEach(n => {
-    if(n.getAttribute("onclick") === "go('" + navId + "')") n.classList.add("active");
-  });
-  const bni = document.getElementById("bni-" + navId);
-  if(bni) bni.classList.add("active");
-
-  const actions = document.getElementById("page-actions");
-  actions.innerHTML = id === "produtos" || id === "home"
-    ? '<button class="btn btn-primary btn-sm" onclick="go('cadastrar-produto')">+ Novo produto</button>'
-    : id === "pedidos" ? '<button class="btn btn-outline btn-sm">&#128229; Exportar</button>' : "";
-
-  window.scrollTo(0,0);
-  try { document.querySelector(".main").scrollTop = 0; } catch(e){}
+// PRODUTOS
+async function loadProdutos(){
+  const{data}=await sb.from('produtos').select('*').eq('fornecedor_id',currentUser.id).order('criado_em',{ascending:false});
+  myProducts=data||[];
+  if(!myProducts.length){el('prod-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📦</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Nenhum produto cadastrado</div><div style="font-size:13px;margin-bottom:20px">Comece adicionando seu primeiro produto.</div><button class="btn btn-primary" onclick="go(\'novo-produto\')">+ Novo produto</button></div>';return}
+  el('prod-list').innerHTML=myProducts.map(p=>'<div class="prod-item"><div style="width:44px;height:44px;background:var(--p-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+(p.imagem_emoji||'📦')+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+p.nome+'</div><div style="font-size:12px;color:var(--muted)">'+p.categoria+' · '+(p.volume||'')+'</div><div style="font-size:14px;font-weight:700;color:var(--p);margin-top:2px">R$ '+p.preco.toFixed(2)+'</div></div><div style="text-align:right"><span class="badge '+(p.ativo?'bg':'br')+'">'+(p.ativo?'Ativo':'Inativo')+'</span><div style="font-size:11px;color:var(--muted);margin-top:4px">Estoque: '+(p.estoque||0)+'</div></div></div>').join('');
 }
+async function salvarProduto(){
+  if(!currentUser)return;
+  const d={fornecedor_id:currentUser.id,fornecedor:currentProfile?.nome_fantasia||currentProfile?.razao_social||'',nome:v('np-nome'),descricao:v('np-desc'),categoria:v('np-cat'),preco:parseFloat(v('np-preco'))||0,estoque:parseInt(v('np-estoque'))||0,volume:v('np-vol'),concentracao:v('np-conc'),imagem_emoji:v('np-emoji')||'🌿',requer_anvisa:document.getElementById('np-anvisa')?.checked||false,ativo:true};
+  if(!d.nome||!d.preco)return showAlert('np-alert','Preencha nome e preço.','err');
+  showLoading('Cadastrando...');const{error}=await sb.from('produtos').insert(d);hideLoading();
+  if(error)return showAlert('np-alert','Erro: '+error.message,'err');
+  showAlert('np-alert','✓ Produto cadastrado!','ok');
+  setTimeout(()=>go('produtos'),1500);
+}
+
+// PEDIDOS
+async function loadPedidos(){
+  const{data}=await sb.from('pedidos').select('*,pedido_itens(nome_produto,quantidade,preco_unitario,subtotal)').eq('fornecedor_id',currentUser.id).order('criado_em',{ascending:false});
+  myOrders=data||[];
+  if(!myOrders.length){el('ped-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="font-size:13px">Nenhum pedido recebido ainda</div></div>';return}
+  el('ped-list').innerHTML=myOrders.map(o=>renderOrderCard(o)).join('');
+}
+function renderOrderCard(o){
+  const st=o.status==='confirmado'?'ba':o.status==='enviado'?'bp':o.status==='entregue'?'bg':'br';
+  const items=(o.pedido_itens||[]).map(i=>'<div style="font-size:12px;color:var(--muted)">'+i.quantidade+'x '+(i.nome_produto||'Produto')+' — R$ '+(i.subtotal||0).toFixed(2)+'</div>').join('');
+  return '<div class="order-item"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600">Pedido #'+o.id.slice(0,8)+'</div><div style="font-size:11px;color:var(--muted)">'+new Date(o.criado_em).toLocaleDateString('pt-BR')+'</div></div><span class="badge '+st+'">'+(o.status||'pendente')+'</span></div>'+items+'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span style="font-size:14px;font-weight:700;color:var(--p)">R$ '+(o.total||0).toFixed(2)+'</span>'+(o.status==='confirmado'?'<button class="btn-sm" style="background:var(--green);color:#fff;border:none;border-radius:100px;font-weight:600;cursor:pointer;padding:6px 14px;font-size:12px" onclick="enviarPedido(\''+o.id+'\')">Marcar enviado</button>':'')+(o.status==='enviado'?'<div style="font-size:11px;color:var(--muted)">Rastreio: '+(o.rastreio||'N/A')+'</div>':'')+'</div></div>'
+}
+async function enviarPedido(id){
+  const rastreio=prompt('Digite o código de rastreio:');if(!rastreio)return;
+  showLoading('Atualizando...');
+  await sb.from('pedidos').update({status:'enviado',rastreio,data_envio:new Date().toISOString()}).eq('id',id);
+  hideLoading();await loadPedidos();await loadDashboard();
+}
+
+// NAVIGATION
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const t=document.getElementById('s-'+id);if(t)t.classList.add('active');
+  ['home','produtos','pedidos','perfil'].forEach(n=>{const b=el('bni-'+n);if(b)b.classList.toggle('active',n===id)});
+  if(id==='produtos')loadProdutos();
+  if(id==='pedidos')loadPedidos();
+  if(id==='home'&&currentUser)loadDashboard();
+  window.scrollTo(0,0);try{t.scrollTop=0}catch(e){}
+}
+
+// UTILS
+function v(id){return document.getElementById(id)?.value?.trim()||''}
+function el(id){return document.getElementById(id)}
+function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
+function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
+function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex'}
+function hideLoading(){const l=el('loading');if(l)l.style.display='none'}
 </script>
 </body>
 </html>
