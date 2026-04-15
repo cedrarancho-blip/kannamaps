@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kannamaps — Seu acesso à cannabis medicinal, de forma simples e legal</title>
+<meta name="description" content="Plataforma que conecta pacientes com orientação médica, receita e acesso a produtos de cannabis medicinal. 100% dentro da ANVISA.">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{--p:#6B26AA;--p2:#8B42CC;--p3:#4A1880;--p-pale:#F2EAFA;--p-mid:#E4D4F5;--text:#18101F;--muted:#6B5F7A;--bg:#FAFAFE;--white:#fff;--green:#1A7F5A;--green-pale:#EBF7F2;--amber:#B7770D;--amber-pale:#FEF6E4;--r:16px;--font:'DM Sans',sans-serif;--font-d:'Bricolage Grotesque',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--font);color:var(--text);background:var(--bg);overflow-x:hidden}a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,250,254,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(107,38,170,.07)}
+.nav-in{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center}
+.nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted);font-weight:500}
+.nav-links a:hover{color:var(--p)}
+.nav-cta{background:var(--p);color:#fff;padding:9px 22px;border-radius:100px;font-size:14px;font-weight:600;transition:all .2s}
+.nav-cta:hover{background:var(--p3);transform:translateY(-1px);box-shadow:0 8px 20px rgba(107,38,170,.25)}
+@media(max-width:768px){.nav-links{display:none}}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:80px 24px 60px;background:linear-gradient(160deg,#FAF8FF 0%,#F2EAFA 50%,#FAF8FF 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(107,38,170,.06),transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.hero-in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center;width:100%}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--white);border:1px solid rgba(107,38,170,.15);border-radius:100px;padding:5px 14px 5px 8px;font-size:12px;font-weight:600;color:var(--p);margin-bottom:24px;box-shadow:0 2px 8px rgba(107,38,170,.08)}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--p);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:var(--font-d);font-size:clamp(32px,4.2vw,56px);font-weight:800;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--p)}
+.hero-sub{font-size:clamp(15px,1.5vw,17px);color:var(--muted);line-height:1.75;max-width:460px;margin-bottom:36px;font-weight:300}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:36px}
+.btn-main{background:var(--p);color:#fff;padding:14px 30px;border-radius:100px;font-size:15px;font-weight:600;transition:all .25s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-main:hover{background:var(--p3);transform:translateY(-2px);box-shadow:0 12px 28px rgba(107,38,170,.3)}
+.btn-sec{background:var(--white);color:var(--text);padding:14px 28px;border-radius:100px;font-size:15px;font-weight:500;border:1.5px solid rgba(107,38,170,.15);transition:all .2s}
+.btn-sec:hover{border-color:var(--p);color:var(--p)}
+.hero-trust{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.t-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+@media(max-width:900px){.hero-in{grid-template-columns:1fr}.phone-wrap{display:flex;justify-content:center;margin-top:40px}}
+
+/* PHONE */
+.phone-wrap{position:relative;flex-shrink:0}
+.phone-dev{width:258px;height:518px;background:linear-gradient(145deg,#E6E6EC,#FFFFFF);border-radius:44px;padding:6px;box-shadow:0 28px 70px rgba(0,0,0,.11),0 0 0 1px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.8)}
+.phone-scr{background:#F2EAFA;border-radius:39px;height:100%;overflow:hidden;position:relative}
+.phone-notch{width:78px;height:22px;background:#18101F;border-radius:0 0 12px 12px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.phone-slides{display:flex;width:400%;height:100%;transition:transform .85s cubic-bezier(.4,0,.2,1)}
+.psl{width:25%;flex-shrink:0;display:flex;flex-direction:column;font-family:var(--font)}
+.f{font-family:var(--font)}
+
+/* Slide 0: Welcome */
+.sl0{background:linear-gradient(160deg,#4A1880,#6B26AA,#8B42CC);padding:38px 18px 18px;align-items:center;justify-content:center;text-align:center;color:#fff}
+.sl0 .logo-ring{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:11px;margin:0 auto 6px}
+.sl0 .brand{font-size:12px;font-weight:600;opacity:.85;margin-bottom:24px}
+.sl0 .hero-emoji{font-size:46px;margin-bottom:14px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.sl0 h3{font-family:var(--font-d);font-size:17px;font-weight:800;line-height:1.2;margin-bottom:10px}
+.sl0 p{font-size:10px;opacity:.7;line-height:1.6;margin-bottom:26px;max-width:190px;margin-left:auto;margin-right:auto}
+.sl0 .wb1{background:#fff;color:var(--p);padding:10px 22px;border-radius:100px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:7px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.sl0 .wb2{background:rgba(255,255,255,.18);color:#fff;padding:8px 18px;border-radius:100px;font-size:10px;font-weight:500;display:inline-block}
+
+/* Slide 1: Dashboard paciente */
+.sl1{background:#FAFAFE;padding:34px 13px 0}
+.sd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sd-brand{display:flex;align-items:center;gap:5px}
+.sd-dot{width:15px;height:15px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:800;color:#fff}
+.sd-txt{font-size:9px;font-weight:700;color:var(--p)}
+.sd-greet{font-size:10px;color:var(--muted);margin-bottom:1px}
+.sd-name{font-size:16px;font-weight:800;font-family:var(--font-d);margin-bottom:8px}
+.sd-ptag{display:flex;align-items:center;gap:5px;background:rgba(107,38,170,.06);border-radius:8px;padding:6px 8px;margin-bottom:8px}
+.sd-card{background:linear-gradient(135deg,var(--p3),var(--p));border-radius:11px;padding:11px;margin-bottom:8px;color:#fff}
+.sd-card .lbl{font-size:6px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.sd-card .val{font-size:11px;font-weight:700;display:block}
+.sd-card .sub{font-size:8px;opacity:.75;display:block;margin-top:2px}
+.sd-card .cbtn{background:rgba(255,255,255,.18);padding:3px 9px;border-radius:100px;font-size:7px;font-weight:600;display:inline-block;margin-top:7px}
+.sd-gr{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px}
+.sd-gs{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:9px;padding:9px;text-align:center}
+.sd-gs .gi{font-size:16px;margin-bottom:3px}
+.sd-gs .gl{font-size:7px;font-weight:600;color:var(--text);display:block}
+.sd-gs .gs{font-size:6px;color:var(--p);display:block;margin-top:1px}
+.sd-jt{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.sd-ji{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:7px}
+.sd-ji:last-child{border:none}
+.sd-ji span{font-weight:500}
+.tag-ok{background:var(--green-pale);color:var(--green);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:600}
+.tag-p{background:var(--p-pale);color:var(--p);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:600}
+.tag-s{background:var(--amber-pale);color:var(--amber);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:600}
+.bnav{display:flex;justify-content:space-around;padding:6px 0;background:#fff;border-top:1px solid rgba(0,0,0,.04);margin-top:auto}
+.bn{text-align:center;font-size:5px;color:var(--muted);font-weight:500}
+.bn.on{font-weight:700}
+.bn span{font-size:13px;display:block;margin-bottom:1px}
+
+/* Slide 2: Médico */
+.sl2{background:#FAFAFE;padding:34px 13px 0}
+.sm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sm-dot{width:15px;height:15px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:800;color:#fff}
+.sm-txt{font-size:9px;font-weight:700;color:var(--green)}
+.sm-badge{background:var(--green-pale);color:var(--green);padding:2px 7px;border-radius:100px;font-size:6px;font-weight:700}
+.sm-card{background:linear-gradient(135deg,#0F5C3E,var(--green));border-radius:11px;padding:11px;margin-bottom:8px;color:#fff}
+.sm-card .lbl{font-size:6px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.sm-card .val{font-size:11px;font-weight:700;display:block}
+.sm-card .sub{font-size:8px;opacity:.75;display:block;margin-top:2px}
+.sm-gr{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px}
+.sm-gs{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:9px;padding:8px;text-align:center}
+.sm-gs b{font-size:14px;font-weight:800;color:var(--green);display:block}
+.sm-gs small{font-size:6px;color:var(--muted)}
+.sm-it{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:8px;padding:7px;display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.sm-ico{width:22px;height:22px;border-radius:5px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.sm-n{font-size:8px;font-weight:600}
+.sm-s{font-size:6px;color:var(--muted)}
+
+/* Slide 3: Fornecedor */
+.sl3{background:#FAFAFE;padding:34px 13px 0}
+.sf-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sf-dot{width:15px;height:15px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:800;color:#fff}
+.sf-txt{font-size:9px;font-weight:700;color:var(--amber)}
+.sf-badge{background:var(--amber-pale);color:var(--amber);padding:2px 7px;border-radius:100px;font-size:6px;font-weight:700}
+.sf-card{background:linear-gradient(135deg,#5C3A08,var(--amber));border-radius:11px;padding:11px;margin-bottom:8px;color:#fff}
+.sf-card .lbl{font-size:6px;opacity:.7;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.sf-card .val{font-size:13px;font-weight:800;display:block}
+.sf-card .sub{font-size:8px;opacity:.75;display:block;margin-top:2px}
+.sf-gr{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px}
+.sf-gs{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:9px;padding:8px;text-align:center}
+.sf-gs b{font-size:14px;font-weight:800;color:var(--amber);display:block}
+.sf-gs small{font-size:6px;color:var(--muted)}
+.sf-it{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:8px;padding:7px;display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.sf-ico{width:22px;height:22px;border-radius:5px;background:var(--amber-pale);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.sf-n{font-size:8px;font-weight:600}
+.sf-s{font-size:6px;color:var(--muted)}
+
+/* Dots + Labels */
+.phone-dots{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.pdot{height:6px;border-radius:3px;cursor:pointer;transition:all .3s}
+.phone-labels{display:flex;gap:8px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+.plbl{font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;cursor:pointer;transition:all .2s;border:1.5px solid transparent;color:var(--muted)}
+.plbl.on{box-shadow:0 2px 8px rgba(107,38,170,.12)}
+
+/* STATS */
+.stats{padding:0;background:var(--white)}
+.stats-in{max-width:1100px;margin:0 auto;padding:0 24px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(107,38,170,.08);border-radius:var(--r);overflow:hidden}
+.si{padding:28px 20px;text-align:center;border-right:1px solid rgba(107,38,170,.08)}
+.si:last-child{border-right:none}
+.sn{font-family:var(--font-d);font-size:clamp(26px,3vw,40px);font-weight:900;color:var(--p);letter-spacing:-1px}
+.sl{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4}
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr}.si:nth-child(2){border-right:none}}
+
+/* SECTION COMMONS */
+.sec{padding:80px 24px}
+.sec-in{max-width:1100px;margin:0 auto}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--p);margin-bottom:10px}
+.sec-h{font-family:var(--font-d);font-size:clamp(26px,3.2vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:12px}
+.sec-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:520px;margin-bottom:44px;font-weight:300}
+
+/* PROCESSO */
+.proc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(107,38,170,.07);border-radius:var(--r);overflow:hidden}
+.ps{background:var(--white);padding:32px 22px}
+.ps-num{font-family:var(--font-d);font-size:52px;font-weight:900;color:var(--p-mid);line-height:1;margin-bottom:10px}
+.ps-icon{font-size:26px;margin-bottom:10px}
+.ps-t{font-size:16px;font-weight:700;margin-bottom:7px}
+.ps-d{font-size:14px;color:var(--muted);line-height:1.65}
+@media(max-width:768px){.proc-grid{grid-template-columns:1fr}}
+
+/* CONFIANÇA */
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.tc-list{display:flex;flex-direction:column;gap:14px;margin-top:20px}
+.tc{display:flex;align-items:flex-start;gap:10px;font-size:15px}
+.tc-ico{width:20px;height:20px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px}
+.tquotes{display:flex;flex-direction:column;gap:18px}
+.tq{background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:var(--r);padding:22px;position:relative}
+.tq::before{content:'\201C';font-size:52px;color:var(--p-mid);position:absolute;top:-8px;left:16px;line-height:1;font-family:Georgia,serif}
+.tq-text{font-size:14px;line-height:1.7;margin-bottom:10px;padding-top:18px}
+.tq-author{font-size:12px;color:var(--muted);font-weight:600}
+@media(max-width:768px){.trust-grid{grid-template-columns:1fr}}
+
+/* ECOSSISTEMA */
+.eco-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
+.ec{background:var(--white);border-radius:var(--r);padding:30px 22px;border:1px solid rgba(107,38,170,.06);transition:all .2s;position:relative;overflow:hidden}
+.ec::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.ec.pac::before{background:var(--p)}.ec.med::before{background:var(--green)}.ec.forn::before{background:var(--amber)}
+.ec:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(107,38,170,.1)}
+.ec-icon{font-size:34px;margin-bottom:14px}
+.ec-t{font-size:18px;font-weight:700;margin-bottom:7px}
+.ec-d{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.ec-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
+.ec-list li{font-size:13px;color:var(--muted);display:flex;gap:7px}
+.ec-list li::before{content:'✓';color:var(--p);font-weight:700;flex-shrink:0}
+.ec-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:9px 18px;border-radius:100px;transition:all .2s;border:1.5px solid}
+.ec-btn.pac{color:var(--p);border-color:rgba(107,38,170,.2)}.ec-btn.pac:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.ec-btn.med{color:var(--green);border-color:rgba(26,127,90,.2)}.ec-btn.med:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.ec-btn.forn{color:var(--amber);border-color:rgba(183,119,13,.2)}.ec-btn.forn:hover{background:var(--amber);color:#fff;border-color:var(--amber)}
+@media(max-width:768px){.eco-grid{grid-template-columns:1fr}}
+
+/* CTA */
+.cta-sec{background:linear-gradient(155deg,#3D1470,#6B26AA,#8B42CC);padding:80px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-in{max-width:600px;margin:0 auto;position:relative}
+.cta-in h2{font-family:var(--font-d);font-size:clamp(26px,3.8vw,42px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-1px;margin-bottom:12px}
+.cta-in p{font-size:15px;color:rgba(255,255,255,.72);margin-bottom:32px;line-height:1.7}
+.cta-form{display:flex;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:4px;max-width:440px;margin:0 auto 10px}
+.cta-inp{flex:1;background:transparent;border:none;padding:11px 16px;font-size:14px;color:#fff;font-family:var(--font);outline:none}
+.cta-inp::placeholder{color:rgba(255,255,255,.45)}
+.cta-btn-el{background:#fff;color:var(--p);padding:10px 22px;border-radius:100px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s}
+.cta-btn-el:hover{transform:scale(1.02);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.cta-note{font-size:11px;color:rgba(255,255,255,.4)}
+
+/* FOOTER */
+footer{background:#0D0517;color:rgba(255,255,255,.55);padding:56px 24px 22px}
+.ft-in{max-width:1100px;margin:0 auto}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:44px}
+.ft-brand p{font-size:13px;line-height:1.8;margin-top:12px;max-width:270px}
+.ft-col h4{font-size:12px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.3px;text-transform:uppercase}
+.ft-col a{display:block;font-size:13px;margin-bottom:8px;transition:color .15s}
+.ft-col a:hover{color:#8B42CC}
+.ft-bot{border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;font-size:12px;flex-wrap:wrap;gap:10px}
+.ft-bot a{color:rgba(255,255,255,.35)}
+.ft-bot a:hover{color:rgba(255,255,255,.65)}
+@media(max-width:768px){.ft-grid{grid-template-columns:1fr 1fr}}
+
+
+@keyframes marqueeSlide{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media(max-width:768px){
+  /* NAV */
+  .nav-in{padding:0 16px;height:56px}
+  .nav-cta{padding:7px 16px;font-size:13px}
+
+  /* HERO */
+  .hero{padding:72px 16px 48px;min-height:auto}
+  .hero-in{grid-template-columns:1fr!important;gap:32px;text-align:center}
+  .hero h1{font-size:clamp(28px,8vw,40px);letter-spacing:-1px}
+  .hero-sub{max-width:100%;margin:0 0 28px;font-size:15px}
+  .hero-btns{flex-direction:column;align-items:center;gap:10px}
+  .btn-main,.btn-sec{width:100%;max-width:320px;justify-content:center;padding:13px 24px;font-size:14px}
+  .hero-trust{justify-content:center;gap:12px}
+  .hero-eyebrow{font-size:11px}
+
+  /* PHONE */
+  .phone-wrap{justify-content:center;margin-top:16px!important}
+  .phone-dev{width:220px;height:440px}
+  .phone-dots{margin-top:10px}
+  .phone-labels{gap:6px}
+  .plbl{font-size:10px;padding:3px 10px}
+
+  /* STATS */
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .si{padding:20px 12px}
+  .si:nth-child(2){border-right:none}
+  .si:nth-child(3){border-top:1px solid rgba(107,38,170,.08)}
+  .si:nth-child(4){border-top:1px solid rgba(107,38,170,.08)}
+  .sn{font-size:26px}
+  .sl{font-size:12px}
+
+  /* SECTIONS */
+  .sec{padding:56px 16px}
+  .sec-h{font-size:clamp(22px,6vw,32px)}
+  .sec-sub{font-size:14px;margin-bottom:32px}
+  .eyebrow{font-size:10px}
+
+  /* PROCESSO */
+  .proc-grid{grid-template-columns:1fr}
+
+  /* CONFIANÇA */
+  .trust-grid{grid-template-columns:1fr!important}
+  .tc-list{gap:12px}
+  .tc{font-size:14px}
+
+  /* DIFERENCIAIS */
+  .dif-grid{grid-template-columns:1fr!important}
+
+  /* DEPOIMENTOS */
+  .dep-grid{grid-template-columns:1fr!important}
+
+  /* ECOSSISTEMA */
+  .eco-grid{grid-template-columns:1fr!important}
+
+  /* CTA */
+  .cta-sec{padding:56px 16px}
+  .cta-form{flex-direction:column;border-radius:16px;padding:8px;gap:8px}
+  .cta-inp{padding:10px 12px;font-size:14px}
+  .cta-btn-el{border-radius:100px;padding:11px 20px}
+  .cta-in h2{font-size:clamp(22px,6vw,32px);letter-spacing:-.5px}
+
+  /* FOOTER */
+  .ft-grid{grid-template-columns:1fr 1fr!important}
+  .ft-brand{grid-column:1/-1}
+  .ft-brand p{max-width:100%}
+  .ft-bot{flex-direction:column;text-align:center;gap:8px}
+
+  /* INLINE GRIDS (diferenciais, depoimentos) */
+  div[style*="grid-template-columns:repeat(3,1fr)"]{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  div[style*="grid-template-columns:repeat(2"]{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+@media(max-width:380px){.phone-wrap{display:none}}
+@media(max-width:480px){
+  .hero h1{font-size:26px}
+  .si{padding:16px 8px}
+  .sn{font-size:22px}
+  .ft-grid{grid-template-columns:1fr!important}
+  div[style*="grid-template-columns:repeat(3,1fr)"]{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* ANIMS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .7s ease both}.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}.d5{animation-delay:.5s}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="nav-in">
+  <a href="/" class="nav-logo"><img src="data:image/jpeg;base64,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" alt="kannamaps" style="height:30px;width:auto;display:block"></a>
+  <div class="nav-links"><a href="#processo">Como funciona</a><a href="#ecossistema">Para quem</a><a href="#diferenciais">Diferenciais</a><a href="#depoimentos">Depoimentos</a></div>
+  <a href="kannamaps-entrada.html" class="nav-cta">Acessar plataforma</a>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-in">
+  <div>
+    <div class="hero-eyebrow fu d1"><span class="eyebrow-dot"></span>Cannabis medicinal · 100% legal no Brasil</div>
+    <h1 class="fu d2">Seu acesso à<br><em>cannabis medicinal,</em><br>de forma simples e legal</h1>
+    <p class="hero-sub fu d3">Acompanhe cada etapa, do primeiro acesso até a autorização — com orientação médica e um ecossistema completo ao seu lado.</p>
+    <div class="hero-btns fu d4">
+      <a href="kannamaps-entrada.html" class="btn-main">Quero começar →</a>
+      <a href="#lista-espera" class="btn-sec">Entrar na lista de espera</a>
+    </div>
+    <div class="hero-trust fu d5">
+      <div class="t-item">🔒 100% alinhado à ANVISA</div>
+      <div class="t-item">🩺 Médicos especializados</div>
+      <div class="t-item">⚡ Discreto e seguro</div>
+    </div>
+  </div>
+
+  <div class="phone-wrap fu d3">
+    <div class="phone-dev">
+      <div class="phone-scr">
+        <div class="phone-notch"></div>
+        <div class="phone-slides" id="kmSlides">
+
+          <!-- Slide 0: Welcome paciente -->
+          <div class="psl sl0 f">
+            <div class="logo-ring">km</div>
+            <div class="brand">kannamaps</div>
+            <div class="hero-emoji">👩‍👦</div>
+            <h3>Sua saúde,<br>no lugar certo.</h3>
+            <p>Marketplace seguro para cannabis medicinal. Consulta, receita e entrega em um só lugar.</p>
+            <div><span class="wb1">Criar minha conta</span></div>
+            <div style="margin-top:7px"><span class="wb2">Já tenho conta</span></div>
+          </div>
+
+          <!-- Slide 1: Dashboard paciente -->
+          <div class="psl sl1 f">
+            <div class="sd-top">
+              <div class="sd-brand"><div class="sd-dot">km</div><span class="sd-txt">kannamaps</span></div>
+              <span style="font-size:13px">🛒 🔔</span>
+            </div>
+            <div class="sd-greet">Bom dia,</div>
+            <div class="sd-name">Ana e Lucas 👩‍👦</div>
+            <div class="sd-ptag"><span style="font-size:15px">👩‍👦</span><span style="font-size:7px;font-weight:600;color:var(--p)">Mãe e filho · Pacientes ativos</span></div>
+            <div class="sd-card">
+              <span class="lbl">PRÓXIMA CONSULTA</span>
+              <span class="val">Dra. Daniela Souza</span>
+              <span class="sub">Amanhã · 11:00 · Online</span>
+              <div class="cbtn">Ver detalhes →</div>
+            </div>
+            <div class="sd-gr">
+              <div class="sd-gs"><div class="gi">📁</div><span class="gl">Documentos</span><span class="gs">2 pendentes</span></div>
+              <div class="sd-gs"><div class="gi">🛒</div><span class="gl">Marketplace</span><span class="gs">Ver produtos</span></div>
+            </div>
+            <div class="sd-jt">Progresso da jornada</div>
+            <div class="sd-ji"><span>✅ Conta criada</span><span class="tag-ok">Feito</span></div>
+            <div class="sd-ji"><span>🟡 Consulta agendada</span><span class="tag-p">Pendente</span></div>
+            <div class="sd-ji"><span>🔒 Autorização ANVISA</span><span class="tag-s">Em breve</span></div>
+            <div class="bnav">
+              <div class="bn on" style="color:var(--p)"><span>🏠</span>Início</div>
+              <div class="bn"><span>🛒</span>Produtos</div>
+              <div class="bn"><span>📁</span>Docs</div>
+              <div class="bn"><span>👤</span>Perfil</div>
+            </div>
+          </div>
+
+          <!-- Slide 2: Médico -->
+          <div class="psl sl2 f">
+            <div class="sm-top">
+              <div style="display:flex;align-items:center;gap:4px"><div class="sm-dot">km</div><span class="sm-txt">kannamaps</span></div>
+              <span class="sm-badge">Médico</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted)">Bom dia,</div>
+            <div style="font-size:15px;font-weight:800;font-family:var(--font-d);margin-bottom:8px">Dr. Rafael Mendes 🩺</div>
+            <div class="sm-card">
+              <span class="lbl">CONSULTAS HOJE</span>
+              <span class="val">4 pacientes agendados</span>
+              <span class="sub">Próximo: 14:00 — Ana Lima</span>
+            </div>
+            <div class="sm-gr">
+              <div class="sm-gs"><b>18</b><small>Esta semana</small></div>
+              <div class="sm-gs"><b>63</b><small>Receitas emitidas</small></div>
+            </div>
+            <div class="sm-it"><div class="sm-ico">👤</div><div><div class="sm-n">Ana Lima</div><div class="sm-s">Ansiedade · CBD</div></div><span style="margin-left:auto;background:var(--green-pale);color:var(--green);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">14:00</span></div>
+            <div class="sm-it"><div class="sm-ico">👤</div><div><div class="sm-n">Pedro Alves</div><div class="sm-s">Epilepsia · THC:CBD</div></div><span style="margin-left:auto;background:var(--amber-pale);color:var(--amber);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">15:30</span></div>
+            <div class="sm-it"><div class="sm-ico">👤</div><div><div class="sm-n">Carla Costa</div><div class="sm-s">Dor crônica · CBD</div></div><span style="margin-left:auto;background:var(--p-pale);color:var(--p);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">16:00</span></div>
+            <div class="bnav">
+              <div class="bn on" style="color:var(--green)"><span>🏠</span>Início</div>
+              <div class="bn"><span>👥</span>Pacientes</div>
+              <div class="bn"><span>📋</span>Receitas</div>
+              <div class="bn"><span>👤</span>Perfil</div>
+            </div>
+          </div>
+
+          <!-- Slide 3: Fornecedor -->
+          <div class="psl sl3 f">
+            <div class="sf-top">
+              <div style="display:flex;align-items:center;gap:4px"><div class="sf-dot">km</div><span class="sf-txt">kannamaps</span></div>
+              <span class="sf-badge">Fornecedor</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted)">Desert Moon CBD</div>
+            <div style="font-size:15px;font-weight:800;font-family:var(--font-d);margin-bottom:8px">R$ 48.750,00 💰</div>
+            <div class="sf-card">
+              <span class="lbl">RECEITA · ABRIL</span>
+              <span class="val">+23% vs. março</span>
+              <span class="sub">156 pedidos · 24 produtos ativos</span>
+            </div>
+            <div class="sf-gr">
+              <div class="sf-gs"><b>24</b><small>Produtos</small></div>
+              <div class="sf-gs"><b>156</b><small>Pedidos</small></div>
+            </div>
+            <div class="sf-it"><div class="sf-ico">📦</div><div><div class="sf-n">Pedido #8f3a</div><div class="sf-s">3x CBD Oil 1500mg</div></div><span style="margin-left:auto;background:var(--green-pale);color:var(--green);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">Enviado</span></div>
+            <div class="sf-it"><div class="sf-ico">📦</div><div><div class="sf-n">Pedido #2c7b</div><div class="sf-s">1x CBN Sleep 30ml</div></div><span style="margin-left:auto;background:var(--amber-pale);color:var(--amber);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">Pendente</span></div>
+            <div class="sf-it"><div class="sf-ico">📦</div><div><div class="sf-n">Pedido #9d4e</div><div class="sf-s">2x THC:CBD 1:1</div></div><span style="margin-left:auto;background:var(--green-pale);color:var(--green);padding:1px 6px;border-radius:100px;font-size:6px;font-weight:700">Entregue</span></div>
+            <div class="bnav">
+              <div class="bn on" style="color:var(--amber)"><span>🏠</span>Início</div>
+              <div class="bn"><span>📦</span>Produtos</div>
+              <div class="bn"><span>📋</span>Pedidos</div>
+              <div class="bn"><span>👤</span>Perfil</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="phone-dots" id="kmDots">
+      <div class="pdot" style="width:18px;background:var(--p)"></div>
+      <div class="pdot" style="width:6px;background:rgba(107,38,170,.2)"></div>
+      <div class="pdot" style="width:6px;background:rgba(107,38,170,.15)"></div>
+      <div class="pdot" style="width:6px;background:rgba(107,38,170,.15)"></div>
+    </div>
+    <div class="phone-labels">
+      <span class="plbl on" style="background:var(--p-pale);color:var(--p);border-color:rgba(107,38,170,.2)" data-s="0">👩‍👦 Paciente</span>
+      <span class="plbl" style="color:var(--green)" data-s="2">🩺 Médico</span>
+      <span class="plbl" style="color:var(--amber)" data-s="3">📦 Fornecedor</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- STATS -->
+<section class="stats" style="padding:48px 24px">
+<div class="stats-in">
+<div class="stats-grid">
+  <div class="si"><div class="sn">+675mil</div><div class="sl">pacientes no Brasil</div></div>
+  <div class="si"><div class="sn">R$4bi</div><div class="sl">mercado estimado 2026</div></div>
+  <div class="si"><div class="sn">+300</div><div class="sl">marcas importadas (RDC 660/2022)</div></div>
+  <div class="si"><div class="sn">100%</div><div class="sl">dentro da legislação</div></div>
+</div>
+</div>
+</section>
+
+
+<!-- MARQUEE PATOLOGIAS -->
+<div style="overflow:hidden;border-top:1px solid rgba(107,38,170,.08);border-bottom:1px solid rgba(107,38,170,.08);padding:14px 0;background:var(--white)">
+  <div id="marqueeTrack" style="display:flex;gap:0;width:max-content;animation:marqueeSlide 28s linear infinite;white-space:nowrap">
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Ansiedade</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Epilepsia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Dor Crônica</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Insônia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Fibromialgia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Autismo</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>TDAH</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Parkinson</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Alzheimer</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Depressão</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Enxaqueca</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Esclerose Múltipla</span>
+    <!-- duplicado para loop contínuo -->
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Ansiedade</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Epilepsia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Dor Crônica</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Insônia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Fibromialgia</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Autismo</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>TDAH</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Parkinson</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Alzheimer</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Depressão</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Enxaqueca</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:13px;color:var(--muted);font-weight:500"><span style="width:5px;height:5px;border-radius:50%;background:var(--p);display:inline-block"></span>Esclerose Múltipla</span>
+  </div>
+</div>
+
+<!-- PROCESSO -->
+<section class="sec" id="processo">
+<div class="sec-in">
+  <div class="eyebrow">Processo</div>
+  <h2 class="sec-h">Simples do início ao fim</h2>
+  <p class="sec-sub">Acompanhe cada etapa, do primeiro acesso até a autorização da ANVISA.</p>
+  <div class="proc-grid">
+    <div class="ps"><div class="ps-num">01</div><div class="ps-icon">🩺</div><div class="ps-t">Consulta médica</div><div class="ps-d">Conecte-se com especialistas em cannabis medicinal. Teleconsulta online com prescrição digital em 24h.</div></div>
+    <div class="ps"><div class="ps-num">02</div><div class="ps-icon">📋</div><div class="ps-t">Receita + ANVISA</div><div class="ps-d">Receba orientação médica personalizada e siga o passo a passo guiado para a autorização ANVISA.</div></div>
+    <div class="ps"><div class="ps-num">03</div><div class="ps-icon">🛒</div><div class="ps-t">Acesse seu tratamento</div><div class="ps-d">Escolha produtos verificados de fornecedores autorizados, com COA e entrega rastreada até você.</div></div>
+  </div>
+</div>
+</section>
+
+<!-- CONFIANÇA -->
+<section class="sec" id="confianca" style="background:var(--white)">
+<div class="sec-in">
+<div class="trust-grid">
+  <div>
+    <div class="eyebrow">Por que a Kannamaps</div>
+    <h2 class="sec-h">Construída sobre protocolos regulatórios brasileiros</h2>
+    <div class="tc-list">
+      <div class="tc"><div class="tc-ico">✓</div><span>100% alinhado à ANVISA e RDC 660/2022 — cada produto verificado antes de entrar na plataforma</span></div>
+      <div class="tc"><div class="tc-ico">✓</div><span>Médicos com CRM ativo, especializados em cannabis medicinal</span></div>
+      <div class="tc"><div class="tc-ico">✓</div><span>COA (Certificate of Analysis) obrigatório para todos os produtos</span></div>
+      <div class="tc"><div class="tc-ico">✓</div><span>Dados protegidos pela LGPD — privacidade total</span></div>
+      <div class="tc"><div class="tc-ico">✓</div><span>Acompanhamento contínuo, não apenas uma venda</span></div>
+    </div>
+  </div>
+  <div class="tquotes">
+    <div class="tq"><p class="tq-text">Não sabia por onde começar. Aqui eu encontrei clareza, um médico de verdade e um processo que me deu segurança do início ao fim.</p><div class="tq-author">Maria, 42 anos · São Paulo, SP</div></div>
+    <div class="tq"><p class="tq-text">Hoje tenho controle da minha jornada. A receita, o protocolo ANVISA e os produtos — tudo em um só lugar.</p><div class="tq-author">João, 35 anos · Rio de Janeiro, RJ</div></div>
+  </div>
+</div>
+</div>
+</section>
+
+
+<!-- DIFERENCIAIS -->
+<section id="diferenciais" style="padding:80px 24px;background:var(--white)">
+<div style="max-width:1100px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:48px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--p);margin-bottom:10px">Por que Kannamaps</div>
+    <h2 style="font-family:var(--font-d);font-size:clamp(26px,3.2vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:12px">Não somos uma clínica digital.<br>Somos a infraestrutura de acesso.</h2>
+    <p style="font-size:16px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.7;font-weight:300">A primeira plataforma que reúne múltiplos fornecedores, médicos e pacientes num ambiente aberto, transparente e seguro.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">🏆</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Múltiplos fornecedores</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Diferente dos concorrentes que vendem apenas uma marca, aqui você compara dezenas de produtos autorizados e escolhe o melhor custo-benefício.</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">💰</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Preço justo e transparente</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Concorrência real entre fornecedores garante os melhores preços do mercado. Sem markup escondido, sem fornecedor exclusivo.</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">⭐</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Avaliações reais</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Só pacientes verificados podem avaliar. Sistema anti-fraude que garante opiniões genuínas sobre cada produto e fornecedor.</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">🔄</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Jornada completa</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Da consulta médica à entrega do produto, tudo dentro da plataforma. Sem pular de site em site para resolver cada etapa.</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">📱</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">App nativo iOS & Android</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Experiência mobile-first para acompanhar pedidos, renovar receitas e se comunicar com seu médico de qualquer lugar.</div>
+    </div>
+    <div style="background:var(--bg);border:1px solid rgba(107,38,170,.08);border-radius:16px;padding:28px 22px">
+      <div style="width:44px;height:44px;background:var(--p-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">🤝</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Comunidade de pacientes</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65">Fórum moderado onde pacientes compartilham experiências, tiram dúvidas e recebem suporte de profissionais parceiros.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section id="depoimentos" style="padding:80px 24px;background:var(--bg)">
+<div style="max-width:1100px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:48px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--p);margin-bottom:10px">Depoimentos</div>
+    <h2 style="font-family:var(--font-d);font-size:clamp(26px,3.2vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1px">O que dizem os pacientes<br>que já utilizam cannabis medicinal</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+    <div style="background:var(--white);border:1px solid rgba(107,38,170,.07);border-radius:16px;padding:28px 24px">
+      <div style="color:#F59E0B;font-size:14px;margin-bottom:16px">★★★★★</div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:20px;font-style:italic">"Finalmente um lugar onde consigo comparar produtos e preços antes de decidir. Economizei mais de R$200 no meu primeiro pedido."</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--p);flex-shrink:0">MF</div>
+        <div><div style="font-size:13px;font-weight:600">Mariana F.</div><div style="font-size:12px;color:var(--muted)">Fibromialgia · São Paulo</div></div>
+      </div>
+    </div>
+    <div style="background:var(--white);border:1px solid rgba(107,38,170,.07);border-radius:16px;padding:28px 24px">
+      <div style="color:#F59E0B;font-size:14px;margin-bottom:16px">★★★★★</div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:20px;font-style:italic">"Meu filho tem epilepsia. Antes era uma odisseia encontrar o produto certo. A Kannamaps simplificou tudo — consulta, receita e entrega num só app."</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--p);flex-shrink:0">RC</div>
+        <div><div style="font-size:13px;font-weight:600">Roberto C.</div><div style="font-size:12px;color:var(--muted)">Pai de paciente · Rio de Janeiro</div></div>
+      </div>
+    </div>
+    <div style="background:var(--white);border:1px solid rgba(107,38,170,.07);border-radius:16px;padding:28px 24px">
+      <div style="color:#F59E0B;font-size:14px;margin-bottom:16px">★★★★★</div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:20px;font-style:italic">"Como médica prescritora, a plataforma me deu visibilidade que eu não teria sozinha. Trisei minha agenda em dois meses."</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">DS</div>
+        <div><div style="font-size:13px;font-weight:600">Dra. Débora S.</div><div style="font-size:12px;color:var(--muted)">Neurologista · Belo Horizonte</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ECOSSISTEMA -->
+<section class="sec" id="ecossistema" style="background:linear-gradient(160deg,#F2EAFA,#FAF8FF)">
+<div class="sec-in">
+  <div style="text-align:center"><div class="eyebrow">Para quem é</div>
+  <h2 class="sec-h">Um ecossistema completo,<br>em um só lugar</h2>
+  <p class="sec-sub" style="margin:0 auto 44px">Uma infraestrutura que conecta pacientes, médicos e fornecedores em escala — com segurança, rastreabilidade e compliance.</p></div>
+  <div class="eco-grid">
+    <div class="ec pac"><div class="ec-icon">👩‍👦</div><div class="ec-t">Pacientes</div><div class="ec-d">Sua jornada de saúde, guiada do começo ao fim. Sem burocracia, sem confusão.</div><ul class="ec-list"><li>Consulta médica online em 24h</li><li>Passo a passo para autorização ANVISA</li><li>Marketplace com produtos verificados</li><li>Rastreio de pedido e histórico médico</li></ul><a href="kannamaps-paciente.html" class="ec-btn pac">Acessar como paciente →</a></div>
+    <div class="ec med"><div class="ec-icon">🩺</div><div class="ec-t">Médicos</div><div class="ec-d">Prescreva com segurança, acompanhe pacientes e amplie sua prática clínica.</div><ul class="ec-list"><li>Agenda e teleconsulta integradas</li><li>Prontuário e receita digital</li><li>Base de pacientes qualificados</li><li>Suporte regulatório completo</li></ul><a href="kannamaps-medico.html" class="ec-btn med">Acessar como médico →</a></div>
+    <div class="ec forn"><div class="ec-icon">📦</div><div class="ec-t">Fornecedores</div><div class="ec-d">Alcance pacientes qualificados em escala nacional, com total conformidade.</div><ul class="ec-list"><li>Vitrine para +675k pacientes</li><li>Gestão de estoque e pedidos</li><li>Validação COA simplificada</li><li>Dashboard financeiro completo</li></ul><a href="kannamaps-fornecedor.html" class="ec-btn forn">Acessar como fornecedor →</a></div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec" id="lista-espera">
+<div class="cta-in">
+  <h2>Entre na lista de espera.<br>Acesso antecipado gratuito.</h2>
+  <p>Seja um dos primeiros a usar a Kannamaps. Membros fundadores terão benefícios exclusivos para sempre.</p>
+  <div class="cta-form"><input class="cta-inp" type="email" placeholder="seu@email.com" id="ctaEmail"><button class="cta-btn-el" onclick="joinWL()">Garantir minha vaga →</button></div>
+  <div class="cta-note">Sem spam. Cancele a qualquer momento. Dados protegidos pela LGPD.</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="ft-in">
+  <div class="ft-grid">
+    <div class="ft-brand">
+      <svg height="30" viewBox="0 0 280 76" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="38" r="36" fill="#9B4FDE"/><text x="38" y="33" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="21" fill="white">km</text><path d="M23 52 Q38 64 53 52" stroke="white" stroke-width="2.8" fill="none" stroke-linecap="round"/><text x="86" y="50" font-family="Arial,sans-serif" font-weight="700" font-size="32" fill="white">kannamaps</text></svg>
+      <p>O marketplace fácil e seguro para cannabis medicinal no Brasil. Conforme RDC 660/2022 da ANVISA.</p>
+    </div>
+    <div class="ft-col"><h4>Plataforma</h4><a href="#processo">Como funciona</a><a href="kannamaps-paciente.html">Para pacientes</a><a href="kannamaps-medico.html">Para médicos</a><a href="kannamaps-fornecedor.html">Para farmácias</a></div>
+    <div class="ft-col"><h4>Empresa</h4><a href="#">Sobre nós</a><a href="#">Blog</a><a href="#">Imprensa</a><a href="#">Trabalhe conosco</a></div>
+    <div class="ft-col"><h4>Suporte</h4><a href="#">Central de ajuda</a><a href="#">Contato</a><a href="#">WhatsApp</a><a href="#">Instagram</a></div>
+  </div>
+  <div class="ft-bot">
+    <span>&copy; 2025 Kannamaps Tecnologia Ltda · CNPJ em registro · kannamaps.com.br</span>
+    <span><a href="#">Termos de uso</a> &nbsp;·&nbsp; <a href="#">Privacidade</a> &nbsp;·&nbsp; <a href="#">LGPD</a></span>
+  </div>
+</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var cur=0,n=4;
+  var colors=['#6B26AA','#6B26AA','#1A7F5A','#B7770D'];
+  var slides=document.getElementById('kmSlides');
+  var dots=document.querySelectorAll('.pdot');
+  var labels=document.querySelectorAll('.plbl');
+
+  function go(s){
+    cur=s;
+    if(slides)slides.style.transform='translateX(-'+(s*25)+'%)';
+    dots.forEach(function(d,i){d.style.width=i===s?'18px':'6px';d.style.background=i===s?colors[s]:'rgba(107,38,170,.15)'});
+    var lblMap={0:[0],2:[1],3:[2]};
+    labels.forEach(function(l,li){
+      var ds=parseInt(l.dataset.s);
+      var isActive=ds===s;
+      l.classList.toggle('on',isActive);
+      if(isActive){l.style.background=s===0?'var(--p-pale)':s===2?'var(--green-pale)':'var(--amber-pale)';l.style.borderColor=s===0?'rgba(107,38,170,.2)':s===2?'rgba(26,127,90,.2)':'rgba(183,119,13,.2)'}
+      else{l.style.background='';l.style.borderColor='transparent'}
+    });
+  }
+
+  setInterval(function(){go((cur+1)%n)},3500);
+  dots.forEach(function(d,i){d.addEventListener('click',function(){go(i)})});
+  labels.forEach(function(l){l.addEventListener('click',function(){go(parseInt(l.dataset.s))})});
+
+  window.joinWL=function(){
+    var e=document.getElementById('ctaEmail').value;
+    if(!e||!e.includes('@'))return alert('Digite um e-mail válido');
+    alert('Obrigado! Você entrou na lista de espera da Kannamaps.');
+    document.getElementById('ctaEmail').value='';
+  };
+});
+</script>
+</body>
+</html>
