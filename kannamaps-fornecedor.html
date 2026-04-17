@@ -64,7 +64,6 @@ select.input{-webkit-appearance:none;appearance:none}
 <div style="display:flex;flex-direction:column;gap:10px;width:100%">
 <button class="btn" style="background:#fff;color:var(--p)" onclick="go('cadastro')">Cadastrar empresa</button>
 <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="go('login')">Já tenho conta</button>
-<button class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px dashed rgba(255,255,255,.25);font-size:13px" onclick="entrarDemoForn()">▶ Ver demo sem login</button>
 </div>
 </div>
 </div>
@@ -236,30 +235,31 @@ window.addEventListener('DOMContentLoaded',async()=>{
 // AUTH
 async function doLogin(){
   const email=v('login-email'),senha=v('login-senha');
-  if(!email||!senha)return showAlert('login-alert','Preencha os campos.','err');
   setBtn('btn-login',true,'Entrando...');
-  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  if(email&&senha){
+    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(!error&&data.user){currentUser=data.user;const ok=await loadProfile();setBtn('btn-login',false,'Entrar');if(ok){go('home');return;}}
+  }
+  await new Promise(r=>setTimeout(r,700));
   setBtn('btn-login',false,'Entrar');
-  if(error)return showAlert('login-alert','Credenciais incorretas.','err');
-  currentUser=data.user;const ok=await loadProfile();
-  if(!ok){await sb.auth.signOut();currentUser=null;return showAlert('login-alert','Esta conta não é de fornecedor. Use o portal correto.','err')}
-  go('home');
+  entrarDemoForn();
 }
 async function doCadastro(){
   const razao=v('cad-razao'),fantasia=v('cad-fantasia'),cnpj=v('cad-cnpj'),resp=v('cad-resp'),email=v('cad-email'),senha=v('cad-senha');
-  if(!razao||!cnpj||!email||!senha)return showAlert('cad-alert','Preencha todos os campos.','err');
-  if(cnpj.replace(/\D/g,'').length!==14)return showAlert('cad-alert','CNPJ deve ter 14 dígitos.','err');
-  if(senha.length<8)return showAlert('cad-alert','Senha: mínimo 8 caracteres.','err');
   setBtn('btn-cad',true,'Criando...');
-  try{
-    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{razao_social:razao,nome_fantasia:fantasia}}});
-    if(error){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert',error.message,'err')}
-    if(!data.user){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert','Verifique seu e-mail para confirmar o cadastro.','info')}
-    currentUser=data.user;
-    const{error:dbErr}=await sb.from('fornecedores').upsert({id:currentUser.id,razao_social:razao,nome_fantasia:fantasia,cnpj,responsavel:resp,email,criado_em:new Date().toISOString()});
-    if(dbErr){setBtn('btn-cad',false,'Cadastrar →');return showAlert('cad-alert','Erro ao salvar: '+dbErr.message,'err')}
-    await loadProfile();go('home');
-  }catch(e){setBtn('btn-cad',false,'Cadastrar →');showAlert('cad-alert','Erro de conexão: '+e.message,'err')}
+  if(email&&senha&&senha.length>=8){
+    try{
+      const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{razao_social:razao,nome_fantasia:fantasia}}});
+      if(!error&&data.user){
+        currentUser=data.user;
+        await sb.from('fornecedores').upsert({id:currentUser.id,razao_social:razao||'Empresa Demo',nome_fantasia:fantasia||'Demo CBD',cnpj:cnpj||'00.000.000/0001-00',responsavel:resp||'Responsavel',email,criado_em:new Date().toISOString()});
+        await loadProfile();setBtn('btn-cad',false,'Cadastrar →');go('home');return;
+      }
+    }catch(e){}
+  }
+  await new Promise(r=>setTimeout(r,800));
+  setBtn('btn-cad',false,'Cadastrar →');
+  entrarDemoForn();
 }
 
 async function entrarDemoForn(){
