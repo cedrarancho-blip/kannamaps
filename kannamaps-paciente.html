@@ -127,7 +127,21 @@ async function doLogin(){
   currentUser=data.user;await loadProfile();go('home');
 }
 
-async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;uploadedDocs={};cart=[];go('welcome')}
+
+async function entrarDemoPaciente(){
+  currentUser={id:'demo-pac-001',email:'ana.demo@kannamaps.com'};
+  currentProfile={id:'demo-pac-001',nome:'Ana e Lucas',email:'ana.demo@kannamaps.com',cpf:'123.456.789-00',telefone:'(21) 99999-0002',sintomas:'Ansiedade e epilepsia (filho)',uso_cbd:'Não',tem_receita:'Não, preciso de receita',anvisa_protocolo:'ANVI-2026-00123'};
+  el('home-nome').textContent='Ana e Lucas 👩‍👦';
+  el('home-consulta-card').innerHTML='<div class="hero-card" onclick="go('consulta')"><div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px">PRÓXIMA CONSULTA</div><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:2px">Dra. Daniela Souza</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:12px">Amanhã · 11:00 · Online</div><span style="background:rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600">Ver detalhes →</span></div>';
+  el('jornada-consulta-badge').textContent='Agendada';
+  el('jornada-consulta-badge').className='badge ba';
+  if(el('perfil-nome-val'))el('perfil-nome-val').textContent='Ana e Lucas';
+  // Load products for demo
+  loadProducts();
+  go('home');
+}
+
+async function doLogout(){if(!currentUser?.id?.startsWith("demo")){await sb.auth.signOut();}currentUser=null;currentProfile=null;uploadedDocs={};cart=[];go('welcome')}
 
 async function doEsqueciSenha(){
   const email=v('esqueci-email');if(!email)return showAlert('esqueci-alert','Digite seu e-mail.','err');
@@ -433,6 +447,7 @@ function fmtCEP(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{5})(\d)/,'$
 <div class="wbtns">
 <button class="btn btn-white" onclick="go('cadastro')">Criar minha conta</button>
 <button class="btn btn-ghost" onclick="go('login')">Já tenho conta</button>
+<button class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px dashed rgba(255,255,255,.25);font-size:13px;margin-top:4px" onclick="entrarDemoPaciente()">▶ Ver demo sem login</button>
 </div>
 </div>
 </div>
