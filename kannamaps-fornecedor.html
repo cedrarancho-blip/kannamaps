@@ -64,6 +64,7 @@ select.input{-webkit-appearance:none;appearance:none}
 <div style="display:flex;flex-direction:column;gap:10px;width:100%">
 <button class="btn" style="background:#fff;color:var(--p)" onclick="go('cadastro')">Cadastrar empresa</button>
 <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="go('login')">Já tenho conta</button>
+<button class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px dashed rgba(255,255,255,.25);font-size:13px" onclick="entrarDemoForn()">▶ Ver demo sem login</button>
 </div>
 </div>
 </div>
@@ -260,7 +261,24 @@ async function doCadastro(){
     await loadProfile();go('home');
   }catch(e){setBtn('btn-cad',false,'Cadastrar →');showAlert('cad-alert','Erro de conexão: '+e.message,'err')}
 }
-async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;go('welcome')}
+
+async function entrarDemoForn(){
+  currentUser={id:'demo-forn-001',email:'demo@desertmooncbd.com'};
+  currentProfile={id:'demo-forn-001',razao_social:'Desert Moon LTDA',nome_fantasia:'Desert Moon CBD',cnpj:'12.345.933/0001-90',responsavel:'Joao Antunes',email:'demo@desertmooncbd.com',telefone:'(11) 99999-0003',cidade:'Sao Paulo',estado:'SP',alvara_anvisa:'ANVISA-2024-FM-00842'};
+  try{el('home-nome').textContent='Desert Moon CBD';}catch(e){}
+  try{
+    el('perfil-av').textContent='DM';el('perfil-nome').textContent='Desert Moon CBD';
+    el('perfil-cnpj').textContent='CNPJ: 12.345.933/0001-90';
+    el('perfil-razao').value='Desert Moon LTDA';el('perfil-fantasia').value='Desert Moon CBD';
+    el('perfil-cnpj-input').value='12.345.933/0001-90';el('perfil-resp').value='Joao Antunes';
+    el('perfil-tel').value='(11) 99999-0003';el('perfil-cidade').value='Sao Paulo';
+    el('perfil-estado').value='SP';el('perfil-alvara').value='ANVISA-2024-FM-00842';
+  }catch(e){}
+  try{loadDashboard();}catch(e){}
+  go('home');
+}
+
+async function doLogout(){if(!currentUser?.id?.startsWith("demo")){await sb.auth.signOut();}currentUser=null;currentProfile=null;go('welcome')}
 
 // PROFILE
 async function loadProfile(){
@@ -310,21 +328,29 @@ async function salvarProduto(){
   if(!currentUser)return;
   const nome=v('np-nome'),preco=parseFloat(v('np-preco'))||0;
   if(!nome||!preco)return showAlert('np-alert','Preencha nome e preço.','err');
+  showLoading('Cadastrando produto...');
+  let coaUrl='',coaPath='',coaStatus='sem_coa';
   const coaFile=document.getElementById('np-coa')?.files[0];
-  if(!coaFile)return showAlert('np-alert','Anexe o COA (Certificate of Analysis).','err');
-  showLoading('Enviando COA...');
-  const coaPath=currentUser.id+'/'+Date.now()+'_'+coaFile.name;
+  if(coaFile){
+    try{
+      const path=currentUser.id+'/'+Date.now()+'_'+coaFile.name;
+      const{error:coaErr,data:upData}=await sb.storage.from('coa').upload(path,coaFile,{cacheControl:'3600',upsert:false});
+      if(!coaErr){
+        const{data:urlData}=sb.storage.from('coa').getPublicUrl(path);
+        coaUrl=urlData?.publicUrl||'';coaPath=path;coaStatus='enviado';
+      }else{
+        // COA upload failed but continue saving product
+        showAlert('np-alert','Aviso: COA nao enviado ('+coaErr.message+'). Produto salvo sem COA.','info');
+      }
+    }catch(e){showAlert('np-alert','Aviso: COA nao enviado. Produto salvo sem COA.','info')}
+  }
   try{
-    const{error:coaErr}=await sb.storage.from('coa').upload(coaPath,coaFile);
-    if(coaErr){hideLoading();return showAlert('np-alert','Erro COA: '+coaErr.message,'err')}
-    const{data:coaUrl}=sb.storage.from('coa').getPublicUrl(coaPath);
-    showLoading('Cadastrando...');
-    const d={fornecedor_id:currentUser.id,fornecedor:currentProfile?.nome_fantasia||currentProfile?.razao_social||'',nome,descricao:v('np-desc'),categoria:v('np-cat'),preco,estoque:parseInt(v('np-estoque'))||0,volume:v('np-vol'),concentracao:v('np-conc'),imagem_emoji:v('np-emoji')||'🌿',requer_anvisa:document.getElementById('np-anvisa')?.checked||false,registro_anvisa:v('np-registro'),lote:v('np-lote'),data_validade:v('np-validade')||null,coa_url:coaUrl.publicUrl,coa_path:coaPath,coa_validade:v('np-coa-val')||null,coa_status:'enviado',aprovacao_status:'pendente',ativo:false};
+    const d={fornecedor_id:currentUser.id,fornecedor:currentProfile?.nome_fantasia||currentProfile?.razao_social||'',nome,descricao:v('np-desc'),categoria:v('np-cat'),preco,estoque:parseInt(v('np-estoque'))||0,volume:v('np-vol'),concentracao:v('np-conc'),imagem_emoji:v('np-emoji')||'🌿',requer_anvisa:document.getElementById('np-anvisa')?.checked||false,registro_anvisa:v('np-registro'),lote:v('np-lote'),data_validade:v('np-validade')||null,coa_url:coaUrl,coa_path:coaPath,coa_validade:v('np-coa-val')||null,coa_status:coaStatus,aprovacao_status:'pendente',ativo:false};
     const{error}=await sb.from('produtos').insert(d);hideLoading();
     if(error)return showAlert('np-alert','Erro: '+error.message,'err');
-    showAlert('np-alert','✓ Produto cadastrado! Aguardando aprovação.','ok');
+    showAlert('np-alert','Produto cadastrado! Aguardando aprovacao.','ok');
     setTimeout(()=>go('produtos'),2000);
-  }catch(e){hideLoading();showAlert('np-alert','Erro de conexão.','err')}
+  }catch(e){hideLoading();showAlert('np-alert','Erro de conexao: '+e.message,'err')}
 }
 
 // PEDIDOS
