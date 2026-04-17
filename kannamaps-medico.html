@@ -73,6 +73,7 @@ textarea.input{resize:vertical;min-height:80px}
 <div style="display:flex;flex-direction:column;gap:10px;width:100%">
 <button class="btn" style="background:#fff;color:var(--p)" onclick="go('cadastro')">Criar conta médica</button>
 <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="go('login')">Já tenho conta</button>
+<button class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px dashed rgba(255,255,255,.25);font-size:13px" onclick="entrarDemo()">▶ Ver demo sem login</button>
 </div>
 </div>
 </div>
@@ -302,7 +303,25 @@ async function doCadastro(){
     await loadProfile();go('home');
   }catch(e){setBtn('btn-cad',false,'Criar conta →');showAlert('cad-alert','Erro de conexão: '+e.message,'err')}
 }
-async function doLogout(){await sb.auth.signOut();currentUser=null;currentProfile=null;go('welcome')}
+
+async function entrarDemo(){
+  currentUser={id:'demo-med-001',email:'dr.demo@kannamaps.com'};
+  currentProfile={id:'demo-med-001',nome:'Dr. Rafael Mendes',crm:'45231',estado_crm:'SP',especialidade:'Neurologista',email:'dr.demo@kannamaps.com',valor_consulta:189,rating:4.9,telefone:'(11) 99999-0001',bio:'Especialista em cannabis medicinal.'};
+  try{el('home-nome').textContent='Dr. Rafael Mendes';}catch(e){}
+  try{el('stat-semana').textContent='12';el('stat-pacientes').textContent='48';el('stat-receitas').textContent='63';}catch(e){}
+  try{
+    var d=new Date().toLocaleDateString('pt-BR');
+    el('agenda-hoje').innerHTML='<div class="appt-item"><div class="av av-md">MS</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Maria Santos</div><div style="font-size:12px;color:var(--muted)">'+d+' 14:00</div></div><span class="badge bg">Confirmada</span></div><div class="appt-item"><div class="av av-md">PO</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Pedro Oliveira</div><div style="font-size:12px;color:var(--muted)">'+d+' 15:30</div></div><span class="badge ba">Agendada</span></div>';
+    el('agenda-proximas').innerHTML='<div class="appt-item"><div class="av av-md">AC</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Ana Costa</div><div style="font-size:12px;color:var(--muted)">Amanha 10:00</div></div><span class="badge ba">Agendada</span></div>';
+    el('perfil-av').textContent='RM';el('perfil-nome').textContent='Dr. Rafael Mendes';
+    el('perfil-crm').textContent='CRM 45.231/SP - Neurologista';
+    el('perfil-nome-input').value='Dr. Rafael Mendes';el('perfil-crm-input').value='45231/SP';
+    el('perfil-esp').value='Neurologista';el('perfil-tel').value='(11) 99999-0001';el('perfil-valor').value=189;
+  }catch(e){}
+  go('home');
+}
+
+async function doLogout(){if(currentUser?.id?.startsWith("demo")){}else{await sb.auth.signOut();}currentUser=null;currentProfile=null;go('welcome')}
 
 // PROFILE
 async function loadProfile(){
@@ -359,8 +378,16 @@ function renderAgenda(containerId,items,emptyMsg){
 
 // PACIENTES
 async function loadPacientes(){
+  if(currentUser&&currentUser.id.startsWith('demo')){
+    allPacientes=[
+      {id:'dp1',nome:'Maria Santos',email:'maria@demo.com',sintomas:'Ansiedade',tem_receita:'Sim, tenho receita',telefone:'(11) 91111-0001',cpf:'111.222.333-44',anvisa_protocolo:'ANVI-2026-00111'},
+      {id:'dp2',nome:'Pedro Oliveira',email:'pedro@demo.com',sintomas:'Epilepsia',tem_receita:'Sim, tenho receita',telefone:'(21) 92222-0002',cpf:'222.333.444-55',anvisa_protocolo:'ANVI-2026-00222'},
+      {id:'dp3',nome:'Ana Costa',email:'ana@demo.com',sintomas:'Dor cronica',tem_receita:'Nao tenho receita',telefone:'(31) 93333-0003',cpf:'333.444.555-66',anvisa_protocolo:''}
+    ];
+    renderPacientes(allPacientes);return;
+  }
   const pacIds=[...new Set(allConsultas.map(c=>c.paciente_id))];
-  if(!pacIds.length){el('pac-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">👥</div><div style="font-size:13px">Seus pacientes aparecerão aqui após a primeira consulta</div></div>';return}
+  if(!pacIds.length){el('pac-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">&#128101;</div><div style="font-size:13px">Seus pacientes aparecerao aqui apos a primeira consulta</div></div>';return}
   const{data}=await sb.from('pacientes').select('*').in('id',pacIds);
   allPacientes=data||[];renderPacientes(allPacientes);
 }
@@ -369,7 +396,7 @@ function renderPacientes(list){
   if(!list.length){el('pac-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhum paciente encontrado</div>';return}
   el('pac-list').innerHTML=list.map(p=>{
     const ini=p.nome?p.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
-    return '<div class="appt-item"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+(p.nome||p.email)+'</div><div style="font-size:12px;color:var(--muted)">'+(p.sintomas||'Sem condições informadas')+'</div></div><span class="badge bg">'+(p.tem_receita==='Sim, tenho receita'?'Com receita':'Sem receita')+'</span></div>'
+    return '<div class="appt-item" style="cursor:pointer" onclick="verPerfilPaciente(\''+p.id+'\')"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+(p.nome||p.email)+'</div><div style="font-size:12px;color:var(--muted)">'+(p.sintomas||'Sem condições informadas')+'</div></div><div style="text-align:right"><span class="badge bg">'+(p.tem_receita==='Sim, tenho receita'?'Com receita':'Sem receita')+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px">Ver perfil →</div></div></div>'
   }).join('');
 }
 
@@ -438,13 +465,48 @@ async function loadReceitas(){
 }
 
 // NAVIGATION
+
+function closePacModal(){var m=document.getElementById('pac-modal');if(m)m.remove();}
+function verPerfilPaciente(id){
+  const p=allPacientes.find(function(x){return x.id===id});if(!p)return;
+  const ini=p.nome?p.nome.split(' ').filter(Boolean).map(function(n){return n[0]}).join('').slice(0,2).toUpperCase():'?';
+  var old=document.getElementById('pac-modal');if(old)old.remove();
+  var m=document.createElement('div');
+  m.id='pac-modal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center';
+  var hist=allConsultas.filter(function(c){return c.paciente_id===id});
+  var histHtml=hist.length?hist.map(function(c){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px"><span>'+(c.data_consulta?new Date(c.data_consulta).toLocaleDateString('pt-BR'):'-')+'</span><span class="badge '+(c.status==='confirmada'||c.status==='realizada'?'bg':'ba')+'">'+c.status+'</span></div>'}).join(''):'<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px">Nenhuma consulta</div>';
+  m.innerHTML='<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:82vh;overflow-y:auto;padding:20px 20px 32px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="width:44px;height:44px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--p);font-size:15px">'+ini+'</div>'
+    +'<div><div style="font-size:16px;font-weight:700">'+(p.nome||'Paciente')+'</div><div style="font-size:12px;color:var(--muted)">'+(p.email||'')+'</div></div>'
+    +'</div>'
+    +'<button onclick="closePacModal()" style="background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>'
+    +'</div>'
+    +'<div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px">'
+    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px">Dados do paciente</div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">CPF</span><span>'+(p.cpf||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">Telefone</span><span>'+(p.telefone||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">Condicoes</span><span style="text-align:right;max-width:55%">'+(p.sintomas||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span style="color:var(--muted)">Protocolo ANVISA</span><span style="color:var(--p);font-weight:600">'+(p.anvisa_protocolo||'Pendente')+'</span></div>'
+    +'</div>'
+    +'<div style="background:var(--bg);border-radius:12px;padding:14px">'
+    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px">Historico de consultas</div>'
+    +histHtml
+    +'</div>'
+    +'</div>';
+  document.body.appendChild(m);
+  m.addEventListener('click',function(e){if(e.target===m)m.remove()});
+}
+
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t=document.getElementById('s-'+id);if(t)t.classList.add('active');
   ['home','pacientes','receitas','perfil'].forEach(n=>{const b=el('bni-'+n);if(b)b.classList.toggle('active',n===id)});
   if(id==='pacientes')loadPacientes();
   if(id==='receitas'&&currentUser)loadReceitas();
-  if(id==='home'&&currentUser)loadDashboard();
+  if(id==='home'&&currentUser&&!currentUser.id.startsWith('demo'))loadDashboard();
   window.scrollTo(0,0);try{t.scrollTop=0}catch(e){}
 }
 
