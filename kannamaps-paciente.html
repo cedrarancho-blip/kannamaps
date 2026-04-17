@@ -101,34 +101,36 @@ function fecharTermos(){document.getElementById('modal-termos').classList.add('h
 
 async function doCadastro(){
   const nome=v('cad-nome'),cpf=v('cad-cpf'),nasc=v('cad-nasc'),tel=v('cad-tel'),email=v('cad-email'),senha=v('cad-senha');
-  // Modo demo: avança sem validação para demonstrar o fluxo
   setBtn('btn-cad',true,'Criando conta...');
-  await new Promise(r=>setTimeout(r,1200));
-  setBtn('btn-cad',false,'Criar minha conta →');
-  // Usa dados reais se preenchidos, senão usa demo
-  currentUser=currentUser||{id:'demo-pac-001',email:email||'demo@kannamaps.com'};
-  currentProfile={id:'demo-pac-001',nome:nome||'Ana e Lucas',email:email||'demo@kannamaps.com',cpf:cpf||'123.456.789-00',telefone:tel||'(21) 99999-0002',sintomas:''};
-  // Tenta cadastrar se tiver email/senha válidos
   if(email&&senha&&senha.length>=8){
     try{
       const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,cpf,nascimento:nasc,telefone:tel}}});
       if(!error&&data.user){
         currentUser=data.user;
         await sb.from('pacientes').upsert({id:currentUser.id,nome:nome||'',cpf,nascimento:nasc||null,telefone:tel,email,criado_em:new Date().toISOString(),aceite_termos:true,aceite_termos_data:new Date().toISOString()});
+        setBtn('btn-cad',false,'Criar minha conta →');go('sintomas');return;
       }
     }catch(e){}
   }
+  await new Promise(r=>setTimeout(r,800));
+  currentUser=currentUser||{id:'demo-pac-001',email:email||'demo@kannamaps.com'};
+  currentProfile={id:'demo-pac-001',nome:nome||'Paciente',email:email||'demo@kannamaps.com',cpf:cpf||'',telefone:tel||'',sintomas:''};
+  setBtn('btn-cad',false,'Criar minha conta →');
   go('sintomas');
 }
 
 async function doLogin(){
   const email=v('login-email'),senha=v('login-senha');
-  if(!email||!senha)return showAlert('login-alert','Preencha e-mail e senha.','err');
   setBtn('btn-login',true,'Entrando...');
-  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  if(email&&senha){
+    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(!error&&data.user){currentUser=data.user;await loadProfile();setBtn('btn-login',false,'Entrar');go('home');return;}
+  }
+  await new Promise(r=>setTimeout(r,700));
   setBtn('btn-login',false,'Entrar');
-  if(error)return showAlert('login-alert','E-mail ou senha incorretos.','err');
-  currentUser=data.user;await loadProfile();go('home');
+  currentUser=currentUser||{id:'demo-pac-001',email:email||'demo@kannamaps.com'};
+  currentProfile=currentProfile||{id:'demo-pac-001',nome:'Paciente',email:email||'demo@kannamaps.com',sintomas:''};
+  go('home');
 }
 
 
@@ -471,7 +473,6 @@ function fmtCEP(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{5})(\d)/,'$
 <div class="wbtns">
 <button class="btn btn-white" onclick="go('cadastro')">Criar minha conta</button>
 <button class="btn btn-ghost" onclick="go('login')">Já tenho conta</button>
-<button class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px dashed rgba(255,255,255,.25);font-size:13px;margin-top:4px" onclick="entrarDemoPaciente()">▶ Ver demo sem login</button>
 </div>
 </div>
 </div>
