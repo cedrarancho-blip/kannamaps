@@ -291,18 +291,22 @@ function timeAgo(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)re
 // ===================== MARKETPLACE =====================
 let currentCat='all';
 async function loadProducts(){
-  const{data}=await sb.from('produtos').select('*').eq('ativo',true).order('destaque',{ascending:false});
-  allProducts=(data||[]).filter(p=>!p.aprovacao_status||p.aprovacao_status==='aprovado');
-  // Se não tiver produtos no banco, carrega produtos demo
-  if(!allProducts.length){
-    allProducts=[
-      {id:'d1',nome:'CBD Full Spectrum',descricao:'Óleo de CBD Full Spectrum extraído da planta inteira, com todos os canabinoides.',categoria:'CBD',preco:320,estoque:50,volume:'30ml',concentracao:'1500mg CBD',imagem_emoji:'🌿',fornecedor:'Green Life',destaque:true,requer_anvisa:false,aprovacao_status:'aprovado'},
-      {id:'d2',nome:'CBD Broad Spectrum',descricao:'Sem THC. Ideal para quem não pode usar THC mas quer os benefícios dos outros canabinoides.',categoria:'CBD',preco:285,estoque:40,volume:'30ml',concentracao:'1000mg CBD',imagem_emoji:'💧',fornecedor:'CannaMed',destaque:true,requer_anvisa:false,aprovacao_status:'aprovado'},
-      {id:'d3',nome:'THC:CBD 1:1',descricao:'Combinação equilibrada de THC e CBD para dor crônica e espasmos musculares.',categoria:'THC:CBD',preco:420,estoque:30,volume:'30ml',concentracao:'750mg THC + 750mg CBD',imagem_emoji:'⚗️',fornecedor:'BioPlant',destaque:false,requer_anvisa:true,aprovacao_status:'aprovado'},
-      {id:'d4',nome:'CBD Isolado',descricao:'99% CBD puro, sem outros canabinoides. Opção para quem precisa de pureza total.',categoria:'CBD',preco:240,estoque:60,volume:'30ml',concentracao:'500mg CBD',imagem_emoji:'✨',fornecedor:'PureCanna',destaque:false,requer_anvisa:false,aprovacao_status:'aprovado'},
-      {id:'d5',nome:'CBN Sleep',descricao:'Formulação noturna com CBN para insônia e ansiedade. Promove sono reparador.',categoria:'CBN',preco:350,estoque:25,volume:'30ml',concentracao:'600mg CBN',imagem_emoji:'🌙',fornecedor:'DreamCanna',destaque:true,requer_anvisa:false,aprovacao_status:'aprovado'},
-      {id:'d6',nome:'CBD 3000mg',descricao:'Alta concentração para dores crônicas intensas e condições neurológicas.',categoria:'CBD',preco:580,estoque:20,volume:'60ml',concentracao:'3000mg CBD',imagem_emoji:'💪',fornecedor:'MedCanna',destaque:false,requer_anvisa:true,aprovacao_status:'aprovado'}
-    ];
+  // Produtos demo sempre disponíveis
+  const demo=[
+    {id:'d1',nome:'CBD Full Spectrum',descricao:'Óleo de CBD completo, extraído da planta inteira com todos os canabinoides.',categoria:'CBD',preco:320,estoque:50,volume:'30ml',concentracao:'1500mg CBD',imagem_emoji:'🌿',fornecedor:'Green Life',destaque:true,requer_anvisa:false},
+    {id:'d2',nome:'CBD Broad Spectrum',descricao:'Sem THC. Ideal para quem quer os benefícios do CBD sem traços de THC.',categoria:'CBD',preco:285,estoque:40,volume:'30ml',concentracao:'1000mg CBD',imagem_emoji:'💧',fornecedor:'CannaMed',destaque:true,requer_anvisa:false},
+    {id:'d3',nome:'THC:CBD 1:1',descricao:'Combinação equilibrada para dor crônica e espasmos musculares.',categoria:'THC:CBD',preco:420,estoque:30,volume:'30ml',concentracao:'750mg THC + 750mg CBD',imagem_emoji:'⚗️',fornecedor:'BioPlant',destaque:false,requer_anvisa:true},
+    {id:'d4',nome:'CBD Isolado 500mg',descricao:'99% CBD puro, sem outros canabinoides. Máxima pureza.',categoria:'CBD',preco:240,estoque:60,volume:'30ml',concentracao:'500mg CBD',imagem_emoji:'✨',fornecedor:'PureCanna',destaque:false,requer_anvisa:false},
+    {id:'d5',nome:'CBN Sleep',descricao:'Formulação noturna com CBN para insônia e ansiedade. Sono reparador.',categoria:'CBN',preco:350,estoque:25,volume:'30ml',concentracao:'600mg CBN',imagem_emoji:'🌙',fornecedor:'DreamCanna',destaque:true,requer_anvisa:false},
+    {id:'d6',nome:'CBD 3000mg Alta Potência',descricao:'Alta concentração para dores intensas e condições neurológicas.',categoria:'CBD',preco:580,estoque:20,volume:'60ml',concentracao:'3000mg CBD',imagem_emoji:'💪',fornecedor:'MedCanna',destaque:false,requer_anvisa:true}
+  ];
+  // Tenta carregar produtos reais do banco
+  try{
+    const{data}=await sb.from('produtos').select('*').eq('ativo',true).order('destaque',{ascending:false});
+    const reais=(data||[]).filter(p=>!p.aprovacao_status||p.aprovacao_status==='aprovado');
+    allProducts=reais.length>0?reais:demo;
+  }catch(e){
+    allProducts=demo;
   }
   renderProducts(allProducts);
 }
