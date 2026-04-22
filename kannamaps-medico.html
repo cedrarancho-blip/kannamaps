@@ -6,11 +6,15 @@
 <title>Kannamaps — Portal do Médico</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--p:#1A7F5A;--p2:#22A06B;--p-pale:#EBF7F2;--p-mid:#D1F0E2;--text:#0D1F17;--muted:#4A6B5A;--border:rgba(26,127,90,.13);--bg:#F5FAF7;--white:#FFF;--green:#1A7F5A;--green-pale:#EBF7F2;--red:#C0392B;--red-pale:#FDECEA;--amber:#B7770D;--amber-pale:#FEF6E4;--purple:#7B2FBE;--purple-pale:#F3EEFB;--r:14px;--r-sm:10px;--font:'DM Sans',sans-serif;--font-d:'Syne',sans-serif}
+/* ===== BASE ===== */
+:root{--p:#1A7F5A;--p2:#22A06B;--p-pale:#EBF7F2;--p-mid:#D1F0E2;--text:#0D1F17;--muted:#4A6B5A;--border:rgba(26,127,90,.13);--bg:#F5FAF7;--white:#FFF;--green:#1A7F5A;--green-pale:#EBF7F2;--red:#C0392B;--red-pale:#FDECEA;--amber:#B7770D;--amber-pale:#FEF6E4;--purple:#7B2FBE;--purple-pale:#F3EEFB;--r:14px;--r-sm:10px;--font:"DM Sans",sans-serif;--font-d:"Syne",sans-serif;--sidebar:240px}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text)}
-::-webkit-scrollbar{display:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--p-mid);border-radius:4px}
+
+/* ===== MOBILE PHONE SHELL ===== */
 .phone{width:390px;min-height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.08);margin:40px auto;display:flex;flex-direction:column}
 @media(max-width:430px){body{background:var(--bg)}.phone{width:100vw;min-height:100dvh;border-radius:0;box-shadow:none;margin:0}}
 .screen{display:none;flex-direction:column;min-height:844px;background:var(--bg)}.screen.active{display:flex}
@@ -22,47 +26,288 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .bnav{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 20px;flex-shrink:0;z-index:10}
 .bni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;border-radius:12px;transition:all .15s}.bni.active .bni-ic,.bni.active .bni-lb{color:var(--p)}.bni.active .bni-lb{font-weight:600}
 .bni-ic{font-size:20px;color:var(--muted)}.bni-lb{font-size:10px;color:var(--muted)}
+
+/* ===== DESKTOP LAYOUT ===== */
+@media(min-width:1024px){
+  body{background:#f0f4f8;display:flex;align-items:flex-start;justify-content:center;padding:0}
+  .phone{display:none!important}
+  .desktop-wrap{display:flex!important;width:100vw;min-height:100vh}
+  .ds-sidebar{width:var(--sidebar);background:linear-gradient(180deg,#0A3D28,#0F5C3E);min-height:100vh;display:flex;flex-direction:column;padding:24px 0;position:fixed;left:0;top:0;bottom:0;z-index:100}
+  .ds-logo{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .ds-nav{padding:16px 12px;flex:1}
+  .ds-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.7);font-size:13px;font-weight:500;margin-bottom:4px;transition:all .15s}
+  .ds-nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
+  .ds-nav-item.active{background:rgba(255,255,255,.15);color:#fff;font-weight:600}
+  .ds-nav-item span:first-child{font-size:16px}
+  .ds-doctor{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
+  .ds-content{margin-left:var(--sidebar);flex:1;min-height:100vh;background:#f0f4f8;overflow-y:auto}
+  .ds-page{display:none;padding:28px 32px}.ds-page.active{display:block}
+  .ds-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+  .ds-title{font-family:var(--font-d);font-size:22px;font-weight:700}
+  .ds-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+  .ds-stat{background:var(--white);border-radius:14px;padding:18px 20px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .ds-stat-num{font-family:var(--font-d);font-size:28px;font-weight:800;color:var(--p)}
+  .ds-stat-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+  .ds-card{background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:20px}
+  .ds-card-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .ds-card-title{font-size:14px;font-weight:600}
+  .ds-card-body{padding:16px 20px}
+  .ds-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .ds-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .ds-table{width:100%;border-collapse:collapse}
+  .ds-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 16px;text-align:left;border-bottom:1px solid var(--border)}
+  .ds-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(26,127,90,.05);vertical-align:middle}
+  .ds-table tr:last-child td{border-bottom:none}
+  .ds-table tr:hover td{background:var(--p-pale);cursor:pointer}
+  /* Chat desktop */
+  .ds-chat-wrap{display:grid;grid-template-columns:280px 1fr;height:520px;overflow:hidden;border-radius:14px;border:1px solid var(--border)}
+  .ds-chat-list{border-right:1px solid var(--border);overflow-y:auto}
+  .ds-chat-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+  .ds-chat-item:hover,.ds-chat-item.active{background:var(--p-pale)}
+  .ds-chat-item-name{font-size:13px;font-weight:600}
+  .ds-chat-item-last{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ds-chat-main{display:flex;flex-direction:column;background:var(--white)}
+  .ds-chat-hdr{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;background:var(--bg)}
+  .ds-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .ds-msg{max-width:70%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5}
+  .ds-msg-out{background:var(--p);color:#fff;align-self:flex-end;border-radius:12px 12px 2px 12px}
+  .ds-msg-in{background:var(--bg);color:var(--text);align-self:flex-start;border-radius:12px 12px 12px 2px}
+  .ds-chat-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+  .ds-chat-input input{flex:1;padding:10px 14px;border-radius:100px;border:1.5px solid var(--border);font-family:var(--font);font-size:13px;outline:none}
+  .ds-chat-input input:focus{border-color:var(--p)}
+  .ds-chat-send{background:var(--p);color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  /* Video desktop */
+  .ds-video-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+}
+@media(max-width:1023px){.desktop-wrap{display:none!important}}
+
+/* ===== SHARED COMPONENTS ===== */
 .btn{padding:14px 20px;border-radius:100px;font-family:var(--font);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--p);color:#fff}.btn-primary:active{background:var(--p2)}
-.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
-.btn-secondary{background:var(--p-pale);color:var(--p)}
-.btn-green{background:var(--green);color:#fff}
-.btn-red{background:var(--red);color:#fff}
-.btn-sm{padding:8px 16px;font-size:13px;width:auto}.btn:disabled{opacity:.5;pointer-events:none}
+.btn-primary{background:var(--p);color:#fff}.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}.btn-secondary{background:var(--p-pale);color:var(--p)}.btn-green{background:var(--green);color:#fff}.btn-red{background:var(--red);color:#fff}.btn-sm{padding:8px 16px;font-size:13px;width:auto}.btn:disabled{opacity:.5;pointer-events:none}
 .ig{margin-bottom:14px}.il{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block}
 .input{width:100%;padding:13px 15px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);font-family:var(--font);font-size:14px;color:var(--text);outline:none;transition:border-color .2s}.input:focus{border-color:var(--p)}.input::placeholder{color:#9CBDAD}
 textarea.input{resize:vertical;min-height:80px}
-.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:12px;transition:all .15s}
-.card-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:12px}
 .badge{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
 .bg{background:var(--green-pale);color:var(--green)}.ba{background:var(--amber-pale);color:var(--amber)}.br{background:var(--red-pale);color:var(--red)}.bp{background:var(--purple-pale);color:var(--purple)}
 .slbl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:18px 0 8px}
 .div{height:1px;background:var(--border);margin:14px 0}
-.av{border-radius:50%;background:var(--p-mid);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--p)}.av-lg{width:64px;height:64px;font-size:22px}.av-md{width:40px;height:40px;font-size:14px}
-.prog{height:6px;background:var(--p-mid);border-radius:100px;overflow:hidden;margin-top:8px}.prog-fill{height:100%;background:var(--p);border-radius:100px;transition:width .5s ease}
-.toggle{width:44px;height:24px;background:var(--p-mid);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}.toggle.on{background:var(--p)}.toggle::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}.toggle.on::after{transform:translateX(20px)}
-.alert{padding:12px 14px;border-radius:var(--r-sm);font-size:13px;margin-bottom:14px;line-height:1.5;animation:fadeIn .3s ease}
-.alert-err{background:var(--red-pale);color:var(--red);border:1px solid rgba(192,57,43,.2)}.alert-ok{background:var(--green-pale);color:var(--green);border:1px solid rgba(26,127,90,.2)}.alert-info{background:var(--purple-pale);color:var(--purple);border:1px solid rgba(123,47,190,.2)}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
-.spinner{width:32px;height:32px;border:3px solid var(--p-mid);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
-.hero-card{background:linear-gradient(135deg,#0F5C3E,#1A7F5A,#22A06B);border-radius:var(--r);padding:18px;margin-bottom:14px;cursor:pointer;transition:transform .15s}.hero-card:active{transform:scale(.98)}
+.av{border-radius:50%;background:var(--p-mid);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--p)}.av-lg{width:64px;height:64px;font-size:22px}.av-md{width:40px;height:40px;font-size:14px}.av-sm{width:32px;height:32px;font-size:11px}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .stat{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.stat-num{font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--p)}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-num{font-family:var(--font-d);font-size:24px;font-weight:800;color:var(--p)}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 .appt-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--white);border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .15s}.appt-item:active{background:var(--p-pale)}
 .welcome-doc{background:linear-gradient(160deg,#0A3D28,#0F5C3E,#1A7F5A);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
 .welcome-doc h1{font-family:var(--font-d);font-size:26px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:10px}
 .welcome-doc p{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:44px;line-height:1.6}
 .tab-bar{display:flex;background:var(--white);border-radius:var(--r);border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
 .tab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;border-right:1px solid var(--border)}.tab:last-child{border-right:none}.tab.on{background:var(--p);color:#fff}
+.alert{padding:12px 14px;border-radius:var(--r-sm);font-size:13px;margin-bottom:14px;line-height:1.5}
+.alert-err{background:var(--red-pale);color:var(--red)}.alert-ok{background:var(--green-pale);color:var(--green)}.alert-info{background:var(--purple-pale);color:var(--purple)}
+.spinner{width:32px;height:32px;border:3px solid var(--p-mid);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+.hero-card{background:linear-gradient(135deg,#0F5C3E,#1A7F5A,#22A06B);border-radius:var(--r);padding:18px;margin-bottom:14px;cursor:pointer}
+/* Chat mobile */
+.chat-msg{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5;max-width:75%;margin-bottom:8px}
+.chat-out{background:var(--p);color:#fff;align-self:flex-end;border-radius:12px 12px 2px 12px;margin-left:auto}
+.chat-in{background:var(--white);border:1px solid var(--border);align-self:flex-start;border-radius:12px 12px 12px 2px}
+.chat-time{font-size:10px;opacity:.6;margin-top:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<div class="phone" id="phone">
 
+<!-- ===== DESKTOP LAYOUT ===== -->
+<div class="desktop-wrap" id="desktop-wrap" style="display:none">
+  <!-- Sidebar -->
+  <div class="ds-sidebar">
+    <div class="ds-logo">
+      <svg height="28" viewBox="0 0 280 76" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="38" r="36" fill="rgba(255,255,255,.2)"/><text x="38" y="34" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="20" fill="white">km</text><path d="M22 50 Q38 62 54 50" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/><text x="88" y="48" font-family="Arial,sans-serif" font-weight="700" font-size="36" fill="white">kannamaps</text></svg>
+    </div>
+    <div class="ds-nav">
+      <div class="ds-nav-item active" id="dsnav-home" onclick="dsGo('home')"><span>🏠</span><span>Dashboard</span></div>
+      <div class="ds-nav-item" id="dsnav-agenda" onclick="dsGo('agenda')"><span>📅</span><span>Agenda</span></div>
+      <div class="ds-nav-item" id="dsnav-pacientes" onclick="dsGo('pacientes')"><span>👥</span><span>Pacientes</span></div>
+      <div class="ds-nav-item" id="dsnav-receitas" onclick="dsGo('receitas')"><span>💊</span><span>Receitas</span></div>
+      <div class="ds-nav-item" id="dsnav-chat" onclick="dsGo('chat')"><span>💬</span><span>Chat <span id="ds-chat-badge" style="background:var(--red);color:#fff;border-radius:100px;padding:1px 6px;font-size:10px;margin-left:4px;display:none">●</span></span></div>
+      <div class="ds-nav-item" id="dsnav-perfil" onclick="dsGo('perfil')"><span>👤</span><span>Perfil</span></div>
+    </div>
+    <div class="ds-doctor">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="av av-sm" id="ds-av" style="background:rgba(255,255,255,.2);color:#fff">?</div>
+        <div><div style="font-size:12px;font-weight:600;color:#fff" id="ds-nome">Médico</div><div style="font-size:10px;color:rgba(255,255,255,.6)" id="ds-crm">CRM</div></div>
+      </div>
+      <button onclick="doLogout()" style="margin-top:12px;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);padding:7px 14px;border-radius:100px;font-size:12px;cursor:pointer;width:100%">Sair</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="ds-content">
+
+    <!-- Dashboard -->
+    <div class="ds-page active" id="dsp-home">
+      <div class="ds-topbar">
+        <div><div style="font-size:13px;color:var(--muted)">Bom dia,</div><div class="ds-title" id="ds-home-nome">Doutor(a)</div></div>
+        <button class="btn btn-primary btn-sm" onclick="dsGo('agenda')">📅 Ver agenda</button>
+      </div>
+      <div class="ds-stats">
+        <div class="ds-stat"><div class="ds-stat-num" id="ds-stat-hoje">0</div><div class="ds-stat-lbl">Consultas hoje</div></div>
+        <div class="ds-stat"><div class="ds-stat-num" id="ds-stat-semana">0</div><div class="ds-stat-lbl">Esta semana</div></div>
+        <div class="ds-stat"><div class="ds-stat-num" id="ds-stat-pacientes">0</div><div class="ds-stat-lbl">Pacientes</div></div>
+        <div class="ds-stat"><div class="ds-stat-num" id="ds-stat-receitas">0</div><div class="ds-stat-lbl">Receitas emitidas</div></div>
+      </div>
+      <div class="ds-grid-2">
+        <div class="ds-card">
+          <div class="ds-card-hdr"><span class="ds-card-title">📅 Agenda de hoje</span></div>
+          <div class="ds-card-body" id="ds-agenda-hoje"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma consulta hoje</div></div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-hdr"><span class="ds-card-title">📋 Próximas consultas</span></div>
+          <div class="ds-card-body" id="ds-agenda-proximas"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma consulta agendada</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda -->
+    <div class="ds-page" id="dsp-agenda">
+      <div class="ds-topbar"><div class="ds-title">📅 Agenda</div></div>
+      <div class="ds-card">
+        <div class="ds-card-hdr"><span class="ds-card-title">Todas as consultas</span></div>
+        <div class="ds-card-body">
+          <table class="ds-table">
+            <thead><tr><th>Paciente</th><th>Data</th><th>Horário</th><th>Status</th><th>Ação</th></tr></thead>
+            <tbody id="ds-agenda-table"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pacientes -->
+    <div class="ds-page" id="dsp-pacientes">
+      <div class="ds-topbar"><div class="ds-title">👥 Pacientes</div><input id="ds-search-pac" class="input" style="width:220px;padding:9px 14px;font-size:13px" placeholder="🔍 Buscar..." oninput="dsFilterPacientes()"></div>
+      <div class="ds-card">
+        <div class="ds-card-body" style="padding:0">
+          <table class="ds-table">
+            <thead><tr><th>Nome</th><th>Condição</th><th>Receita</th><th>ANVISA</th><th>Ações</th></tr></thead>
+            <tbody id="ds-pac-table"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Receitas -->
+    <div class="ds-page" id="dsp-receitas">
+      <div class="ds-topbar"><div class="ds-title">💊 Receitas emitidas</div></div>
+      <div class="ds-card">
+        <div class="ds-card-body" style="padding:0">
+          <table class="ds-table">
+            <thead><tr><th>Paciente</th><th>Produto</th><th>Data</th><th>Status</th><th>PDF</th></tr></thead>
+            <tbody id="ds-rx-table"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="ds-page" id="dsp-chat">
+      <div class="ds-topbar"><div class="ds-title">💬 Chat com pacientes</div></div>
+      <div class="ds-chat-wrap ds-card">
+        <div class="ds-chat-list" id="ds-chat-list"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Nenhuma conversa</div></div>
+        <div class="ds-chat-main">
+          <div class="ds-chat-hdr" id="ds-chat-hdr">Selecione um paciente</div>
+          <div class="ds-chat-msgs" id="ds-chat-msgs"><div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Selecione um paciente para ver a conversa</div></div>
+          <div class="ds-chat-input">
+            <input id="ds-chat-inp" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter')dsSendMsg()">
+            <button class="ds-chat-send" onclick="dsSendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Perfil -->
+    <div class="ds-page" id="dsp-perfil">
+      <div class="ds-topbar"><div class="ds-title">👤 Meu perfil</div></div>
+      <div class="ds-grid-2">
+        <div class="ds-card">
+          <div class="ds-card-hdr"><span class="ds-card-title">Dados profissionais</span></div>
+          <div class="ds-card-body">
+            <div style="text-align:center;margin-bottom:20px">
+              <div class="av av-lg" style="margin:0 auto 10px" id="ds-perfil-av">?</div>
+              <div style="font-size:16px;font-weight:600" id="ds-perfil-nome">Médico</div>
+              <div style="font-size:13px;color:var(--muted)" id="ds-perfil-crm"></div>
+            </div>
+            <div id="ds-perfil-alert"></div>
+            <div class="ig"><label class="il">Nome completo</label><input class="input" id="ds-nome-input"></div>
+            <div class="ig"><label class="il">Especialidade</label><input class="input" id="ds-esp-input"></div>
+            <div class="ig"><label class="il">Telefone</label><input class="input" id="ds-tel-input"></div>
+            <div class="ig"><label class="il">Valor da consulta (R$)</label><input class="input" type="number" id="ds-valor-input"></div>
+            <div class="ig"><label class="il">Bio</label><textarea class="input" id="ds-bio-input"></textarea></div>
+            <button class="btn btn-primary" onclick="dsSalvarPerfil()">Salvar alterações</button>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-hdr"><span class="ds-card-title">Link da videoconsulta</span></div>
+          <div class="ds-card-body">
+            <div style="background:var(--p-pale);border-radius:10px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6;color:var(--muted)">Seu link exclusivo de videoconsulta. Compartilhe com pacientes ou use pela plataforma.</div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;font-family:monospace;word-break:break-all;color:var(--p)" id="ds-video-link">Faça login para ver seu link</div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="copiarLinkVideo()">📋 Copiar link</button>
+            <div class="div"></div>
+            <button class="btn btn-green" onclick="dsIniciarVideo()">📹 Iniciar videoconsulta</button>
+            <div id="ds-video-wrap" style="display:none;margin-top:12px;border-radius:10px;overflow:hidden">
+              <iframe id="ds-video-iframe" style="width:100%;height:400px;border:none" allow="camera;microphone;fullscreen;display-capture"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Perfil paciente expandido (desktop) -->
+    <div class="ds-page" id="dsp-pac-detail">
+      <div class="ds-topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onclick="dsGo('pacientes')" style="background:var(--white);border:1px solid var(--border);border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">←</button>
+          <div class="ds-title" id="dsp-pac-nome">Paciente</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary btn-sm" onclick="dsAbrirChat()">💬 Chat</button>
+          <button class="btn btn-green btn-sm" onclick="dsNovaReceita()">💊 Nova receita</button>
+          <button class="btn btn-primary btn-sm" onclick="dsIniciarVideoConsulta()">📹 Iniciar consulta</button>
+        </div>
+      </div>
+      <div class="ds-grid-3" id="dsp-pac-info-grid"></div>
+      <!-- Receita form (hidden by default) -->
+      <div class="ds-card" id="ds-rx-form" style="display:none">
+        <div class="ds-card-hdr"><span class="ds-card-title">💊 Emitir receita</span><button onclick="document.getElementById('ds-rx-form').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted)">✕</button></div>
+        <div class="ds-card-body">
+          <div class="ds-grid-2">
+            <div class="ig"><label class="il">Diagnóstico (CID)</label><input class="input" id="ds-rx-diag" placeholder="Ex: F41.1 - Ansiedade"></div>
+            <div class="ig"><label class="il">Produto prescrito</label><input class="input" id="ds-rx-produto" placeholder="Ex: CBD Full Spectrum 1500mg"></div>
+            <div class="ig"><label class="il">Dosagem</label><input class="input" id="ds-rx-dosagem" placeholder="Ex: 20 gotas sublingual"></div>
+            <div class="ig"><label class="il">Posologia</label><input class="input" id="ds-rx-posologia" placeholder="Ex: 2x ao dia"></div>
+            <div class="ig"><label class="il">Duração</label><input class="input" id="ds-rx-duracao" placeholder="Ex: 90 dias"></div>
+            <div class="ig"><label class="il">Concentração máx. autorizada</label><input class="input" id="ds-rx-conc" placeholder="Ex: 3000mg"></div>
+            <div class="ig"><label class="il">Produtos autorizados</label><input class="input" id="ds-rx-produtos" placeholder="Ex: CBD Full Spectrum, CBD Isolado"></div>
+            <div class="ig"><label class="il">Observações</label><textarea class="input" id="ds-rx-obs" style="min-height:60px" placeholder="Orientações adicionais..."></textarea></div>
+          </div>
+          <div id="ds-rx-alert" style="margin-bottom:10px"></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" style="flex:1" onclick="dsEmitirReceita()">Emitir receita</button>
+            <button class="btn btn-secondary" style="flex:1" onclick="dsEmitirReceita(true)">Emitir + Baixar PDF</button>
+          </div>
+        </div>
+      </div>
+      <!-- Video em consulta -->
+      <div class="ds-card" id="ds-video-consulta" style="display:none">
+        <div class="ds-card-hdr"><span class="ds-card-title">📹 Videoconsulta em andamento</span><button onclick="dsEncerrarVideo()" style="background:var(--red);color:#fff;border:none;border-radius:100px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600">Encerrar</button></div>
+        <div class="ds-card-body" style="padding:0"><iframe id="ds-consulta-iframe" style="width:100%;height:480px;border:none" allow="camera;microphone;fullscreen;display-capture"></iframe></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MOBILE LAYOUT ===== -->
+<div class="phone" id="phone">
 <!-- ===== WELCOME ===== -->
 <div class="screen active" id="s-welcome">
 <div class="welcome-doc">
@@ -260,28 +505,80 @@ textarea.input{resize:vertical;min-height:80px}
 
 </div>
 
+
+<!-- ===== CHAT MOBILE ===== -->
+<div class="screen" id="s-chat">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title" id="chat-pac-nome">Chat</div><div style="width:36px"></div></div>
+<div class="cnt" style="padding:0 0 0 0">
+<div id="chat-msgs" style="flex:1;padding:16px;display:flex;flex-direction:column;min-height:500px;overflow-y:auto"></div>
+</div>
+<div style="display:flex;gap:8px;padding:10px 16px 20px;border-top:1px solid var(--border);background:var(--white);position:sticky;bottom:0">
+<input class="input" id="chat-inp" placeholder="Digite uma mensagem..." style="flex:1;padding:10px 14px;font-size:13px" onkeydown="if(event.key==='Enter')sendMsg()">
+<button onclick="sendMsg()" style="background:var(--p);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">➤</button>
+</div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(245,250,247,.95);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px;display:none"><div class="spinner"></div><div style="font-size:14px;color:var(--muted)" id="loading-msg">Carregando...</div></div>
+
+</div>
+
 <script>
 const SUPA_URL='https://dfxrdxfjqumajxikykay.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmeHJkeGZqcXVtYWp4aWt5a2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTgwMDgsImV4cCI6MjA5MTI3NDAwOH0.U1giCEnSkfjZeUWUigDMIpHm5wpvilSFJH4OljpJNT8';
 const{createClient}=supabase;const sb=createClient(SUPA_URL,SUPA_KEY);
-let currentUser=null,currentProfile=null,allConsultas=[],allPacientes=[],allReceitas=[],currentConsulta=null;
+let currentUser=null,currentProfile=null,allConsultas=[],allPacientes=[],allReceitas=[],currentConsulta=null,currentChatPac=null,isDesktop=false;
 
-// INIT
+// ===== INIT =====
 window.addEventListener('DOMContentLoaded',async()=>{
-  showLoading('Verificando sessão...');
-  sb.auth.onAuthStateChange(async(ev,session)=>{if(ev==='SIGNED_IN'&&session){currentUser=session.user;const ok=await loadProfile();const a=document.querySelector('.screen.active');if(ok&&a&&['s-welcome','s-login','s-cadastro'].includes(a.id))go('home')}});
+  isDesktop=window.innerWidth>=1024;
+  if(isDesktop){document.getElementById('desktop-wrap').style.display='flex';document.getElementById('phone').style.display='none';}
+  showLoading('Verificando sessao...');
   const{data:{session}}=await sb.auth.getSession();
   hideLoading();
-  if(session){currentUser=session.user;const ok=await loadProfile();if(ok)go('home');else go('welcome')}else{go('welcome')}
+  if(session){currentUser=session.user;const ok=await loadProfile();if(ok){goMain('home');}else{goMain('welcome');}}
+  else{goMain('welcome');}
 });
 
-// AUTH
+function goMain(id){
+  if(isDesktop){
+    if(['welcome','login','cadastro'].includes(id)){document.getElementById('desktop-wrap').style.display='none';document.getElementById('phone').style.display='flex';go(id);}
+    else{document.getElementById('desktop-wrap').style.display='flex';document.getElementById('phone').style.display='none';dsGo(id);}
+  }else{go(id);}
+}
+
+// ===== MOBILE NAV =====
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const t=document.getElementById('s-'+id);if(t)t.classList.add('active');
+  ['home','pacientes','receitas','perfil'].forEach(n=>{const b=el('bni-'+n);if(b)b.classList.toggle('active',n===id)});
+  if(id==='pacientes')loadPacientes();
+  if(id==='receitas'&&currentUser)loadReceitas();
+  if(id==='home'&&currentUser&&!currentUser.id.startsWith('demo'))loadDashboard();
+  window.scrollTo(0,0);try{t.scrollTop=0}catch(e){}
+}
+
+// ===== DESKTOP NAV =====
+function dsGo(id){
+  document.querySelectorAll('.ds-page').forEach(p=>p.classList.remove('active'));
+  const t=document.getElementById('dsp-'+id);if(t)t.classList.add('active');
+  document.querySelectorAll('.ds-nav-item').forEach(n=>n.classList.remove('active'));
+  const nav=document.getElementById('dsnav-'+id);if(nav)nav.classList.add('active');
+  if(id==='home')dsLoadDashboard();
+  if(id==='agenda')dsLoadAgenda();
+  if(id==='pacientes')dsLoadPacientes();
+  if(id==='receitas')dsLoadReceitas();
+  if(id==='chat')dsLoadChat();
+}
+
+// ===== AUTH =====
 async function doLogin(){
   const email=v('login-email'),senha=v('login-senha');
   setBtn('btn-login',true,'Entrando...');
   if(email&&senha){
     const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
-    if(!error&&data.user){currentUser=data.user;const ok=await loadProfile();setBtn('btn-login',false,'Entrar');if(ok){go('home');return;}}
+    if(!error&&data.user){currentUser=data.user;const ok=await loadProfile();setBtn('btn-login',false,'Entrar');if(ok){goMain('home');return;}}
   }
   await new Promise(r=>setTimeout(r,700));
   setBtn('btn-login',false,'Entrar');
@@ -296,228 +593,534 @@ async function doCadastro(){
       if(!error&&data.user){
         currentUser=data.user;
         await sb.from('medicos').upsert({id:currentUser.id,nome:nome||'Dr. Demo',crm:crm||'00000',estado_crm:(estado||'SP').toUpperCase(),especialidade:esp||'Clinico Geral',email,criado_em:new Date().toISOString()});
-        await loadProfile();setBtn('btn-cad',false,'Criar conta →');go('home');return;
+        await loadProfile();setBtn('btn-cad',false,'Criar conta');goMain('home');return;
       }
     }catch(e){}
   }
   await new Promise(r=>setTimeout(r,800));
-  setBtn('btn-cad',false,'Criar conta →');
+  setBtn('btn-cad',false,'Criar conta');
   entrarDemo();
 }
-
 async function entrarDemo(){
   currentUser={id:'demo-med-001',email:'dr.demo@kannamaps.com'};
   currentProfile={id:'demo-med-001',nome:'Dr. Rafael Mendes',crm:'45231',estado_crm:'SP',especialidade:'Neurologista',email:'dr.demo@kannamaps.com',valor_consulta:189,rating:4.9,telefone:'(11) 99999-0001',bio:'Especialista em cannabis medicinal.'};
-  try{el('home-nome').textContent='Dr. Rafael Mendes';}catch(e){}
-  try{el('stat-semana').textContent='12';el('stat-pacientes').textContent='48';el('stat-receitas').textContent='63';}catch(e){}
-  try{
-    var d=new Date().toLocaleDateString('pt-BR');
-    el('agenda-hoje').innerHTML='<div class="appt-item"><div class="av av-md">MS</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Maria Santos</div><div style="font-size:12px;color:var(--muted)">'+d+' 14:00</div></div><span class="badge bg">Confirmada</span></div><div class="appt-item"><div class="av av-md">PO</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Pedro Oliveira</div><div style="font-size:12px;color:var(--muted)">'+d+' 15:30</div></div><span class="badge ba">Agendada</span></div>';
-    el('agenda-proximas').innerHTML='<div class="appt-item"><div class="av av-md">AC</div><div style="flex:1"><div style="font-size:14px;font-weight:600">Ana Costa</div><div style="font-size:12px;color:var(--muted)">Amanha 10:00</div></div><span class="badge ba">Agendada</span></div>';
-    el('perfil-av').textContent='RM';el('perfil-nome').textContent='Dr. Rafael Mendes';
-    el('perfil-crm').textContent='CRM 45.231/SP - Neurologista';
-    el('perfil-nome-input').value='Dr. Rafael Mendes';el('perfil-crm-input').value='45231/SP';
-    el('perfil-esp').value='Neurologista';el('perfil-tel').value='(11) 99999-0001';el('perfil-valor').value=189;
-  }catch(e){}
-  go('home');
+  allPacientes=[
+    {id:'dp1',nome:'Maria Santos',email:'maria@demo.com',sintomas:'Ansiedade cronica',tem_receita:'Sim, tenho receita',telefone:'(11) 91111-0001',cpf:'111.222.333-44',anvisa_protocolo:'ANVI-2026-00111'},
+    {id:'dp2',nome:'Pedro Oliveira',email:'pedro@demo.com',sintomas:'Epilepsia refrataria',tem_receita:'Sim, tenho receita',telefone:'(21) 92222-0002',cpf:'222.333.444-55',anvisa_protocolo:'ANVI-2026-00222'},
+    {id:'dp3',nome:'Ana Costa',email:'ana@demo.com',sintomas:'Dor cronica lombar',tem_receita:'Nao tenho receita',telefone:'(31) 93333-0003',cpf:'333.444.555-66',anvisa_protocolo:''}
+  ];
+  allConsultas=[
+    {id:'dc1',paciente_id:'dp1',pacientes:{nome:'Maria Santos',sintomas:'Ansiedade'},data_consulta:new Date().toISOString().split('T')[0],horario:'14:00',status:'confirmada'},
+    {id:'dc2',paciente_id:'dp2',pacientes:{nome:'Pedro Oliveira',sintomas:'Epilepsia'},data_consulta:new Date().toISOString().split('T')[0],horario:'15:30',status:'agendada'},
+    {id:'dc3',paciente_id:'dp3',pacientes:{nome:'Ana Costa',sintomas:'Dor cronica'},data_consulta:new Date(Date.now()+86400000).toISOString().split('T')[0],horario:'10:00',status:'agendada'}
+  ];
+  updateUI();
+  goMain('home');
 }
+async function doLogout(){if(!currentUser?.id?.startsWith('demo')){await sb.auth.signOut();}currentUser=null;currentProfile=null;allConsultas=[];allPacientes=[];goMain('welcome');}
 
-async function doLogout(){if(currentUser?.id?.startsWith("demo")){}else{await sb.auth.signOut();}currentUser=null;currentProfile=null;go('welcome')}
-
-// PROFILE
+// ===== PROFILE =====
 async function loadProfile(){
   if(!currentUser)return false;
-  let{data}=await sb.from('medicos').select('*').eq('id',currentUser.id).single();
-  if(!data){return false}
+  const{data}=await sb.from('medicos').select('*').eq('id',currentUser.id).single();
+  if(!data)return false;
   currentProfile=data;
-  const fn=data.nome||currentUser.email?.split('@')[0]||'Doutor(a)';
-  el('home-nome').textContent=fn.split(' ').slice(0,2).join(' ')+' 🩺';
-  const ini=data.nome?data.nome.replace(/Dr\.?\s?|Dra\.?\s?/gi,'').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
-  el('perfil-av').textContent=ini;el('perfil-nome').textContent=data.nome||'';el('perfil-crm').textContent='CRM '+data.crm+'/'+data.estado_crm+' · '+data.especialidade;
-  el('perfil-nome-input').value=data.nome||'';el('perfil-crm-input').value=(data.crm||'')+'/'+data.estado_crm;el('perfil-esp').value=data.especialidade||'';el('perfil-tel').value=data.telefone||'';el('perfil-bio').value=data.bio||'';el('perfil-valor').value=data.valor_consulta||89;
-  await loadDashboard();return true;
+  updateUI();
+  await loadDashboard();
+  return true;
 }
-async function salvarPerfil(){
-  if(!currentUser)return;
-  const d={nome:v('perfil-nome-input'),especialidade:v('perfil-esp'),telefone:v('perfil-tel'),bio:v('perfil-bio'),valor_consulta:parseFloat(v('perfil-valor'))||89};
-  showLoading('Salvando...');
-  try{await sb.from('medicos').update(d).eq('id',currentUser.id);
-  hideLoading();}catch(e){hideLoading();showAlert('perfil-alert','Erro de conexão.','err');return}currentProfile={...currentProfile,...d};
-  el('perfil-nome').textContent=d.nome;el('home-nome').textContent=d.nome.split(' ').slice(0,2).join(' ')+' 🩺';
-  showAlert('perfil-alert','✓ Perfil salvo!','ok');
+function updateUI(){
+  if(!currentProfile)return;
+  const nome=currentProfile.nome||'Doutor(a)';
+  const ini=nome.replace(/Dr\.?\s?|Dra\.?\s?/gi,'').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase()||'DR';
+  // Mobile
+  try{el('home-nome').textContent=nome;}catch(e){}
+  try{el('perfil-av').textContent=ini;el('perfil-nome').textContent=nome;el('perfil-crm').textContent='CRM '+currentProfile.crm+'/'+currentProfile.estado_crm+' - '+currentProfile.especialidade;
+    el('perfil-nome-input').value=nome;el('perfil-crm-input').value=(currentProfile.crm||'')+'/'+currentProfile.estado_crm;
+    el('perfil-esp').value=currentProfile.especialidade||'';el('perfil-tel').value=currentProfile.telefone||'';
+    el('perfil-bio').value=currentProfile.bio||'';el('perfil-valor').value=currentProfile.valor_consulta||89;}catch(e){}
+  // Desktop
+  try{el('ds-av').textContent=ini;el('ds-nome').textContent=nome.split(' ').slice(0,2).join(' ');el('ds-crm').textContent='CRM '+currentProfile.crm+'/'+currentProfile.estado_crm;
+    el('ds-home-nome').textContent=nome;el('ds-perfil-av').textContent=ini;el('ds-perfil-nome').textContent=nome;
+    el('ds-perfil-crm').textContent='CRM '+currentProfile.crm+'/'+currentProfile.estado_crm+' - '+currentProfile.especialidade;
+    el('ds-nome-input').value=nome;el('ds-esp-input').value=currentProfile.especialidade||'';
+    el('ds-tel-input').value=currentProfile.telefone||'';el('ds-valor-input').value=currentProfile.valor_consulta||89;
+    el('ds-bio-input').value=currentProfile.bio||'';
+    const room='kannamaps-dr-'+currentProfile.id.slice(0,8);
+    el('ds-video-link').textContent='https://meet.jit.si/'+room;}catch(e){}
 }
 
-// DASHBOARD
+// ===== DASHBOARD =====
 async function loadDashboard(){
-  if(!currentUser)return;
-  const{data:consultas}=await sb.from('consultas').select('*,pacientes(nome,sintomas,uso_cbd,tem_receita)').eq('medico_id',currentUser.id).order('data_consulta',{ascending:true});
-  allConsultas=consultas||[];
+  if(!currentUser||currentUser.id.startsWith('demo'))return renderDemoDashboard();
+  const{data}=await sb.from('consultas').select('*,pacientes(nome,sintomas,uso_cbd,tem_receita)').eq('medico_id',currentUser.id).order('data_consulta',{ascending:true});
+  allConsultas=data||[];
+  renderDashboard();
+}
+
+function mkAppt(id,ini,nome,dt,badge,status){
+  return '<div class="appt-item" onclick="openConsultaDemo(\''+id+'\')"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+nome+'</div><div style="font-size:12px;color:var(--muted)">'+dt+'</div></div><span class="badge '+badge+'">'+status+'</span></div>';
+}
+function mkDsAppt(id,ini,nome,dt,badge,status){
+  return '<div class="appt-item" onclick="dsVerPaciente(\''+id+'\')"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+nome+'</div><div style="font-size:12px;color:var(--muted)">'+dt+'</div></div><span class="badge '+badge+'">'+status+'</span></div>';
+}
+
+function renderDemoDashboard(){
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  try{el('stat-hoje').textContent='2';el('stat-semana').textContent='12';el('stat-pacientes').textContent='48';el('stat-receitas').textContent='63';}catch(e){}
+  try{
+    const hj=mkAppt('dc1','MS','Maria Santos',hoje+' 14:00','bg','Confirmada')+mkAppt('dc2','PO','Pedro Oliveira',hoje+' 15:30','ba','Agendada');
+    el('agenda-hoje').innerHTML=hj;
+    el('agenda-proximas').innerHTML=mkAppt('dc3','AC','Ana Costa','Amanha 10:00','ba','Agendada');
+  }catch(e){}
+  // Desktop
+  try{
+    el('ds-stat-hoje').textContent='2';el('ds-stat-semana').textContent='12';el('ds-stat-pacientes').textContent='48';el('ds-stat-receitas').textContent='63';
+    el('ds-agenda-hoje').innerHTML=mkDsAppt('dp1','MS','Maria Santos',hoje+' 14:00','bg','Confirmada')+mkDsAppt('dp2','PO','Pedro Oliveira',hoje+' 15:30','ba','Agendada');
+    el('ds-agenda-proximas').innerHTML=mkDsAppt('dp3','AC','Ana Costa','Amanha 10:00','ba','Agendada');
+  }catch(e){}
+}
+function renderDashboard(){
   const hoje=new Date().toISOString().split('T')[0];
   const hj=allConsultas.filter(c=>c.data_consulta?.startsWith(hoje));
-  const sem=allConsultas.filter(c=>{const d=new Date(c.data_consulta);const now=new Date();const diff=(d-now)/(1000*60*60*24);return diff>=0&&diff<=7});
-  el('stat-hoje').textContent=hj.length;el('stat-semana').textContent=sem.length;
-  // Count unique patients
-  const pacIds=new Set(allConsultas.map(c=>c.paciente_id));el('stat-pacientes').textContent=pacIds.size;
-  const{count}=await sb.from('receitas').select('*',{count:'exact',head:true}).eq('medico_id',currentUser.id);
-  el('stat-receitas').textContent=count||0;
-  // Render today
-  renderAgenda('agenda-hoje',hj.length?hj:null,'Nenhuma consulta para hoje');
-  // Render upcoming
+  const sem=allConsultas.filter(c=>{const d=new Date(c.data_consulta);const now=new Date();return (d-now)/(86400000)>=0&&(d-now)/(86400000)<=7});
+  const pacs=new Set(allConsultas.map(c=>c.paciente_id)).size;
+  // Mobile stats
+  try{el('stat-hoje').textContent=hj.length;el('stat-semana').textContent=sem.length;el('stat-pacientes').textContent=pacs;}catch(e){}
+  // Desktop stats
+  try{el('ds-stat-hoje').textContent=hj.length;el('ds-stat-semana').textContent=sem.length;el('ds-stat-pacientes').textContent=pacs;}catch(e){}
+  // Receitas count
+  sb.from('receitas').select('*',{count:'exact',head:true}).eq('medico_id',currentUser.id).then(({count})=>{
+    try{el('stat-receitas').textContent=count||0;el('ds-stat-receitas').textContent=count||0;}catch(e){}
+  });
+  renderAgenda('agenda-hoje',hj.length?hj:null,'Nenhuma consulta hoje');
   const prox=allConsultas.filter(c=>new Date(c.data_consulta)>new Date()).slice(0,5);
   renderAgenda('agenda-proximas',prox.length?prox:null,'Nenhuma consulta agendada');
 }
+
+// ===== AGENDA =====
 function renderAgenda(containerId,items,emptyMsg){
-  const c=el(containerId);
-  if(!items){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">'+emptyMsg+'</div>';return}
+  const c=el(containerId);if(!c)return;
+  if(!items){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">'+emptyMsg+'</div>';return;}
   c.innerHTML=items.map(a=>{
-    const pac=a.pacientes||{};const ini=pac.nome?pac.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
-    const dt=a.data_consulta?new Date(a.data_consulta).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
-    const st=a.status==='confirmada'?'bg':a.status==='realizada'?'bp':'ba';
-    return '<div class="appt-item" onclick="openConsulta(\''+a.id+'\')"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+(pac.nome||'Paciente')+'</div><div style="font-size:12px;color:var(--muted)">'+dt+' · '+(a.horario||'')+'</div></div><span class="badge '+st+'">'+(a.status||'agendada')+'</span></div>'
+    const pac=a.pacientes||{};
+    const ini=(pac.nome||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    const dt=a.data_consulta?new Date(a.data_consulta).toLocaleDateString('pt-BR'):'';
+    const st=a.status==='confirmada'?'bg':a.status==='realizada'?'bg':'ba';
+    return mkAppt(a.id,ini,(pac.nome||'Paciente'),dt+' '+(a.horario||''),st,(a.status||'agendada'));
   }).join('');
 }
 
-// PACIENTES
-async function loadPacientes(){
-  if(currentUser&&currentUser.id.startsWith('demo')){
-    allPacientes=[
-      {id:'dp1',nome:'Maria Santos',email:'maria@demo.com',sintomas:'Ansiedade',tem_receita:'Sim, tenho receita',telefone:'(11) 91111-0001',cpf:'111.222.333-44',anvisa_protocolo:'ANVI-2026-00111'},
-      {id:'dp2',nome:'Pedro Oliveira',email:'pedro@demo.com',sintomas:'Epilepsia',tem_receita:'Sim, tenho receita',telefone:'(21) 92222-0002',cpf:'222.333.444-55',anvisa_protocolo:'ANVI-2026-00222'},
-      {id:'dp3',nome:'Ana Costa',email:'ana@demo.com',sintomas:'Dor cronica',tem_receita:'Nao tenho receita',telefone:'(31) 93333-0003',cpf:'333.444.555-66',anvisa_protocolo:''}
-    ];
-    renderPacientes(allPacientes);return;
+// ===== DESKTOP FUNCTIONS =====
+function dsLoadDashboard(){renderDemoDashboard();}
+function dsLoadAgenda(){
+  const tbody=el('ds-agenda-table');if(!tbody)return;
+  const consultas=allConsultas.length?allConsultas:[...allPacientes.map((p,i)=>({id:'dc'+(i+1),paciente_id:p.id,pacientes:{nome:p.nome},data_consulta:new Date(Date.now()+i*86400000).toISOString().split('T')[0],horario:['10:00','14:00','16:00'][i]||'09:00',status:['confirmada','agendada','agendada'][i]||'agendada'}))];
+  tbody.innerHTML=consultas.map(c=>{
+    const pac=c.pacientes||allPacientes.find(p=>p.id===c.paciente_id)||{};
+    const dt=c.data_consulta?new Date(c.data_consulta).toLocaleDateString('pt-BR'):'';
+    const st=c.status==='confirmada'?'bg':'ba';
+        return '<tr style="cursor:pointer" onclick="dsVerPaciente(this.dataset.pid)" data-pid="'+c.paciente_id+'"><td><strong>'+(pac.nome||'Paciente')+'</strong></td><td>'+dt+'</td><td>'+(c.horario||'-')+'</td><td><span class="badge '+st+'">'+(c.status||'agendada')+'</span></td><td><button class="btn btn-sm btn-green" style="padding:5px 12px;font-size:11px" onclick="event.stopPropagation();dsIniciarVideoDir(this.dataset.cid)" data-cid="'+c.id+'">Iniciar</button></td></tr>';
+  }).join('');
+}
+function dsLoadPacientes(){
+  const tbody=el('ds-pac-table');if(!tbody)return;
+  const pacs=allPacientes;
+  if(!pacs.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Nenhum paciente</td></tr>';return;}
+  tbody.innerHTML=pacs.map(p=>{
+    const rec=p.tem_receita&&p.tem_receita.includes('Sim');
+    const anv=p.anvisa_protocolo?'bg':'ba';
+    return '<tr style="cursor:pointer" onclick="dsVerPaciente(this.dataset.pid)" data-pid="'+p.id+'"><td><strong>'+(p.nome||'-')+'</strong><div style="font-size:11px;color:var(--muted)">'+(p.email||'')+'</div></td><td>'+(p.sintomas||'-')+'</td><td><span class="badge '+(rec?'bg':'ba')+'">'+(rec?'Com receita':'Sem receita')+'</span></td><td><span class="badge '+anv+'">'+(p.anvisa_protocolo||'Pendente')+'</span></td><td><button class="btn btn-sm btn-secondary" style="padding:5px 12px;font-size:11px" onclick="event.stopPropagation();dsVerPaciente(this.dataset.pid)" data-pid="'+p.id+'">Ver perfil</button></td></tr>';
+  }).join('');;
+}
+function dsFilterPacientes(){
+  const q=(el('ds-search-pac')?.value||'').toLowerCase();
+  const filtered=allPacientes.filter(p=>(p.nome||'').toLowerCase().includes(q)||(p.sintomas||'').toLowerCase().includes(q));
+  const tbody=el('ds-pac-table');if(!tbody)return;
+  tbody.innerHTML=filtered.map(p=>{
+    const rec=p.tem_receita&&p.tem_receita.includes('Sim');
+    return '<tr style="cursor:pointer" onclick="dsVerPaciente(this.dataset.pid)" data-pid="'+p.id+'"><td><strong>'+(p.nome||'-')+'</strong></td><td>'+(p.sintomas||'-')+'</td><td><span class="badge '+(rec?'bg':'ba')+'">'+(rec?'Com receita':'Sem receita')+'</span></td><td><span class="badge '+(p.anvisa_protocolo?'bg':'ba')+'">'+(p.anvisa_protocolo||'Pendente')+'</span></td><td><button class="btn btn-sm btn-secondary" style="padding:5px 12px;font-size:11px" onclick="event.stopPropagation();dsVerPaciente(this.dataset.pid)" data-pid="'+p.id+'">Ver perfil</button></td></tr>';
+  }).join('');;
+}
+function dsLoadReceitas(){
+  const tbody=el('ds-rx-table');if(!tbody)return;
+  if(!allReceitas.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Nenhuma receita emitida</td></tr>';return;}
+  tbody.innerHTML=allReceitas.map(r=>{
+    const dt=r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):'-';
+    return '<tr><td>'+(r.paciente_nome||r.paciente_id||'-')+'</td><td>'+(r.produto||'-')+'</td><td>'+dt+'</td><td><span class="badge bg">'+(r.status||'ativa')+'</span></td><td><button class="btn btn-sm btn-secondary" style="padding:5px 12px;font-size:11px" onclick="gerarPDFReceita(allReceitas.find(x=>x.id===this.dataset.rid))" data-rid="'+r.id+'">PDF</button></td></tr>';
+  }).join('');;
+}
+function dsVerPaciente(id){
+  currentChatPac=allPacientes.find(p=>p.id===id)||{id,nome:'Paciente'};
+  const p=currentChatPac;
+  el('dsp-pac-nome').textContent=p.nome||'Paciente';
+  const ini=(p.nome||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  const consultas=allConsultas.filter(c=>c.paciente_id===id);
+  const histHtml=consultas.length?consultas.map(c=>'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px"><span>'+(c.data_consulta?new Date(c.data_consulta).toLocaleDateString('pt-BR'):'-')+'</span><span>'+( c.horario||'')+'</span><span class="badge '+(c.status==='confirmada'||c.status==='realizada'?'bg':'ba')+'">'+(c.status||'agendada')+'</span></div>').join(''):'<div style="text-align:center;padding:12px;color:var(--muted);font-size:12px">Nenhuma consulta</div>';
+  // Receitas do paciente
+  const pacReceitas=allReceitas.filter(r=>r.paciente_id===id);
+  const rxHtml=pacReceitas.length?pacReceitas.map(r=>{
+    const dt=r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):'-';
+    const rid=r.id||'';
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">'+(r.produto||'-')+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+dt+' · '+(r.diagnostico||'')+'</div></div><div style="display:flex;gap:6px;align-items:center"><span class="badge bg">'+(r.status||'ativa')+'</span><button data-rid="'+rid+'" onclick="gerarPDFReceita(allReceitas.find(x=>x.id===this.dataset.rid))" style="background:var(--p-pale);color:var(--p);border:none;border-radius:100px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">PDF</button></div></div></div>';
+  }).join(''):'<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Nenhuma receita emitida ainda</div>';
+
+  const grid=el('dsp-pac-info-grid');
+  grid.style.gridTemplateColumns='repeat(3,1fr)';
+  grid.innerHTML=
+    '<div class="ds-card"><div class="ds-card-hdr"><span class="ds-card-title">Dados pessoais</span></div><div class="ds-card-body"><div style="text-align:center;margin-bottom:16px"><div class="av av-lg" style="margin:0 auto 8px">'+ini+'</div><div style="font-size:16px;font-weight:600">'+(p.nome||'-')+'</div><div style="font-size:12px;color:var(--muted)">'+(p.email||'')+'</div></div><div style="font-size:13px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">CPF</span><span>'+(p.cpf||'-')+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Telefone</span><span>'+(p.telefone||'-')+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Condicoes</span><span>'+(p.sintomas||'-')+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Protocolo ANVISA</span><span style="color:var(--p);font-weight:600">'+(p.anvisa_protocolo||'Pendente')+'</span></div></div></div></div>'+
+    '<div class="ds-card"><div class="ds-card-hdr"><span class="ds-card-title">Historico de consultas</span></div><div class="ds-card-body">'+histHtml+'</div></div>'+
+    '<div class="ds-card"><div class="ds-card-hdr"><span class="ds-card-title">Chat recente</span></div><div class="ds-card-body" id="ds-pac-chat-preview"><div style="text-align:center;padding:12px;color:var(--muted);font-size:12px">Nenhuma mensagem</div></div></div>'+
+    '<div class="ds-card" style="grid-column:1/-1"><div class="ds-card-hdr" style="display:flex;justify-content:space-between;align-items:center"><span class="ds-card-title">💊 Receitas emitidas</span><button class="btn btn-primary btn-sm" onclick="dsNovaReceita()" style="padding:6px 16px;font-size:12px">+ Nova receita</button></div><div class="ds-card-body" id="ds-pac-rx-list">'+rxHtml+'</div></div>';
+  el('ds-rx-form').style.display='none';
+  el('ds-video-consulta').style.display='none';
+  dsGo('pac-detail');
+  loadChatPreview(id);
+}
+function dsNovaReceita(){el('ds-rx-form').style.display='block';el('ds-rx-form').scrollIntoView({behavior:'smooth'});}
+function dsAbrirChat(){dsGo('chat');setTimeout(()=>{if(currentChatPac)dsSelectChat(currentChatPac.id);},100);}
+function dsIniciarVideoConsulta(){
+  if(!currentChatPac)return;
+  const room='kannamaps-'+currentChatPac.id.slice(0,8);
+  el('ds-consulta-iframe').src='https://meet.jit.si/'+room+'#userInfo.displayName='+encodeURIComponent(currentProfile?.nome||'Medico');
+  el('ds-video-consulta').style.display='block';
+  el('ds-video-consulta').scrollIntoView({behavior:'smooth'});
+}
+function dsIniciarVideoDir(consultaId){
+  const c=allConsultas.find(x=>x.id===consultaId)||{};
+  dsVerPaciente(c.paciente_id||'dp1');
+  setTimeout(dsIniciarVideoConsulta,300);
+}
+function dsEncerrarVideo(){el('ds-consulta-iframe').src='';el('ds-video-consulta').style.display='none';}
+function dsIniciarVideo(){
+  const room='kannamaps-dr-'+( currentProfile?.id||'demo').slice(0,8);
+  el('ds-video-iframe').src='https://meet.jit.si/'+room+'#userInfo.displayName='+encodeURIComponent(currentProfile?.nome||'Medico');
+  el('ds-video-wrap').style.display='block';
+}
+function copiarLinkVideo(){
+  const link=el('ds-video-link')?.textContent;
+  if(link)navigator.clipboard.writeText(link).then(()=>alert('Link copiado!'));
+}
+async function dsSalvarPerfil(){
+  if(!currentUser||currentUser.id.startsWith('demo')){showAlert('ds-perfil-alert','Perfil salvo!','ok');return;}
+  const d={nome:el('ds-nome-input')?.value,especialidade:el('ds-esp-input')?.value,telefone:el('ds-tel-input')?.value,bio:el('ds-bio-input')?.value,valor_consulta:parseFloat(el('ds-valor-input')?.value)||89};
+  try{await sb.from('medicos').update(d).eq('id',currentUser.id);currentProfile={...currentProfile,...d};updateUI();showAlert('ds-perfil-alert','Perfil salvo!','ok');}
+  catch(e){showAlert('ds-perfil-alert','Erro ao salvar','err');}
+}
+async function dsEmitirReceita(baixarPdf=false){
+  const p=currentChatPac;if(!p){showAlert('ds-rx-alert','Selecione um paciente','err');return;}
+  const diag=el('ds-rx-diag')?.value||'';
+  const produto=el('ds-rx-produto')?.value||'';
+  if(!produto){showAlert('ds-rx-alert','Preencha o produto prescrito','err');return;}
+  const rx={medico_id:currentUser?.id,paciente_id:p.id,paciente_nome:p.nome,medico_nome:currentProfile?.nome,medico_crm:currentProfile?.crm+'/'+currentProfile?.estado_crm,diagnostico:diag,produto,dosagem:el('ds-rx-dosagem')?.value||'',posologia:el('ds-rx-posologia')?.value||'',duracao:el('ds-rx-duracao')?.value||'',concentracao_max:el('ds-rx-conc')?.value||'',produtos_autorizados:el('ds-rx-produtos')?.value||'',observacoes:el('ds-rx-obs')?.value||'',status:'ativa',criado_em:new Date().toISOString(),hash:'KM-'+Date.now().toString(36).toUpperCase()};
+  if(!currentUser?.id?.startsWith('demo')){
+    try{await sb.from('receitas').insert(rx);}catch(e){console.log('Receita save error:',e);}
   }
+  allReceitas=[rx,...allReceitas];
+  showAlert('ds-rx-alert','Receita emitida com sucesso!','ok');
+  if(baixarPdf)gerarPDFReceita(rx);
+  // Atualiza lista de receitas no perfil se estiver visível
+  const rxList=el('ds-pac-rx-list');
+  if(rxList&&currentChatPac){
+    const pacRx=allReceitas.filter(r=>r.paciente_id===currentChatPac.id);
+    rxList.innerHTML=pacRx.map(r=>{
+      const dt=r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):'-';
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">'+(r.produto||'-')+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+dt+' · '+(r.diagnostico||'')+'</div></div><div style="display:flex;gap:6px;align-items:center"><span class="badge bg">'+(r.status||'ativa')+'</span><button onclick="gerarPDFReceita(allReceitas.find(x=>x.id===\''+r.id+'\'))" style="background:var(--p-pale);color:var(--p);border:none;border-radius:100px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">PDF</button></div></div></div>';
+    }).join('') || '<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Nenhuma receita</div>';
+  }
+  setTimeout(()=>{el('ds-rx-form').style.display='none';},2000);
+}
+
+// ===== CHAT =====
+let chatMessages={},activeChatId=null,demoChatHistory={};
+async function dsLoadChat(){
+  const listEl=el('ds-chat-list');if(!listEl)return;
+  // Se demo e sem pacientes, carrega demo
+  if(currentUser?.id?.startsWith('demo')&&!allPacientes.length){
+    allPacientes=[
+      {id:'dp1',nome:'Maria Santos',sintomas:'Ansiedade cronica'},
+      {id:'dp2',nome:'Pedro Oliveira',sintomas:'Epilepsia refrataria'},
+      {id:'dp3',nome:'Ana Costa',sintomas:'Dor cronica lombar'}
+    ];
+  }
+  const pacs=allPacientes;
+  if(!pacs.length){listEl.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Nenhum paciente</div>';return;}
+  listEl.innerHTML=pacs.map(p=>{
+    const ini=(p.nome||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    return '<div class="ds-chat-item" id="dschat-'+p.id+'" style="cursor:pointer" onclick="dsSelectChat(this.dataset.pid)" data-pid="'+p.id+'"><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm">'+ini+'</div><div><div class="ds-chat-item-name">'+(p.nome||'Paciente')+'</div><div class="ds-chat-item-last">'+(p.sintomas||'Clique para conversar')+'</div></div></div></div>';
+  }).join('');;
+  // Auto-seleciona primeiro se nenhum ativo
+  if(activeChatId)dsSelectChat(activeChatId);
+  else if(pacs.length>0)dsSelectChat(pacs[0].id);
+}
+async function dsSelectChat(pacId){
+  activeChatId=pacId;
+  const pac=allPacientes.find(p=>p.id===pacId)||{id:pacId,nome:'Paciente'};
+  document.querySelectorAll('.ds-chat-item').forEach(i=>i.classList.remove('active'));
+  const item=el('dschat-'+pacId);if(item)item.classList.add('active');
+  el('ds-chat-hdr').textContent=pac.nome||'Paciente';
+  await loadChatMsgs(pacId,'ds-chat-msgs');
+}
+async function loadChatMsgs(pacId,containerId){
+  const c=el(containerId);if(!c)return;
+  if(currentUser?.id?.startsWith('demo')){
+    if(!demoChatHistory[pacId]){
+      demoChatHistory[pacId]=[
+        {out:false,txt:'Ola doutor, tenho uma duvida sobre a dosagem.',hr:'09:00'},
+        {out:true,txt:'Ola! Pode me dizer qual produto esta usando?',hr:'09:01'},
+        {out:false,txt:'Estou usando o CBD Full Spectrum 1500mg.',hr:'09:02'}
+      ];
+    }
+    renderChatMsgs(demoChatHistory[pacId],c);
+    return;
+  }
+  const{data}=await sb.from('mensagens').select('*').or('remetente_id.eq.'+currentUser.id+',destinatario_id.eq.'+currentUser.id).order('criado_em',{ascending:true});
+  const msgs=(data||[]).filter(m=>m.remetente_id===pacId||m.destinatario_id===pacId);
+  if(!msgs.length){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma mensagem ainda</div>';return;}
+  c.innerHTML=msgs.map(m=>{
+    const isOut=m.remetente_id===currentUser.id;
+    return '<div class="ds-msg '+(isOut?'ds-msg-out':'ds-msg-in')+'">'+m.texto+'<div class="chat-time">'+new Date(m.criado_em).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</div></div>';
+  }).join('');
+  c.scrollTop=c.scrollHeight;
+}
+async function loadChatPreview(pacId){
+  const c=el('ds-pac-chat-preview');if(!c)return;
+  if(currentUser?.id?.startsWith('demo')){c.innerHTML='<div style="font-size:12px;color:var(--muted)">Ola doutor, tenho uma duvida...</div>';return;}
+  const{data}=await sb.from('mensagens').select('*').or('remetente_id.eq.'+currentUser.id+',destinatario_id.eq.'+currentUser.id).order('criado_em',{ascending:false}).limit(3);
+  const msgs=(data||[]).filter(m=>m.remetente_id===pacId||m.destinatario_id===pacId);
+  if(!msgs.length){c.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:12px">Nenhuma mensagem</div>';return;}
+  c.innerHTML=msgs.reverse().map(m=>'<div style="font-size:12px;padding:4px 0;color:var(--muted)">'+(m.remetente_id===currentUser.id?'Voce: ':'')+m.texto+'</div>').join('');
+}
+async function dsSendMsg(){
+  const inp=el('ds-chat-inp');const txt=inp?.value?.trim();
+  if(!txt)return;
+  // Se não tem chat ativo mas tem paciente atual, usa ele
+  if(!activeChatId&&currentChatPac){activeChatId=currentChatPac.id;}
+  if(!activeChatId){showChatMsg('Selecione um paciente primeiro');return;}
+  inp.value='';
+  const msgs=el('ds-chat-msgs');
+  const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  // Salva na sessao (demo ou real)
+  if(currentUser?.id?.startsWith('demo')){
+    if(!demoChatHistory[activeChatId])demoChatHistory[activeChatId]=[];
+    demoChatHistory[activeChatId].push({out:true,txt,hr:hora});
+  }
+  msgs.innerHTML+='<div class="ds-msg ds-msg-out">'+txt+'<div class="chat-time">'+hora+'</div></div>';
+  msgs.scrollTop=msgs.scrollHeight;
+  if(!currentUser?.id?.startsWith('demo')){
+    try{await sb.from('mensagens').insert({remetente_id:currentUser.id,destinatario_id:activeChatId,texto:txt,criado_em:new Date().toISOString(),lida:false});}
+    catch(e){console.log('Chat save error:',e);}
+  }
+}
+
+function renderChatMsgs(msgs,container){
+  if(!msgs||!msgs.length){container.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma mensagem</div>';return;}
+  container.innerHTML=msgs.map(m=>'<div class="ds-msg '+(m.out?'ds-msg-out':'ds-msg-in')+'">'+m.txt+'<div class="chat-time">'+m.hr+'</div></div>').join('');
+  container.scrollTop=container.scrollHeight;
+}
+
+function showChatMsg(txt){const c=el('ds-chat-msgs');if(c)c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">'+txt+'</div>';}
+// Mobile chat
+let mobileChatPacId=null;
+async function openChat(pacId){
+  mobileChatPacId=pacId;
+  const pac=allPacientes.find(p=>p.id===pacId)||{nome:'Paciente'};
+  el('chat-pac-nome').textContent=pac.nome||'Chat';
+  go('chat');
+  await loadChatMsgs(pacId,'chat-msgs');
+}
+async function sendMsg(){
+  const inp=el('chat-inp');const txt=inp?.value?.trim();
+  if(!txt||!mobileChatPacId)return;
+  inp.value='';
+  const c=el('chat-msgs');
+  c.innerHTML+='<div class="chat-msg chat-out">'+txt+'<div class="chat-time">Agora</div></div>';
+  c.scrollTop=c.scrollHeight;
+  if(!currentUser?.id?.startsWith('demo')){
+    await sb.from('mensagens').insert({remetente_id:currentUser.id,destinatario_id:mobileChatPacId,texto:txt,criado_em:new Date().toISOString(),lida:false});
+  }
+}
+
+// ===== MOBILE CONSULTA =====
+function openConsulta(id){
+  currentConsulta=allConsultas.find(c=>c.id===id);if(!currentConsulta)return;
+  const pac=currentConsulta.pacientes||{};
+  const ini=(pac.nome||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  el('consulta-av').textContent=ini;el('consulta-pac-nome').textContent=pac.nome||'Paciente';
+  el('consulta-pac-info').textContent=(currentConsulta.horario||'')+' - '+(currentConsulta.data_consulta?new Date(currentConsulta.data_consulta).toLocaleDateString('pt-BR'):'');
+  el('consulta-status').textContent=currentConsulta.status||'agendada';
+  el('consulta-perfil').innerHTML='<strong>Condicoes:</strong> '+(pac.sintomas||'-')+'<br><strong>CBD anterior:</strong> '+(pac.uso_cbd||'-')+'<br><strong>Receita:</strong> '+(pac.tem_receita||'-');
+  go('consulta');
+}
+function openConsultaDemo(id){currentConsulta=allConsultas.find(c=>c.id===id)||{id,pacientes:{nome:'Paciente'},status:'agendada'};openConsulta(id);}
+function entrarConsulta(){
+  if(!currentConsulta)return;
+  const room='kannamaps-'+currentConsulta.id.slice(0,8);
+  el('video-wrap').style.display='block';
+  el('video-iframe').src='https://meet.jit.si/'+room+'#userInfo.displayName='+encodeURIComponent(currentProfile?.nome||'Medico');
+  el('btn-video').style.display='none';
+}
+function sairConsulta(){el('video-iframe').src='';el('video-wrap').style.display='none';el('btn-video').style.display='flex';}
+
+// ===== MOBILE PACIENTES =====
+async function loadPacientes(){
+  if(currentUser?.id?.startsWith('demo')){renderPacientes(allPacientes);return;}
   const pacIds=[...new Set(allConsultas.map(c=>c.paciente_id))];
-  if(!pacIds.length){el('pac-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">&#128101;</div><div style="font-size:13px">Seus pacientes aparecerao aqui apos a primeira consulta</div></div>';return}
+  if(!pacIds.length){el('pac-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Nenhum paciente</div>';return;}
   const{data}=await sb.from('pacientes').select('*').in('id',pacIds);
   allPacientes=data||[];renderPacientes(allPacientes);
 }
-function filterPacientes(){const q=v('search-pac').toLowerCase();renderPacientes(allPacientes.filter(p=>(p.nome||'').toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q)))}
+function filterPacientes(){const q=v('search-pac').toLowerCase();renderPacientes(allPacientes.filter(p=>(p.nome||'').toLowerCase().includes(q)||(p.email||'').toLowerCase().includes(q)));}
 function renderPacientes(list){
-  if(!list.length){el('pac-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhum paciente encontrado</div>';return}
+  if(!list.length){el('pac-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Nenhum paciente</div>';return;}
   el('pac-list').innerHTML=list.map(p=>{
-    const ini=p.nome?p.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
-    return '<div class="appt-item" style="cursor:pointer" onclick="verPerfilPaciente(\''+p.id+'\')"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+(p.nome||p.email)+'</div><div style="font-size:12px;color:var(--muted)">'+(p.sintomas||'Sem condições informadas')+'</div></div><div style="text-align:right"><span class="badge bg">'+(p.tem_receita==='Sim, tenho receita'?'Com receita':'Sem receita')+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px">Ver perfil →</div></div></div>'
+    const ini=(p.nome||'?').split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        return '<div class="appt-item" style="cursor:pointer" onclick="verPerfilPaciente(this.dataset.pid)" data-pid="'+p.id+'"><div class="av av-md">'+ini+'</div><div style="flex:1"><div style="font-size:14px;font-weight:600">'+(p.nome||p.email)+'</div><div style="font-size:12px;color:var(--muted)">'+(p.sintomas||'-')+'</div></div><div style="text-align:right"><span class="badge bg">'+(p.tem_receita&&p.tem_receita.includes('Sim')?'Com receita':'Sem receita')+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px">Ver perfil</div></div></div>';
   }).join('');
 }
-
-// CONSULTA DETAIL
-async function openConsulta(id){
-  currentConsulta=allConsultas.find(c=>c.id===id);if(!currentConsulta)return;
-  const pac=currentConsulta.pacientes||{};
-  const ini=pac.nome?pac.nome.split(' ').filter(Boolean).map(n=>n[0]).join('').slice(0,2).toUpperCase():'?';
-  el('consulta-av').textContent=ini;el('consulta-pac-nome').textContent=pac.nome||'Paciente';
-  el('consulta-pac-info').textContent=(currentConsulta.horario||'')+' · '+(currentConsulta.data_consulta?new Date(currentConsulta.data_consulta).toLocaleDateString('pt-BR'):'');
-  el('consulta-status').textContent=currentConsulta.status||'agendada';
-  el('consulta-perfil').innerHTML='<strong>Condições:</strong> '+(pac.sintomas||'Não informado')+'<br><strong>CBD anterior:</strong> '+(pac.uso_cbd||'Não informado')+'<br><strong>Tem receita:</strong> '+(pac.tem_receita||'Não informado');
-  // Pre-fill receita
-  el('rx-diag').value='';el('rx-produto').value='';el('rx-dosagem').value='';el('rx-posologia').value='';el('rx-duracao').value='';el('rx-obs').value='';el('rx-produtos-aut').value='';el('rx-categorias').value='';el('rx-conc-max').value='';
-  el('pront-anamnese').value='';el('pront-diag').value='';el('pront-conduta').value='';
-  go('consulta');
-}
-function switchTab(tabEl,showId){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));tabEl.classList.add('on');
-  ['tab-video','tab-prontuario','tab-receita'].forEach(id=>{el(id).style.display=id===showId?'block':'none'});
-}
-
-// VIDEO
-function entrarConsulta(){
-  if(!currentConsulta)return;
-  const room='kannamaps-dr-'+(currentConsulta.id?.slice(0,8)||'demo');
-  el('video-wrap').style.display='block';el('video-iframe').src='https://meet.jit.si/'+room+'#config.startWithAudioMuted=false&config.startWithVideoMuted=false&userInfo.displayName='+encodeURIComponent(currentProfile?.nome||'Médico');
-  el('btn-video').style.display='none';
-}
-function sairConsulta(){el('video-wrap').style.display='none';el('btn-video').style.display='flex';el('video-iframe').src=''}
-
-// PRONTUARIO
-async function salvarProntuario(){
-  if(!currentUser||!currentConsulta)return;
-  const d={paciente_id:currentConsulta.paciente_id,medico_id:currentUser.id,consulta_id:currentConsulta.id,anamnese:v('pront-anamnese'),hipotese_diagnostica:v('pront-diag'),conduta:v('pront-conduta')};
-  if(!d.anamnese)return showAlert('pront-alert','Preencha a anamnese.','err');
-  showLoading('Salvando...');
-  const{error}=await sb.from('prontuarios').insert(d);
-  hideLoading();
-  if(error)return showAlert('pront-alert','Erro: '+error.message,'err');
-  showAlert('pront-alert','✓ Prontuário salvo!','ok');
-}
-
-// RECEITA
-async function emitirReceita(){
-  if(!currentUser||!currentConsulta)return;
-  const d={consulta_id:currentConsulta.id,paciente_id:currentConsulta.paciente_id,medico_id:currentUser.id,diagnostico:v('rx-diag'),produto_prescrito:v('rx-produto'),dosagem:v('rx-dosagem'),posologia:v('rx-posologia'),duracao_tratamento:v('rx-duracao'),observacoes:v('rx-obs'),produtos_autorizados:v('rx-produtos-aut'),categorias_autorizadas:v('rx-categorias'),concentracao_max:v('rx-conc-max'),status:'ativa',validade:new Date(Date.now()+180*24*60*60*1000).toISOString().split('T')[0]};
-  if(!d.diagnostico||!d.produto_prescrito||!d.dosagem)return showAlert('rx-alert','Preencha diagnóstico, produto e dosagem.','err');
-  showLoading('Emitindo receita...');
-  const{error}=await sb.from('receitas').insert(d);
-  if(!error)await sb.from('consultas').update({status:'realizada'}).eq('id',currentConsulta.id);
-  hideLoading();
-  if(error)return showAlert('rx-alert','Erro: '+error.message,'err');
-  showAlert('rx-alert','✓ Receita emitida com sucesso!','ok');
-}
-
-// RECEITAS LIST
-async function loadReceitas(){
-  const{data}=await sb.from('receitas').select('*,pacientes(nome)').eq('medico_id',currentUser.id).order('criado_em',{ascending:false});
-  allReceitas=data||[];
-  if(!allReceitas.length){el('rx-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="font-size:13px">Nenhuma receita emitida ainda</div></div>';return}
-  el('rx-list').innerHTML=allReceitas.map(r=>{
-    const pac=r.pacientes||{};
-    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:14px;font-weight:600">'+(pac.nome||'Paciente')+'</div><div style="font-size:12px;color:var(--muted)">'+new Date(r.criado_em).toLocaleDateString('pt-BR')+'</div></div><span class="badge '+(r.status==='ativa'?'bg':'ba')+'">'+(r.status||'ativa')+'</span></div><div style="font-size:12px;color:var(--muted);line-height:1.6"><strong>Diagnóstico:</strong> '+(r.diagnostico||'-')+'<br><strong>Produto:</strong> '+(r.produto_prescrito||'-')+'<br><strong>Dosagem:</strong> '+(r.dosagem||'-')+' · '+(r.posologia||'-')+'<br><strong>Validade:</strong> '+(r.validade?new Date(r.validade).toLocaleDateString('pt-BR'):'-')+'</div></div>'
-  }).join('');
-}
-
-// NAVIGATION
-
 function closePacModal(){var m=document.getElementById('pac-modal');if(m)m.remove();}
 function verPerfilPaciente(id){
   const p=allPacientes.find(function(x){return x.id===id});if(!p)return;
-  const ini=p.nome?p.nome.split(' ').filter(Boolean).map(function(n){return n[0]}).join('').slice(0,2).toUpperCase():'?';
+  const ini=(p.nome||'?').split(' ').filter(Boolean).map(function(n){return n[0]}).join('').slice(0,2).toUpperCase();
   var old=document.getElementById('pac-modal');if(old)old.remove();
+  var hist=allConsultas.filter(function(c){return c.paciente_id===id});
+  var histHtml=hist.length?hist.map(function(c){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px"><span>'+(c.data_consulta?new Date(c.data_consulta).toLocaleDateString('pt-BR'):'-')+'</span><span class="badge '+(c.status==='confirmada'||c.status==='realizada'?'bg':'ba')+'">'+c.status+'</span></div>'}).join(''):'<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px">Nenhuma consulta</div>';
   var m=document.createElement('div');
   m.id='pac-modal';
   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center';
-  var hist=allConsultas.filter(function(c){return c.paciente_id===id});
-  var histHtml=hist.length?hist.map(function(c){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:12px"><span>'+(c.data_consulta?new Date(c.data_consulta).toLocaleDateString('pt-BR'):'-')+'</span><span class="badge '+(c.status==='confirmada'||c.status==='realizada'?'bg':'ba')+'">'+c.status+'</span></div>'}).join(''):'<div style="text-align:center;padding:12px;color:var(--muted);font-size:13px">Nenhuma consulta</div>';
   m.innerHTML='<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:82vh;overflow-y:auto;padding:20px 20px 32px">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
-    +'<div style="display:flex;align-items:center;gap:10px">'
-    +'<div style="width:44px;height:44px;border-radius:50%;background:var(--p-pale);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--p);font-size:15px">'+ini+'</div>'
-    +'<div><div style="font-size:16px;font-weight:700">'+(p.nome||'Paciente')+'</div><div style="font-size:12px;color:var(--muted)">'+(p.email||'')+'</div></div>'
-    +'</div>'
-    +'<button onclick="closePacModal()" style="background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>'
-    +'</div>'
+    +'<div style="display:flex;align-items:center;gap:10px"><div class="av av-md">'+ini+'</div><div><div style="font-size:16px;font-weight:700">'+(p.nome||'Paciente')+'</div><div style="font-size:12px;color:var(--muted)">'+(p.email||'')+'</div></div></div>'
+    +'<button onclick="closePacModal()" style="background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer">✕</button></div>'
     +'<div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px">Dados do paciente</div>'
-    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">CPF</span><span>'+(p.cpf||'-')+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">Telefone</span><span>'+(p.telefone||'-')+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:13px"><span style="color:var(--muted)">Condicoes</span><span style="text-align:right;max-width:55%">'+(p.sintomas||'-')+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span style="color:var(--muted)">Protocolo ANVISA</span><span style="color:var(--p);font-weight:600">'+(p.anvisa_protocolo||'Pendente')+'</span></div>'
-    +'</div>'
-    +'<div style="background:var(--bg);border-radius:12px;padding:14px">'
-    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px">Historico de consultas</div>'
-    +histHtml
-    +'</div>'
+    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Dados</div>'
+    +'<div style="font-size:13px;display:flex;flex-direction:column;gap:7px">'
+    +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">CPF</span><span>'+(p.cpf||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Telefone</span><span>'+(p.telefone||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Condicoes</span><span>'+(p.sintomas||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">ANVISA</span><span style="color:var(--p);font-weight:600">'+(p.anvisa_protocolo||'Pendente')+'</span></div></div></div>'
+    +'<div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Historico</div>'+histHtml+'</div>'
+    +'<div style="display:flex;gap:8px"><button class="btn btn-secondary btn-sm" style="flex:1" onclick="var pid=this.dataset.pid;closePacModal();openChat(pid)" data-pid="'+p.id+'">Chat</button>'
+    +'<button class="btn btn-primary btn-sm" onclick="closePacModal()" style="flex:1">Fechar</button></div>'
     +'</div>';
   document.body.appendChild(m);
   m.addEventListener('click',function(e){if(e.target===m)m.remove()});
 }
 
-function go(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const t=document.getElementById('s-'+id);if(t)t.classList.add('active');
-  ['home','pacientes','receitas','perfil'].forEach(n=>{const b=el('bni-'+n);if(b)b.classList.toggle('active',n===id)});
-  if(id==='pacientes')loadPacientes();
-  if(id==='receitas'&&currentUser)loadReceitas();
-  if(id==='home'&&currentUser&&!currentUser.id.startsWith('demo'))loadDashboard();
-  window.scrollTo(0,0);try{t.scrollTop=0}catch(e){}
+// ===== RECEITAS MOBILE =====
+async function loadReceitas(){
+  if(!currentUser)return;
+  if(currentUser.id.startsWith('demo')){el('rx-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma receita emitida</div>';return;}
+  const{data}=await sb.from('receitas').select('*,pacientes(nome)').eq('medico_id',currentUser.id).order('criado_em',{ascending:false});
+  allReceitas=data||[];
+  if(!allReceitas.length){el('rx-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Nenhuma receita emitida</div>';return;}
+  el('rx-list').innerHTML=allReceitas.map(r=>'<div class="card" onclick="gerarPDFReceita(r)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:600">'+(r.pacientes?.nome||r.paciente_nome||'-')+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(r.produto||'-')+' - '+(r.criado_em?new Date(r.criado_em).toLocaleDateString('pt-BR'):'-')+'</div></div><span class="badge bg">'+( r.status||'ativa')+'</span></div></div>').join('');
+}
+async function emitirReceita(){
+  if(!currentConsulta){showAlert('rx-alert','Abra uma consulta primeiro','err');return;}
+  const rx={medico_id:currentUser?.id,paciente_id:currentConsulta.paciente_id,paciente_nome:currentConsulta.pacientes?.nome,medico_nome:currentProfile?.nome,medico_crm:(currentProfile?.crm||'')+'/'+( currentProfile?.estado_crm||''),diagnostico:v('rx-diag'),produto:v('rx-produto'),dosagem:v('rx-dosagem'),posologia:v('rx-posologia'),duracao:v('rx-duracao'),produtos_autorizados:v('rx-produtos-aut'),categorias_autorizadas:v('rx-categorias'),concentracao_max:v('rx-conc-max'),observacoes:v('rx-obs'),status:'ativa',criado_em:new Date().toISOString(),hash:'KM-'+Date.now().toString(36).toUpperCase()};
+  if(!currentUser?.id?.startsWith('demo')){try{await sb.from('receitas').insert(rx);}catch(e){}}
+  else{allReceitas=[rx,...allReceitas];}
+  showAlert('rx-alert','Receita emitida! O paciente ja pode visualizar.','ok');
+  gerarPDFReceita(rx);
+}
+async function salvarProntuario(){
+  if(!currentConsulta)return;
+  const d={anamnese:v('pront-anamnese'),diagnostico:v('pront-diag'),conduta:v('pront-conduta'),medico_id:currentUser?.id,paciente_id:currentConsulta.paciente_id,consulta_id:currentConsulta.id,criado_em:new Date().toISOString()};
+  if(!currentUser?.id?.startsWith('demo')){try{await sb.from('prontuarios').upsert(d);}catch(e){}}
+  showAlert('pront-alert','Prontuario salvo!','ok');
 }
 
-// UTILS
-function v(id){return document.getElementById(id)?.value?.trim()||''}
-function el(id){return document.getElementById(id)}
-function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==='err'?'err':type==='ok'?'ok':'info')+'">'+msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000)}
-function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text}
-function showLoading(msg){const l=el('loading');if(!l)return;el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';clearTimeout(window._loadTimer);window._loadTimer=setTimeout(hideLoading,8000)}
-function hideLoading(){clearTimeout(window._loadTimer);const l=el('loading');if(l)l.style.display='none'}
+// ===== PDF RECEITA =====
+function gerarPDFReceita(rx){
+  if(!rx){alert('Receita nao encontrada.');return;}
+  const hash=rx.hash||('KM-'+Date.now().toString(36).toUpperCase());
+  // Tenta jsPDF
+  const lib=window.jspdf||window.jsPDF;
+  if(lib){
+    try{
+      const{jsPDF:J}=lib;const doc=new J();
+      doc.setFillColor(26,127,90);doc.rect(0,0,210,32,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('Kannamaps',14,14);
+      doc.setFontSize(9);doc.setFont(undefined,'normal');doc.text('Plataforma de Cannabis Medicinal',14,22);doc.text('kannamaps.com.br',14,29);
+      doc.setTextColor(26,127,90);doc.setFontSize(15);doc.setFont(undefined,'bold');doc.text('RECEITA MEDICA',105,46,{align:'center'});
+      doc.setFontSize(8);doc.setTextColor(100,100,100);doc.setFont(undefined,'normal');doc.text('Hash: '+hash,105,53,{align:'center'});
+      doc.setDrawColor(26,127,90);doc.setLineWidth(0.4);doc.line(14,57,196,57);
+      doc.setTextColor(30,30,30);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.text('Medico Prescritor',14,65);
+      doc.setFont(undefined,'normal');doc.setFontSize(9);
+      doc.text('Nome: '+(rx.medico_nome||currentProfile?.nome||'-'),14,72);
+      doc.text('CRM: '+(rx.medico_crm||(currentProfile?.crm+'/'+currentProfile?.estado_crm)||'-'),14,78);
+      doc.text('Especialidade: '+(currentProfile?.especialidade||'-'),14,84);
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.text('Paciente',120,65);
+      doc.setFont(undefined,'normal');doc.setFontSize(9);
+      doc.text('Nome: '+(rx.paciente_nome||currentChatPac?.nome||'-'),120,72);
+      doc.text('Data: '+new Date().toLocaleDateString('pt-BR'),120,78);
+      doc.line(14,90,196,90);
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(26,127,90);doc.text('PRESCRICAO',14,99);
+      doc.setTextColor(30,30,30);doc.setFont(undefined,'normal');doc.setFontSize(9);
+      let y=108;
+      [['Diagnostico (CID):',rx.diagnostico],['Produto:',rx.produto],['Dosagem:',rx.dosagem],['Posologia:',rx.posologia],['Duracao:',rx.duracao],['Concentracao max:',rx.concentracao_max],['Produtos autorizados:',rx.produtos_autorizados],['Observacoes:',rx.observacoes]].forEach(([l,v])=>{
+        if(!v||!v.trim())return;
+        doc.setFont(undefined,'bold');doc.text(l,14,y);
+        doc.setFont(undefined,'normal');const lines=doc.splitTextToSize(v,170);doc.text(lines,14,y+5);y+=5+(lines.length*5)+4;
+        if(y>260){doc.addPage();y=20;}
+      });
+      const yf=Math.max(y+10,250);
+      doc.setDrawColor(200,200,200);doc.line(14,yf,196,yf);doc.setFontSize(7);doc.setTextColor(130,130,130);
+      doc.text('Verificacao: kannamaps.com.br/verificar/'+hash,105,yf+6,{align:'center'});
+      doc.text('RDC 660/2022 ANVISA | Kannamaps Tecnologia Ltda',105,yf+11,{align:'center'});
+      doc.save('receita_'+(rx.paciente_nome||'paciente').replace(/\s+/g,'_')+'_'+hash+'.pdf');
+      return;
+    }catch(err){console.log('jsPDF err:',err);}
+  }
+  // Fallback HTML para impressao
+  const html='<!DOCTYPE html><html><head><meta charset=UTF-8><title>Receita - Kannamaps</title><style>body{font-family:Arial,sans-serif;max-width:680px;margin:30px auto;font-size:13px;color:#222}.hdr{background:#1A7F5A;color:#fff;padding:14px 20px;border-radius:6px;margin-bottom:18px}.hdr h1{margin:0;font-size:18px}.hdr p{margin:3px 0 0;font-size:11px;opacity:.85}.titulo{text-align:center;color:#1A7F5A;font-size:17px;font-weight:bold;margin-bottom:3px}.hash{text-align:center;color:#999;font-size:10px;margin-bottom:14px}hr{border:none;border-top:1px solid #1A7F5A;margin:14px 0}.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.box{border:1px solid #ddd;border-radius:4px;padding:10px}.box h3{color:#1A7F5A;margin:0 0 8px;font-size:11px;text-transform:uppercase}.row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:12px}.lb{color:#888}.campo{margin:6px 0;font-size:12px}.campo b{color:#333}.footer{margin-top:20px;padding-top:10px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center}@media print{.print-btn{display:none}}</style></head><body>'
+    +'<div class="hdr"><h1>kannamaps</h1><p>Plataforma de Cannabis Medicinal</p></div>'
+    +'<div class="titulo">RECEITA MEDICA</div><div class="hash">Hash: '+hash+'</div><hr>'
+    +'<div class="cols"><div class="box"><h3>Medico Prescritor</h3>'
+    +'<div class="row"><span class="lb">Nome</span><span>'+(rx.medico_nome||currentProfile?.nome||'-')+'</span></div>'
+    +'<div class="row"><span class="lb">CRM</span><span>'+(rx.medico_crm||(currentProfile?.crm+'/'+currentProfile?.estado_crm)||'-')+'</span></div>'
+    +'</div><div class="box"><h3>Paciente</h3>'
+    +'<div class="row"><span class="lb">Nome</span><span>'+(rx.paciente_nome||currentChatPac?.nome||'-')+'</span></div>'
+    +'<div class="row"><span class="lb">Data</span><span>'+new Date().toLocaleDateString('pt-BR')+'</span></div>'
+    +'</div></div><hr>'
+    +(rx.diagnostico?'<div class="campo"><b>Diagnostico (CID):</b> '+rx.diagnostico+'</div>':'')
+    +(rx.produto?'<div class="campo"><b>Produto prescrito:</b> '+rx.produto+'</div>':'')
+    +(rx.dosagem?'<div class="campo"><b>Dosagem:</b> '+rx.dosagem+'</div>':'')
+    +(rx.posologia?'<div class="campo"><b>Posologia:</b> '+rx.posologia+'</div>':'')
+    +(rx.duracao?'<div class="campo"><b>Duracao:</b> '+rx.duracao+'</div>':'')
+    +(rx.concentracao_max?'<div class="campo"><b>Concentracao maxima:</b> '+rx.concentracao_max+'</div>':'')
+    +(rx.produtos_autorizados?'<div class="campo"><b>Produtos autorizados:</b> '+rx.produtos_autorizados+'</div>':'')
+    +(rx.observacoes?'<div class="campo"><b>Observacoes:</b> '+rx.observacoes+'</div>':'')
+    +'<div class="footer">Verificacao: kannamaps.com.br/verificar/'+hash+' | RDC 660/2022 ANVISA</div>'
+    +'<br><button class="print-btn" onclick="window.print()" style="background:#1A7F5A;color:#fff;border:none;padding:9px 22px;border-radius:4px;cursor:pointer;font-size:13px;margin-top:8px">Imprimir / Salvar PDF</button>'
+    +'</body></html>';
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();setTimeout(()=>w.print(),600);}
+  else{alert('Permita popups no navegador para abrir a receita. Hash: '+hash);}
+}
+
+// ===== SALVAR PERFIL MOBILE =====
+async function salvarPerfil(){
+  if(!currentUser||currentUser.id.startsWith('demo')){showAlert('perfil-alert','Perfil salvo!','ok');return;}
+  const d={nome:v('perfil-nome-input'),especialidade:v('perfil-esp'),telefone:v('perfil-tel'),bio:v('perfil-bio'),valor_consulta:parseFloat(v('perfil-valor'))||89};
+  try{await sb.from('medicos').update(d).eq('id',currentUser.id);currentProfile={...currentProfile,...d};updateUI();showAlert('perfil-alert','Perfil salvo!','ok');}
+  catch(e){showAlert('perfil-alert','Erro ao salvar','err');}
+}
+
+// ===== VIDEO MOBILE =====
+function switchTab(tabEl,showId){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));tabEl.classList.add('on');
+  ['tab-video','tab-prontuario','tab-receita'].forEach(id=>{el(id).style.display=id===showId?'block':'none'});
+}
+
+// ===== UTILS =====
+function v(id){return document.getElementById(id)?.value?.trim()||'';}
+function el(id){return document.getElementById(id);}
+function showAlert(cid,msg,type){const c=el(cid);if(!c)return;c.innerHTML='<div class="alert alert-'+(type==="err"?"err":type==="ok"?"ok":"info")+'">'+ msg+'</div>';setTimeout(()=>{if(c)c.innerHTML=''},5000);}
+function setBtn(id,dis,text){const b=el(id);if(!b)return;b.disabled=dis;b.textContent=text;}
+function showLoading(msg){const l=el('loading');if(!l)return;if(el('loading-msg'))el('loading-msg').textContent=msg||'Carregando...';l.style.display='flex';}
+function hideLoading(){const l=el('loading');if(l)l.style.display='none';}
 </script>
 </body>
 </html>
