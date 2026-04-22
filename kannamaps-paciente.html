@@ -143,6 +143,57 @@ async function entrarDemoPaciente(){
   go('home');
 }
 
+
+async function loadPedidos(){
+  const listEl=el('pedidos-list');if(!listEl)return;
+  if(currentUser?.id?.startsWith('demo')){
+    listEl.innerHTML=renderPedidoDemo();return;
+  }
+  const{data}=await sb.from('pedidos').select('*,pedido_historico(status,descricao,criado_em)').eq('paciente_id',currentUser.id).order('criado_em',{ascending:false});
+  if(!data||!data.length){listEl.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📦</div><div style="font-size:13px">Nenhum pedido ainda</div></div>';return;}
+  listEl.innerHTML=data.map(p=>renderPedidoCard(p)).join('');
+}
+function renderPedidoDemo(){
+  return renderPedidoCard({
+    id:'demo-001',status:'confirmado',status_entrega:'enviado',
+    codigo_rastreio:'BR123456789',transportadora:'Correios',
+    total:320,criado_em:new Date().toISOString(),
+    pedido_historico:[
+      {status:'confirmado',descricao:'Pedido confirmado',criado_em:new Date(Date.now()-3*86400000).toISOString()},
+      {status:'separando',descricao:'Em separação no estoque',criado_em:new Date(Date.now()-2*86400000).toISOString()},
+      {status:'enviado',descricao:'Enviado via Correios — BR123456789',criado_em:new Date(Date.now()-86400000).toISOString()}
+    ]
+  });
+}
+function renderPedidoCard(p){
+  const statusIcon={confirmado:'🟡',separando:'🔵',enviado:'🟣',entregue:'🟢',cancelado:'🔴'};
+  const statusLabel={confirmado:'Confirmado',separando:'Separando',enviado:'Enviado',entregue:'Entregue',cancelado:'Cancelado'};
+  const st=p.status_entrega||p.status||'confirmado';
+  const hist=(p.pedido_historico||[]).sort((a,b)=>new Date(a.criado_em)-new Date(b.criado_em));
+  const steps=['confirmado','separando','enviado','entregue'];
+  const stepIdx=steps.indexOf(st);
+  const progressPct=stepIdx>=0?Math.round((stepIdx/(steps.length-1))*100):0;
+  return '<div class="card" style="margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">'
+    +'<div><div style="font-size:13px;font-weight:600">Pedido #'+( p.id?.slice(0,8)||'demo001')+'</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+(p.criado_em?new Date(p.criado_em).toLocaleDateString('pt-BR'):'')+'</div></div>'
+    +'<span style="font-size:20px">'+( statusIcon[st]||'📦')+'</span></div>'
+    // Progress bar
+    +'<div style="margin-bottom:12px">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
+    +steps.map((s,i)=>'<div style="font-size:10px;color:'+(i<=stepIdx?'var(--p)':'var(--muted)')+';font-weight:'+(i===stepIdx?'700':'400')+';text-align:center;flex:1">'+s.charAt(0).toUpperCase()+s.slice(1)+'</div>').join('')
+    +'</div>'
+    +'<div style="height:4px;background:var(--p-mid);border-radius:100px;overflow:hidden">'
+    +'<div style="height:100%;width:'+progressPct+'%;background:var(--p);border-radius:100px;transition:width .5s"></div></div></div>'
+    // Rastreio
+    +(p.codigo_rastreio?'<div style="background:var(--p-pale);border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11px;color:var(--muted)">Código de rastreio</div><div style="font-size:13px;font-weight:600;color:var(--p)">'+(p.transportadora||'')+'  '+p.codigo_rastreio+'</div></div><span style="font-size:18px">📮</span></div>':'')
+    // Historico
+    +(hist.length?'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Histórico</div>'
+    +hist.map(h=>'<div style="display:flex;gap:10px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--p);margin-top:4px;flex-shrink:0"></div><div><div style="font-size:12px;font-weight:500">'+(h.descricao||h.status)+'</div><div style="font-size:10px;color:var(--muted)">'+new Date(h.criado_em).toLocaleDateString('pt-BR')+'</div></div></div>').join(''):'')
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span style="font-size:13px;color:var(--muted)">Total</span><span style="font-size:15px;font-weight:700;color:var(--p)">R$ '+(p.total||p.subtotal||0).toFixed(2)+'</span></div>'
+    +'</div>';
+}
+
 async function doLogout(){if(!currentUser?.id?.startsWith("demo")){await sb.auth.signOut();}currentUser=null;currentProfile=null;uploadedDocs={};cart=[];go('welcome')}
 
 async function doEsqueciSenha(){
@@ -277,7 +328,7 @@ async function uploadDoc(tipo,input){
 // ===================== NOTIFICATIONS =====================
 async function loadNotifications(){
   if(!currentUser)return;
-  const{data}=await sb.from('notificacoes').select('*').eq('paciente_id',currentUser.id).order('criado_em',{ascending:false}).limit(20);
+  const{data}=await sb.from('notificacoes').select('*').eq('user_id',currentUser.id).order('criado_em',{ascending:false}).limit(20);
   const list=el('notif-list');if(!data||data.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">🔔</div><div style="font-size:13px">Nenhuma notificação ainda</div></div>';el('notif-dot').style.display='none';return}
   const unread=data.filter(n=>!n.lida).length;el('notif-dot').style.display=unread>0?'block':'none';
   list.innerHTML=data.map(n=>'<div class="notif-item'+(n.lida?'':' unread')+'" onclick="markNotifRead(\''+n.id+'\''+(n.link_tela?',\''+n.link_tela+'\'':'')+')"><div style="font-size:13px;font-weight:'+(n.lida?'400':'600')+'">'+n.titulo+'</div>'+(n.mensagem?'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+n.mensagem+'</div>':'')+'<div style="font-size:11px;color:var(--muted);margin-top:4px">'+timeAgo(n.criado_em)+'</div></div>').join('');
@@ -362,7 +413,7 @@ async function finalizarPedido(){
     showLoading('Processando pedido...');
     await new Promise(r=>setTimeout(r,1200));
     hideLoading();cart=[];updateCartBadge();
-    el('cart-items').innerHTML='<div class="success-wrap"><div class="success-icon">📦</div><div style="font-family:var(--font-d);font-size:20px;font-weight:800;margin-bottom:8px">Pedido realizado!</div><div style="font-size:13px;color:var(--muted);margin-bottom:20px">Pedido #demo001<br>Você receberá atualizações por e-mail.</div><button class="btn btn-primary" onclick="go(\'home\')">Voltar ao início</button></div>';
+    el('cart-items').innerHTML='<div class="success-wrap"><div class="success-icon">📦</div><div style="font-family:var(--font-d);font-size:20px;font-weight:800;margin-bottom:8px">Pedido realizado!</div><div style="font-size:13px;color:var(--muted);margin-bottom:20px">Você receberá atualizações por e-mail e notificações aqui.</div><button class="btn btn-primary" style="margin-bottom:10px" onclick="go(\'pedidos\')">📦 Acompanhar pedido</button><button class="btn btn-outline" onclick="go(\'home\')">Voltar ao início</button></div>';
     el('cart-empty').style.display='none';el('cart-summary').style.display='none';return;
   }
   // Check if any cart item requires ANVISA
@@ -393,7 +444,7 @@ async function finalizarPedido(){
     const{data:pedido,error}=await sb.from('pedidos').insert({paciente_id:currentUser.id,status:'confirmado',subtotal:sub,total:sub,pagamento_metodo:'pix',validacao_anvisa:requiresAnvisa,validacao_receita:requiresAnvisa}).select().single();
     if(error){hideLoading();return showAlert('cart-alert','Erro: '+error.message,'err')}
     for(const i of cart){await sb.from('pedido_itens').insert({pedido_id:pedido.id,produto_id:i.id,nome_produto:i.nome,quantidade:i.qty,preco_unitario:i.preco,subtotal:i.preco*i.qty})}
-    await sb.from('notificacoes').insert({paciente_id:currentUser.id,titulo:'Pedido confirmado! 📦',mensagem:'Seu pedido #'+pedido.id.slice(0,8)+' no valor de R$ '+sub.toFixed(2)+' foi confirmado.',tipo:'pedido',link_tela:'home'});
+    await sb.from('notificacoes').insert({user_id:currentUser.id,titulo:'Pedido confirmado! 📦',mensagem:'Seu pedido #'+pedido.id.slice(0,8)+' no valor de R$ '+sub.toFixed(2)+' foi confirmado.',tipo:'pedido',link_tela:'home'});
     cart=[];updateCartBadge();hideLoading();
     el('cart-items').innerHTML='<div class="success-wrap"><div class="success-icon">📦</div><div style="font-family:var(--font-d);font-size:20px;font-weight:800;margin-bottom:8px">Pedido realizado!</div><div style="font-size:13px;color:var(--muted);margin-bottom:20px">Pedido #'+pedido.id.slice(0,8)+'<br>Você receberá atualizações por e-mail.</div><button class="btn btn-primary" onclick="go(\'home\')">Voltar ao início</button></div>';
     el('cart-empty').style.display='none';el('cart-summary').style.display='none';
@@ -441,6 +492,7 @@ function go(id){
   if(id==='consulta')loadConsultaResumo();
   if(id==='docs'&&currentUser)loadDocs();
   if(id==='marketplace')loadProducts();
+  if(id==='pedidos')loadPedidos();
   if(id==='agendar')loadDoctors();
   if(id==='confirmacao'&&selectedDoctor){const ce=document.getElementById('conf-medico');if(ce)ce.textContent=selectedDoctor.nome+' · '+selectedDoctor.especialidade}
   if(id==='pagamento'&&selectedDoctor){el('pag-medico').textContent=selectedDoctor.nome+' · '+selectedDoctor.especialidade;el('pag-valor').textContent='R$ '+(selectedDoctor.valor_consulta||89).toFixed(2);el('btn-pagar').textContent='Pagar R$ '+(selectedDoctor.valor_consulta||89).toFixed(2)+' →'}
@@ -602,6 +654,7 @@ function fmtCEP(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{5})(\d)/,'$
 <div id="home-consulta-card"><div class="hero-card" onclick="go('consulta')"><div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px">PRÓXIMA CONSULTA</div><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:2px" id="home-dr-nome">Sua consulta</div><div style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:12px">Amanhã · 11:00 · Online</div><span style="background:rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600">Ver detalhes →</span></div></div>
 <div class="slbl">Minha jornada</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
+<div class="card" style="cursor:pointer;text-align:center;padding:18px 12px;grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:14px" onclick="go('pedidos')"><div style="font-size:26px">📦</div><div style="text-align:left"><div style="font-size:14px;font-weight:600">Meus pedidos</div><div style="font-size:11px;color:var(--muted);margin-top:2px" id="home-pedidos-status">Acompanhar rastreio →</div></div></div>
 <div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('docs')"><div style="font-size:26px;margin-bottom:6px">📁</div><div style="font-size:13px;font-weight:600">Documentos</div><div style="font-size:11px;color:var(--amber);margin-top:2px" id="home-docs-status">2 pendentes</div></div>
 <div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('marketplace')"><div style="font-size:26px;margin-bottom:6px">🛒</div><div style="font-size:13px;font-weight:600">Marketplace</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Ver produtos</div></div>
 <div class="card" style="cursor:pointer;text-align:center;padding:18px 12px" onclick="go('anvisa')"><div style="font-size:26px;margin-bottom:6px">🏛</div><div style="font-size:13px;font-weight:600">ANVISA</div><div style="font-size:11px;color:var(--amber);margin-top:2px">Guia passo a passo</div></div>
@@ -757,6 +810,22 @@ function fmtCEP(e){let v=e.value.replace(/\D/g,'');v=v.replace(/^(\d{5})(\d)/,'$
 <div class="sbar"><span>9:41</span><span>•••</span></div>
 <div class="hdr"><div style="width:36px"></div><div class="hdr-title">Nova senha</div><div style="width:36px"></div></div>
 <div class="cnt"><div style="margin-bottom:24px"><div style="font-family:var(--font-d);font-size:20px;font-weight:700;margin-bottom:6px">Criar nova senha</div></div><div id="reset-alert"></div><div class="ig"><label class="il">Nova senha</label><input class="input" id="reset-senha" type="password" placeholder="Mínimo 8 caracteres"></div><div class="ig"><label class="il">Confirmar</label><input class="input" id="reset-confirma" type="password" placeholder="Repita a nova senha"></div><button class="btn btn-primary" id="btn-reset" onclick="doRedefinirSenha()">Salvar nova senha</button></div>
+</div>
+
+
+<!-- ===== MEUS PEDIDOS ===== -->
+<div class="screen" id="s-pedidos">
+<div class="sbar"><span>9:41</span><span>•••</span></div>
+<div class="hdr"><div class="back" onclick="go('home')">←</div><div class="hdr-title">Meus pedidos</div><div style="width:36px"></div></div>
+<div class="cnt">
+<div id="pedidos-list"><div style="text-align:center;padding:40px;color:var(--muted)"><div class="spinner" style="margin:0 auto 12px"></div>Carregando...</div></div>
+</div>
+<div class="bnav">
+<div class="bni" id="bni-home2" onclick="go('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Início</span></div>
+<div class="bni" onclick="go('marketplace')"><span class="bni-ic">🛒</span><span class="bni-lb">Produtos</span></div>
+<div class="bni" onclick="go('docs')"><span class="bni-ic">📁</span><span class="bni-lb">Docs</span></div>
+<div class="bni" onclick="go('perfil')"><span class="bni-ic">👤</span><span class="bni-lb">Perfil</span></div>
+</div>
 </div>
 
 <!-- LOADING -->
